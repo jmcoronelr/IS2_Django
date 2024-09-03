@@ -14,7 +14,7 @@ def role_create(request):
             return redirect('role_list')
     else:
         form = RoleForm()
-    return render(request, 'role_form.html', {'form': form})
+    return render(request, 'role_form.html', {'form': form, 'role': None})
 
 def role_update(request, pk):
     role = get_object_or_404(Role, pk=pk)
@@ -25,7 +25,8 @@ def role_update(request, pk):
             return redirect('role_list')
     else:
         form = RoleForm(instance=role)
-    return render(request, 'role_form.html', {'form': form})
+    return render(request, 'role_form.html', {'form': form, 'role': role})
+
 
 def role_delete(request, pk):
     role = get_object_or_404(Role, pk=pk)

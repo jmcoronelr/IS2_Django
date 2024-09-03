@@ -2,14 +2,31 @@
 <html>
 <head>
     <title>{% if role %}Editar Rol{% else %}Crear Rol{% endif %}</title>
+    <!-- Incluye Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>{% if role %}Editar Rol{% else %}Crear Rol{% endif %}</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">{% if role %}Guardar Cambios{% else %}Crear Rol{% endif %}</button>
-    </form>
-    <a href="{% url 'role_list' %}">Volver a la lista</a>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title text-center">{% if role %}Editar Rol{% else %}Crear Rol{% endif %}</h1>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">{% if role %}Guardar Cambios{% else %}Crear Rol{% endif %}</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{% url 'role_list' %}" class="btn btn-secondary">Volver a la lista</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
