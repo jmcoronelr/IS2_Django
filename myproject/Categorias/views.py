@@ -46,7 +46,7 @@ def categoria_list(request):
     else:
         categorias = Categorias.objects.all()
     
-    return render(request, 'categorias/categoria_list.html', {'categorias': categorias, 'query': query})
+    return render(request, 'Categorias/categoria_list.html', {'categorias': categorias, 'query': query})
 
 
 def categoria_edit(request, pk):

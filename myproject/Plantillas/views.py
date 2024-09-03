@@ -45,7 +45,7 @@ def plantilla_create(request):
             return redirect('plantilla_list')
     else:
         form = PlantillaForm()
-    return render(request, 'plantillas/plantilla_create.html', {'form': form})
+    return render(request, 'Plantillas/plantilla_create.html', {'form': form})
 
 def plantilla_edit(request, pk):
     """
@@ -70,7 +70,7 @@ def plantilla_edit(request, pk):
             return redirect('plantilla_list')
     else:
         form = PlantillaForm(instance=plantilla)
-    return render(request, 'plantillas/plantilla_edit.html', {'form': form})
+    return render(request, 'Plantillas/plantilla_edit.html', {'form': form})
 
 def plantilla_delete(request, pk):
     """
@@ -91,4 +91,4 @@ def plantilla_delete(request, pk):
     if request.method == 'POST':
         plantilla.delete()
         return redirect('plantilla_list')
-    return render(request, 'plantillas/plantilla_confirm_delete.html', {'plantilla': plantilla})
+    return render(request, 'Plantillas/plantilla_confirm_delete.html', {'plantilla': plantilla})
