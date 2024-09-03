@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block titulo %} Sitio {% endblock %}</title>
-  </head>
-  <body>
+{% extends 'base.html'%}
+  {%block content%}
     <nav>
       <div style="display: inline-block">
         <a href="/">Home</a> | {% if user.is_authenticated %}
@@ -38,5 +32,6 @@
       <h1>Sitio Vacio</h1>
       {% endblock %}
     </main>
+    {%endblock%}
   </body>
 </html>
