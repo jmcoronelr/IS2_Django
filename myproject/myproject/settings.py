@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +55,7 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,8 +76,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'IS2',  # Reemplaza con el nombre de tu base de datos
+        'USER': 'postgres',           # Reemplaza con el nombre de tu usuario de PostgreSQL
+        'PASSWORD': 'postgres',           # Reemplaza con tu contraseña
+        'HOST': 'localhost',                   # O la IP de tu servidor de base de datos
+        'PORT': '5432',                        # Puerto de PostgreSQL, usualmente es 5432
     }
 }
 
@@ -121,3 +126,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'usuarios.Usuario'
+LOGIN_REDIRECT_URL = 'sistema'  # vista o URL de inicio a la que quieras redirige después del inicio de sesión
+LOGOUT_REDIRECT_URL = 'login'  # vista o URL a la que redirige después del cierre de sesión
