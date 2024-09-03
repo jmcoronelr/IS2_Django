@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Contenidos</title>
+</head>
+<body>
+    <h1>Lista de Contenidos</h1>
+    <a href="{% url 'content_create' %}">Crear Nuevo Contenido</a>
+    <ul>
+        {% for content in contents %}
+        <li>
+            {{ content.title }} -
+            <a href="{% url 'content_delete' content.pk %}">Eliminar</a> |
+            <a href="{% url 'content_edit' content.pk %}">Editar</a> |
+            <a href="{% url 'content_detail' content.pk %}">Ver</a>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

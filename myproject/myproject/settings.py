@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'content',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': True,  # Asegúrate de que esto esté habilitado
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -75,8 +76,12 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'IS2',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',  # O la IP de tu servidor de base de datos
+        'PORT': '5432',  # Puerto por defecto de PostgreSQL
     }
 }
 

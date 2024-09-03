@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalle del Contenido</title>
+</head>
+<body>
+    <h1>{{ content.title }}</h1>
+    <p>{{ content.description }}</p>
+    <p><strong>Categoría:</strong> {{ content.category.name }}</p>
+    <p><strong>Estado:</strong> {{ content.get_status_display }}</p>
+    <p><strong>Creado en:</strong> {{ content.created_at }}</p>
+    <p><strong>Última actualización:</strong> {{ content.updated_at }}</p>
+    <a href="{% url 'content_list' %}">Volver a la lista</a>
+</body>
+</html>
