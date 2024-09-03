@@ -1,0 +1,23 @@
+<!-- CRUD/templates/CRUD/categoria_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Categoria List</title>
+</head>
+<body>
+    <h1>Lista de Categorías</h1>
+    <ul>
+        {% for categoria in categorias %}
+            <li>
+                {{ categoria.descripcionCorta }} - {{ categoria.descripcionLarga }} ({{ categoria.estado }})
+                <a href="{% url 'categoria_edit' categoria.pk %}">Editar</a>
+                <a href="{% url 'categoria_delete' categoria.pk %}">Eliminar</a>
+            </li>
+        {% empty %}
+            <li>No hay categorías disponibles.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'categoria_create' %}">Crear nueva categoría</a>
+</body>
+</html>
