@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if role %}Editar Rol{% else %}Crear Rol{% endif %}</title>
+</head>
+<body>
+    <h1>{% if role %}Editar Rol{% else %}Crear Rol{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">{% if role %}Guardar Cambios{% else %}Crear Rol{% endif %}</button>
+    </form>
+    <a href="{% url 'role_list' %}">Volver a la lista</a>
+</body>
+</html>
