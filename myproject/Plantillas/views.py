@@ -2,20 +2,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Plantilla
 from .forms import PlantillaForm
 
-def plantilla_list(request):
-    """
-    Vista para listar todas las plantillas.
+from django.core.paginator import Paginator
+from django.shortcuts import render
 
-    Renderiza la plantilla 'plantilla_list.html' con la lista de todas las instancias de Plantilla.
+def plantilla_list(request):
+    plantilla_list = Plantilla.objects.all()
+    paginator = Paginator(plantilla_list, 10)  # Mostrar 10 plantillas por página
+
+    page_number = request.GET.get('page')
+    plantillas = paginator.get_page(page_number)
     
-    Args:
-        request: El objeto HttpRequest que contiene los datos de la solicitud.
-    
-    Returns:
-        HttpResponse: La respuesta HTTP con el renderizado de la plantilla.
-    """
-    plantillas = Plantilla.objects.all()
-    return render(request, 'plantillas/plantilla_list.html', {'plantillas': plantillas})
+    return render(request, 'Plantillas/plantilla_list.html', {'plantillas': plantillas})
+
 
 def plantilla_create(request):
     """
