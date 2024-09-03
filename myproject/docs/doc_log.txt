@@ -1,0 +1,3 @@
+2024-09-03 17:21:48.522831 - Documented: Categorias.views
+2024-09-03 17:21:48.530790 - Documented: Categorias.models
+2024-09-03 17:21:48.541109 - Documented: Categorias.forms
