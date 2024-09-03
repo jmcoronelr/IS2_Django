@@ -1,0 +1,36 @@
+{%extends 'base.html'%} {%block content%}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'sistema' %}">CMS</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <form action="{% url 'usuarios:logout' %}" method="post">
+            {% csrf_token %}
+            <button class="nav-link">LogOut</button>
+          </form>
+          {% endif %}
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Categorias</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Plantillas</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+{%endblock%}
