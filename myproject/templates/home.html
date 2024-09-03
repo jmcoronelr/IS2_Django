@@ -1,14 +1,31 @@
-{% extends 'layout.html' %}
+{% extends 'base.html'%}
+  {%block content%}
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'home' %}">CMS</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <a class="nav-link" href="{% url 'usuarios:login'%}">Iniciar Sesion</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'usuarios:registro'%}">Registrarse</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-
-{% block titulo %}
-    Home
-{% endblock %}
-
-
-{% block main %}
-    <h1>Home</h1>
-    <p>Django Admin panel <a href="/admin">here</a></p>
-{% endblock %}
-    
-    
+    {%endblock%}
+  </body>
+</html>
