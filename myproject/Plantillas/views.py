@@ -6,6 +6,15 @@ from django.core.paginator import Paginator
 from django.shortcuts import render
 
 def plantilla_list(request):
+    """
+    Vista para listar todas las plantillas
+    
+    Args:
+        request: El objeto HttpRequest que contiene los datos de la solicitud.
+    
+    Returns:
+        HttpResponse: La respuesta HTTP con el renderizado de la plantilla.
+    """
     plantilla_list = Plantilla.objects.all()
     paginator = Paginator(plantilla_list, 10)  # Mostrar 10 plantillas por página
 
