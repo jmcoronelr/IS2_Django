@@ -29,9 +29,10 @@ def categoria_create(request):
 
 def categoria_list(request):
     """
-    Vista para listar todas las categorías.
+    Vista para listar todas las categorías o buscar una categoría específica.
 
-    Renderiza la plantilla 'categoria_list.html' con la lista de todas las instancias de Categoria.
+    Si se proporciona un término de búsqueda en la solicitud GET, la lista de
+    categorías se filtrará en función de ese término.
     
     Args:
         request: El objeto HttpRequest que contiene los datos de la solicitud.
@@ -39,8 +40,13 @@ def categoria_list(request):
     Returns:
         HttpResponse: La respuesta HTTP con el renderizado de la plantilla.
     """
-    categorias = Categorias.objects.all()  # Obtiene todas las instancias de Categorias
-    return render(request, 'Categorias/categoria_list.html', {'categorias': categorias})
+    query = request.GET.get('q')
+    if query:
+        categorias = Categorias.objects.filter(descripcionCorta__icontains=query)
+    else:
+        categorias = Categorias.objects.all()
+    
+    return render(request, 'categorias/categoria_list.html', {'categorias': categorias, 'query': query})
 
 
 def categoria_edit(request, pk):

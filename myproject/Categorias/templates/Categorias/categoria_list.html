@@ -15,6 +15,31 @@
             margin-bottom: 20px;
             text-align: center;
         }
+        form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 8px;
+            font-size: 16px;
+            width: 70%;
+            max-width: 400px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
         ul {
             list-style-type: none;
             padding: 0;
@@ -59,6 +84,12 @@
 </head>
 <body>
     <h1>Lista de Categorías</h1>
+    
+    <form method="get" action="{% url 'categoria_list' %}">
+        <input type="text" name="q" value="{{ query }}" placeholder="Buscar categoría...">
+        <button type="submit">Buscar</button>
+    </form>
+    
     <ul>
         {% for categoria in categorias %}
             <li>
@@ -72,6 +103,7 @@
             <li>No hay categorías disponibles.</li>
         {% endfor %}
     </ul>
+
     <a href="{% url 'categoria_create' %}" class="create-link">Crear nueva categoría</a>
 </body>
 </html>
