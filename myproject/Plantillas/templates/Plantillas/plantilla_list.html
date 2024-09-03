@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Plantillas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            background-color: white;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+            margin-left: 10px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .create-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .create-link:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Plantillas</h1>
+    <ul>
+        {% for plantilla in plantillas %}
+            <li>
+                <span>{{ plantilla.descripcion }} - {{ plantilla.estado }}</span>
+                <div class="actions">
+                    <a href="{% url 'plantilla_edit' plantilla.pk %}">Editar</a>
+                    <a href="{% url 'plantilla_delete' plantilla.pk %}">Eliminar</a>
+                </div>
+            </li>
+        {% empty %}
+            <li>No hay plantillas disponibles.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'plantilla_create' %}" class="create-link">Crear nueva plantilla</a>
+</body>
+</html>
