@@ -7,7 +7,7 @@ from django.urls import reverse
 import datetime
 
 def content_list(request):
-    contents = Content.objects.all()
+    contents = Content.objects.all().order_by('created_at')
     
     # Filtrar por fecha
     fecha = request.GET.get('fecha')
