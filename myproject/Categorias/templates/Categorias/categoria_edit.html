@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crear o Modificar Categoria</title>
+    <title>Editar Categoría</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,10 +42,10 @@
 </head>
 <body>
     <form method="post">
-        <h1>Crear o Modificar Categoria</h1>
+        <h1>Editar Categoría</h1>
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Guardar</button>
+        <button type="submit">Guardar Cambios</button>
     </form>
 </body>
 </html>

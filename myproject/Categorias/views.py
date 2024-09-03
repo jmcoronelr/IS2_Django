@@ -11,7 +11,7 @@ def categoria_create(request):
     else:
         form = Form_Categorias()
 
-    return render(request, 'Categorias/categoria_form.html', {'form': form})
+    return render(request, 'Categorias/categoria_create.html', {'form': form})
 
 
 def categoria_list(request):
@@ -30,7 +30,7 @@ def categoria_edit(request, pk):
     else:
         form = Form_Categorias(instance=categoria)
 
-    return render(request, 'Categorias/categoria_form.html', {'form': form})
+    return render(request, 'Categorias/categoria_edit.html', {'form': form})
 
 def categoria_delete(request, pk):
     categoria = get_object_or_404(Categorias, pk=pk)
