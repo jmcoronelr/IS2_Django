@@ -24,7 +24,7 @@ class UsuarioManager(BaseUserManager):
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=150, unique=True, default='default_user')
+    username = models.CharField(max_length=150, unique=True, default='')
     email = models.EmailField(max_length=255, unique=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)

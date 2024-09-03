@@ -1,11 +1,9 @@
 from pyexpat.errors import messages
-from django.forms import ValidationError
 from django.shortcuts import redirect, render
-from .forms import AsignarRolForm, RegistroUsuarioForm
-from .models import Rol, Usuario, UsuarioRol
-from django.core.exceptions import ValidationError
+from .forms import RegistroUsuarioForm
 from django.views.generic.edit import FormView
 from django.contrib.auth import login
+from django.contrib.auth.views import LogoutView
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
     
@@ -29,13 +27,13 @@ def registrar_usuario(request):
     context = {
         'registro_form': registro_form,
     }
-    return render(request, 'registro.html', context)
+    return render(request, 'usuarios/registro.html', context)
 
 
 
 
 class CustomLoginView(FormView):
-    template_name = 'login.html'
+    template_name = 'usuarios/login.html'
     form_class = AuthenticationForm
     success_url = reverse_lazy('sistema')  # Redirige a la página de inicio después de iniciar sesión
 
@@ -44,3 +42,6 @@ class CustomLoginView(FormView):
         user = form.get_user()
         login(self.request, user)
         return super().form_valid(form)
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('home')  # Redirige a la página de login después del logout
