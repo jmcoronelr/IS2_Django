@@ -29,7 +29,7 @@ class CategoriaViewTestCase(TestCase):
         try:
             response = self.client.get(reverse('categoria_list'))
             self.assertEqual(response.status_code, 200)
-            self.assertTemplateUsed(response, 'categorias/categoria_list.html')
+            self.assertTemplateUsed(response, 'Categorias/categoria_list.html')
             self.assertContains(response, "Categoria Test")
             log_unittest('CategoriaListView', 'test_categoria_list_view', 'PASSED')
         except AssertionError as e:
