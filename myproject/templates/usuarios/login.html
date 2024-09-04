@@ -1,4 +1,7 @@
-{%extends 'base.html'%} {%block content%} {% load widget_tweaks %}
+{% extends 'base.html' %}
+{% block content %}
+{% load socialaccount %}
+{% load widget_tweaks %}
 <html>
   <head>
     <style>
@@ -78,9 +81,15 @@
             >Regístrate aquí</a
           >
         </p>
+
+        <!-- Botón de inicio de sesión con Google -->
+        <p class="text-center">
+          <a href='google/' class="btn btn-outline-secondary">
+              Iniciar sesión con Google
+          </a>
+      </p>      
       </div>
     </div>
   </body>
 </html>
-
-{%endblock%}
+{% endblock %}

@@ -5,6 +5,10 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
+from allauth.socialaccount.providers.google.views import oauth2_login
+
+def google_login_redirect(request):
+    return oauth2_login(request)
 
 def registrar_usuario(request):
     """
