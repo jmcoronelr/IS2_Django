@@ -15,7 +15,7 @@ def plantilla_list(request):
     Returns:
         HttpResponse: La respuesta HTTP con el renderizado de la plantilla.
     """
-    plantilla_list = Plantilla.objects.all()
+    plantilla_list = Plantilla.objects.all().order_by('id')  # O cualquier otro campo
     paginator = Paginator(plantilla_list, 10)  # Mostrar 10 plantillas por página
 
     page_number = request.GET.get('page')
