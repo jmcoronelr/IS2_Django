@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Contenidos</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html {
+    scroll-behavior: smooth;
+        }
+        .content-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            background-color: #f9f9f9;
+            width: 200px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            word-wrap: break-word;
+        }
+        .row > [class*='col-'] {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        .content-title {
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        .content-info {
+            font-size: 0.85em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .content-actions {
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        /* Colores minimalistas */
+        .btn-primary {
+            background-color: #00796b;
+            border-color: #00796b;
+        }
+        .btn-warning {
+            background-color: #fbc02d;
+            border-color: #fbc02d;
+        }
+        .btn-danger {
+            background-color: #e64a19;
+            border-color: #e64a19;
+        }
+        .btn-primary:hover, .btn-warning:hover, .btn-danger:hover {
+            opacity: 0.8;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .filter-container select {
+            margin-left: 10px;
+            padding: 5px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .filter-container button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #00796b;
+            color: white;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #00796b;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #e0e0e0;
+            margin: 0 4px;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #f1f1f1;
+        }
+        .pagination .active a {
+            background-color: #00796b;
+            color: white;
+            border: 1px solid #00796b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Contenidos</h1>
+        <form method="GET" class="filter-container">
+            <a href="{% url 'content_create' %}" class="btn btn-success">Crear Nuevo Contenido</a>
+            <div class="filters">
+                <select name="fecha">
+                    <option value="">Filtrar por fecha</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mes</option>
+                </select>
+                <select name="estado">
+                    <option value="">Filtrar por estado</option>
+                    <option value="draft">Borrador</option>
+                    <option value="review">En Revisión</option>
+                    <option value="published">Publicado</option>
+                    <option value="rejected">Rechazado</option>
+                    <option value="inactive">Inactivo</option>
+                </select>
+                <select name="categoria">
+                    <option value="">Filtrar por categoría</option>
+                    <option value="1">Categoría 1</option>
+                    <option value="2">Categoría 2</option>
+                    <!-- Añadir más categorías según sea necesario -->
+                </select>
+                <button type="submit">Filtrar</button> <!-- Botón para aplicar los filtros -->
+            </div>
+        </form>
+
+        <div class="row g-2">
+            {% for content in contents %}
+            <div class="col-md-2">
+                <div class="content-card">
+                    <div class="content-title">{{ content.title }}</div>
+                    <div class="content-info">
+                        <p>Categoría: {{ content.category.name }}</p>
+                        <p>Estado: {{ content.get_status_display }}</p>
+                    </div>
+                    <div class="content-actions">
+                        <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
+                        <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-warning btn-sm">Editar</a>
+                        <!-- Botón que abre el modal -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Paginación -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-4">
+                {% if contents.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for num in contents.paginator.page_range %}
+                    {% if contents.number == num %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > contents.number|add:'-3' and num < contents.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if contents.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+
+
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar este contenido?
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteForm" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="page" value="{{ request.GET.page }}"> <!-- Incluye la página actual -->
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>    
+    <!-- Incluir Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script para manejar el botón de eliminación y el formulario del modal
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var contentId = button.getAttribute('data-bs-content-id');
+            var deleteForm = document.getElementById('deleteForm');
+            var currentPage = "{{ request.GET.page|default:1 }}"; // Obtiene la página actual
+            deleteForm.action = '/content/delete/' + contentId + '/?page=' + currentPage;
+        });
+    </script></body>
+</html>

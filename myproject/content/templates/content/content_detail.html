@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalle del Contenido</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>{{ content.title }}</h1>
+        <p>{{ content.description }}</p>
+        <p><strong>Categoría:</strong> {{ content.category.name }}</p>
+        <p><strong>Estado:</strong> {{ content.get_status_display }}</p>
+        <p><strong>Creado en:</strong> {{ content.created_at }}</p>
+        <p><strong>Última actualización:</strong> {{ content.updated_at }}</p>
+        <a href="{% url 'content_list' %}" class="btn btn-secondary">Volver a la lista</a>
+    </div>
+    
+    <!-- Incluir Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

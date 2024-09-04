@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'content',
     'usuarios',
     'widget_tweaks',
     'Categorias',
@@ -58,6 +59,8 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,  # Asegúrate de que esto esté habilitado
         'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -79,12 +82,6 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'IS2',  # Reemplaza con el nombre de tu base de datos
-        'USER': 'postgres',           # Reemplaza con el nombre de tu usuario de PostgreSQL
-        'PASSWORD': 'postgres',           # Reemplaza con tu contraseña
-        'HOST': 'localhost',                   # O la IP de tu servidor de base de datos
-        'PORT': '5432',                        # Puerto de PostgreSQL, usualmente es 5432
     'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'IS2',
         'USER': 'postgres',
