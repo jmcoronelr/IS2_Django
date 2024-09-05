@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Roles del Usuario: {{ usuario.nombre }} {{ usuario.apellido }}</h2>
+
+  <ul>
+    {% for rol_en_categoria in roles_en_categoria %}
+      <li>
+        Rol: {{ rol_en_categoria.rol.nombre }} en la categoría: {{ rol_en_categoria.categoria.descripcionCorta }}
+      </li>
+    {% empty %}
+      <li>El usuario no tiene roles asignados.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
+{% endblock %}

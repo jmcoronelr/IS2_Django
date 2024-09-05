@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Asignar Rol a {{ usuario.email }}</h2>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Asignar Rol</button>
+  </form>
+
+  <h3>Roles actuales del usuario:</h3>
+  <ul>
+    {% for rol in roles_actuales %}
+      <li>{{ rol.categoria.nombre }} - {{ rol.rol.nombre }}</li>
+    {% empty %}
+      <li>No tiene roles asignados.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'ver_usuario' usuario.id %}">Regresar a detalles del usuario</a>
+{% endblock %}

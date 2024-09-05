@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=hozz9%=@vwx5$=ye41!=l63r&yvybw#v*^q-&fudgkxwb-_io'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'usuarios',
     'widget_tweaks',
     'Categorias',
+    'roles',
     'Plantillas',
     'django.contrib.sites',
     'allauth',
@@ -101,10 +102,8 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,  # Asegúrate de que esto esté habilitado
-        'DIRS': ['templates'],
-        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Detalles del Rol: {{ rol.nombre }}</h2>
+  <p>Descripción: {{ rol.descripcion }}</p>
+  
+  <h3>Permisos Asignados:</h3>
+  <ul>
+    {% for permiso in permisos %}
+      <li>{{ permiso.nombre }} - {{ permiso.descripcion }}</li>
+    {% empty %}
+      <li>No hay permisos asignados a este rol.</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'asignar_permisos' rol.id %}" class="btn btn-primary">Asignar Permisos</a>
+  <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
+{% endblock %}
