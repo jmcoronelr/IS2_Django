@@ -1,11 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Usuario, Rol, RolEnCategoria, Categorias
-from .forms import AsignarRolForm
+from .models import Usuario, Rol, RolEnCategoria, Categorias, Permiso
+from .forms import AsignarRolForm, CrearRolForm, AsignarPermisoForm
 
 @login_required
 def asignar_rol(request, usuario_id):
+    """
+    Asigna o actualiza un rol para un usuario en una categoría específica.
+    Si el método es POST, se procesa el formulario y se asigna un rol.
+    Si el método es GET, se muestra el formulario para la asignación.
+    
+    :param request: La solicitud HTTP.
+    :param usuario_id: El ID del usuario al que se le va a asignar el rol.
+    :return: Renderiza la plantilla de asignación de roles.
+    """
     usuario = get_object_or_404(Usuario, id=usuario_id)
     roles_actuales = RolEnCategoria.objects.filter(usuario=usuario)
     
@@ -39,6 +48,13 @@ def asignar_rol(request, usuario_id):
 
 @login_required
 def ver_usuario(request, usuario_id):
+    """
+    Muestra los roles asignados a un usuario en diferentes categorías.
+
+    :param request: La solicitud HTTP.
+    :param usuario_id: El ID del usuario cuyos roles serán mostrados.
+    :return: Renderiza la plantilla que muestra los roles y categorías del usuario.
+    """
     usuario = get_object_or_404(Usuario, id=usuario_id)
     roles_en_categoria = RolEnCategoria.objects.filter(usuario=usuario)
     return render(request, 'roles/ver_usuario.html', {
@@ -48,17 +64,23 @@ def ver_usuario(request, usuario_id):
 
 @login_required
 def lista_usuarios(request):
+    """
+    Lista todos los usuarios del sistema.
+
+    :param request: La solicitud HTTP.
+    :return: Renderiza la plantilla que muestra la lista de usuarios.
+    """
     usuarios = Usuario.objects.all()
     return render(request, 'roles/lista_usuarios.html', {'usuarios': usuarios})
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import Rol
-from .forms import CrearRolForm
-
 @login_required
 def crear_rol(request):
+    """
+    Crea un nuevo rol en el sistema.
+
+    :param request: La solicitud HTTP.
+    :return: Renderiza la plantilla con el formulario de creación de roles.
+    """
     if request.method == 'POST':
         form = CrearRolForm(request.POST)
         if form.is_valid():
@@ -70,17 +92,15 @@ def crear_rol(request):
 
     return render(request, 'roles/crear_rol.html', {'form': form})
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.models import Permission
-from .models import Rol
-from .forms import AsignarPermisoForm
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Rol, Permiso
-from .forms import AsignarPermisoForm
-
 @login_required
 def asignar_permisos(request, rol_id):
+    """
+    Asigna permisos a un rol específico.
+
+    :param request: La solicitud HTTP.
+    :param rol_id: El ID del rol al que se le asignarán permisos.
+    :return: Renderiza la plantilla con el formulario de asignación de permisos.
+    """
     rol = get_object_or_404(Rol, id=rol_id)
     if request.method == 'POST':
         form = AsignarPermisoForm(request.POST, instance=rol)
@@ -100,6 +120,13 @@ def asignar_permisos(request, rol_id):
 
 @login_required
 def ver_rol(request, rol_id):
+    """
+    Muestra los detalles de un rol, incluidos los permisos asignados.
+
+    :param request: La solicitud HTTP.
+    :param rol_id: El ID del rol que se va a mostrar.
+    :return: Renderiza la plantilla que muestra los permisos del rol.
+    """
     rol = get_object_or_404(Rol, id=rol_id)
     permisos = rol.permisos.all()  # Obtenemos los permisos asignados al rol
     return render(request, 'roles/ver_rol.html', {
@@ -109,6 +136,12 @@ def ver_rol(request, rol_id):
 
 @login_required
 def lista_roles(request):
+    """
+    Lista todos los roles disponibles en el sistema.
+
+    :param request: La solicitud HTTP.
+    :return: Renderiza la plantilla que muestra la lista de roles.
+    """
     roles = Rol.objects.all()  # Obtenemos todos los roles
     return render(request, 'roles/lista_roles.html', {
         'roles': roles,
