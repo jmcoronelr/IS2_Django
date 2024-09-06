@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <h2>Lista de Usuarios</h2>
+  <div class="container mt-4">
+    <h2 class="mb-4">Lista de Usuarios</h2>
 
-  <ul>
-    {% for usuario in usuarios %}
-      <li>
-        <a href="{% url 'ver_usuario' usuario.id %}">
-          {{ usuario.nombre }} {{ usuario.apellido }} - {{ usuario.email }}
-        </a>
-      </li>
-    {% empty %}
-      <li>No hay usuarios registrados.</li>
-    {% endfor %}
-  </ul>
+    <ul class="list-group">
+      {% for usuario in usuarios %}
+        <li class="list-group-item">
+          <a href="{% url 'ver_usuario' usuario.id %}" class="text-decoration-none text-dark">
+            <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong> - {{ usuario.email }}
+          </a>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No hay usuarios registrados.</li>
+      {% endfor %}
+    </ul>
+  </div>
 {% endblock %}
+

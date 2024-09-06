@@ -1,19 +1,19 @@
-{% extends "base.html" %}
+{%extends 'base.html'%} {%block content%}
+    <div class="container mt-4">
+        <h1 class="mb-4">Lista de Roles</h1>
 
-{% block content %}
-  <h2>Lista de Roles</h2>
+        <ul class="list-group">
+            {% for rol in roles %}
+                <li class="list-group-item">
+                    <a href="{% url 'ver_rol' rol.id %}" class="text-decoration-none text-dark">
+                        <strong>{{ rol.nombre }}</strong> - {{ rol.descripcion }}
+                    </a>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No hay roles disponibles.</li>
+            {% endfor %}
+        </ul>
 
-  <ul>
-    {% for rol in roles %}
-      <li>
-        <a href="{% url 'ver_rol' rol.id %}">
-          {{ rol.nombre }} - {{ rol.descripcion }}
-        </a>
-      </li>
-    {% empty %}
-      <li>No hay roles disponibles.</li>
-    {% endfor %}
-  </ul>
-
-  <a href="{% url 'crear_rol' %}" class="btn btn-primary">Crear Nuevo Rol</a>
-{% endblock %}
+        <a href="{% url 'crear_rol' %}" class="btn btn-primary mt-3">Crear Nuevo Rol</a>
+    </div>
+{%endblock%}

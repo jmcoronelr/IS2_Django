@@ -1,18 +1,33 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Rol</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Detalles del Rol: {{ rol.nombre }}</h2>
+        <p class="mb-4"><strong>Descripción:</strong> {{ rol.descripcion }}</p>
 
-{% block content %}
-  <h2>Detalles del Rol: {{ rol.nombre }}</h2>
-  <p>Descripción: {{ rol.descripcion }}</p>
-  
-  <h3>Permisos Asignados:</h3>
-  <ul>
-    {% for permiso in permisos %}
-      <li>{{ permiso.nombre }} - {{ permiso.descripcion }}</li>
-    {% empty %}
-      <li>No hay permisos asignados a este rol.</li>
-    {% endfor %}
-  </ul>
+        <h3 class="mb-3">Permisos Asignados:</h3>
+        <ul class="list-group mb-4">
+            {% for permiso in permisos %}
+                <li class="list-group-item">
+                    {{ permiso.nombre }} - {{ permiso.descripcion }}
+                </li>
+            {% empty %}
+                <li class="list-group-item">No hay permisos asignados a este rol.</li>
+            {% endfor %}
+        </ul>
 
-  <a href="{% url 'asignar_permisos' rol.id %}" class="btn btn-primary">Asignar Permisos</a>
-  <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
-{% endblock %}
+        <a href="{% url 'asignar_permisos' rol.id %}" class="btn btn-primary mr-2">Asignar Permisos</a>
+        <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,22 +1,37 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asignar Rol</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Asignar Rol a {{ usuario.email }}</h2>
 
-{% block content %}
-  <h2>Asignar Rol a {{ usuario.email }}</h2>
+        <form method="post" class="mb-4 bg-light p-4 rounded border">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Asignar Rol</button>
+        </form>
 
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Asignar Rol</button>
-  </form>
+        <h3 class="mb-3">Roles actuales del usuario:</h3>
+        <ul class="list-group mb-4">
+            {% for rol in roles_actuales %}
+                <li class="list-group-item">
+                    {{ rol.categoria.nombre }} - {{ rol.rol.nombre }}
+                </li>
+            {% empty %}
+                <li class="list-group-item">No tiene roles asignados.</li>
+            {% endfor %}
+        </ul>
 
-  <h3>Roles actuales del usuario:</h3>
-  <ul>
-    {% for rol in roles_actuales %}
-      <li>{{ rol.categoria.nombre }} - {{ rol.rol.nombre }}</li>
-    {% empty %}
-      <li>No tiene roles asignados.</li>
-    {% endfor %}
-  </ul>
+        <a href="{% url 'ver_usuario' usuario.id %}" class="btn btn-secondary">Regresar a detalles del usuario</a>
+    </div>
 
-  <a href="{% url 'ver_usuario' usuario.id %}">Regresar a detalles del usuario</a>
-{% endblock %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
