@@ -84,12 +84,6 @@ SOCIALACCOUNT_PROVIDERS = {
         },
     }
 }
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-]
 
 SITE_ID = 1
 
