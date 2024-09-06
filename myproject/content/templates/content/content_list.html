@@ -98,7 +98,10 @@
     <div class="container">
         <h1 class="mb-4">Lista de Contenidos</h1>
         <form method="GET" class="filter-container">
+            {% load tiene_permiso%}
+            {% if request.user|tiene_permiso:"crear_contenido" %}
             <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
+            {%endif%}
             <div class="filters">
                 <select name="fecha">
                     <option value="">Filtrar por fecha</option>
@@ -135,8 +138,13 @@
                     </div>
                     <div class="content-actions">
                         <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
+                        {% if request.user|tiene_permiso:"editar" %}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
+                        {%endif%}
+                        {% if request.user|tiene_permiso:"publicar_contenido" %}
+                        <a href="" class="btn btn-primary btn-sm">Publicar</a>
+                        {%endif%}
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
                     </div>
                 </div>
             </div>

@@ -36,20 +36,23 @@
               </form>
               {% endif %}
             </li>
+            {% load tiene_permiso%}
+            {% if request.user|tiene_permiso:"administrar_sitio" %}
             <li class="nav-item">
               <a class="nav-link" href="{% url 'categoria_list' %}">Categorias</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{% url 'plantilla_list'%}">Plantillas</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'content_list'%}">Contenido</a>
-            </li>
             <li class="nav-item"></li>
               <a class="nav-link" href="{% url 'lista_roles'%}">Roles</a>
             </li>
             <li class="nav-item"></li>
               <a class="nav-link" href="{% url 'lista_usuarios'%}">Usuarios</a>
+            </li>
+            {% endif %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'content_list'%}">Contenido</a>
             </li>
           </ul>
         </div>
