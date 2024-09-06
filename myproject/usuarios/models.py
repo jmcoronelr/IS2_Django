@@ -97,4 +97,80 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+class Rol(models.Model):
+    """
+    Modelo que define un rol en el sistema. Cada rol tiene un nombre único y una
+    descripción opcional.
+
+    Atributos:
+    - nombre: Nombre único del rol.
+    - descripcion: Descripción opcional del rol.
+
+    Métodos:
+    - __str__: Retorna el nombre del rol.
+    """
+
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+class Permiso(models.Model):
+    """
+    Modelo que define un permiso en el sistema. Cada permiso tiene un nombre único y una
+    descripción opcional.
+
+    Atributos:
+    - nombre: Nombre único del permiso.
+    - descripcion: Descripción opcional del permiso.
+
+    Métodos:
+    - __str__: Retorna el nombre del permiso.
+    """
+
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.nombre
+
+class UsuarioRol(models.Model):
+    """
+    Modelo intermedio para establecer la relación entre el modelo Usuario y el modelo Rol.
+    Representa una relación muchos a muchos.
+
+    Atributos:
+    - usuario: Relación con el modelo Usuario.
+    - rol: Relación con el modelo Rol.
+
+    Meta:
+    - unique_together: Garantiza que cada combinación de usuario y rol sea única.
+    """
+
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('usuario', 'rol')
+
+class RolPermiso(models.Model):
+    """
+    Modelo intermedio para establecer la relación entre el modelo Rol y el modelo Permiso.
+    Representa una relación muchos a muchos.
+
+    Atributos:
+    - rol: Relación con el modelo Rol.
+    - permiso: Relación con el modelo Permiso.
+
+    Meta:
+    - unique_together: Garantiza que cada combinación de rol y permiso sea única.
+    """
+
+    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
+    permiso = models.ForeignKey(Permiso, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('rol', 'permiso')
+
 

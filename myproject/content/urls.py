@@ -8,4 +8,5 @@ urlpatterns = [
     path('delete/<int:pk>/', views.content_delete, name='content_delete'),
     path('edit/<int:pk>/', views.content_edit, name='content_edit'),
     path('detail/<int:pk>/', views.content_detail, name='content_detail'),
+    path('<int:plantilla_id>/get_blocks/', views.get_plantilla_blocks, name='get_plantilla_blocks'),
 ]

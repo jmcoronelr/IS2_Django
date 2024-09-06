@@ -17,4 +17,4 @@ class Categorias(models.Model):
         """
         Devuelve una representación en cadena del objeto, mostrando la descripción corta.
         """
-        return self.descripcionCorta
+        return self.title

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario
+from .models import Usuario, Rol
 
 class RegistroUsuarioForm(forms.ModelForm):
     """
@@ -42,4 +42,17 @@ class RegistroUsuarioForm(forms.ModelForm):
             raise forms.ValidationError('La contraseña es obligatoria.')
         return password
 
+
+class AsignarRolForm(forms.Form):
+    """
+    Formulario para asignar un rol a un usuario existente.
+    Utiliza campos de selección basados en los modelos `Usuario` y `Rol`.
+
+    Atributos:
+    - usuario: Campo de selección de un usuario del queryset de todos los usuarios.
+    - rol: Campo de selección de un rol del queryset de todos los roles.
+    """
+
+    usuario = forms.ModelChoiceField(queryset=Usuario.objects.all())
+    rol = forms.ModelChoiceField(queryset=Rol.objects.all())
 

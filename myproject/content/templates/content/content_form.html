@@ -6,23 +6,170 @@
     <title>Crear/Editar Contenido</title>
     <!-- Incluir Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container-custom {
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #f1f2f6;
+            width: 1233px;
+            height: 743px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .content-area {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%;
+            height: 500px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        .draggable {
+            width: 200px;
+            height: 100px;
+            border: 1px solid #ccc;
+            background-color: #e0e0e0;
+            text-align: center;
+            line-height: 100px;
+            cursor: move;
+            position: absolute;
+            resize: both;
+            overflow: hidden;
+        }
+        .footer-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .footer-buttons .btn {
+            padding: 10px 20px;
+        }
+        .form-inline-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .form-inline-container .form-group {
+            flex: 1;
+            text-align: center;
+        }
+        .form-inline-container input,
+        .form-inline-container select,
+        .form-inline-container textarea {
+            width: 100%;
+            height: 40px; /* Altura uniforme para todos los campos */
+            resize: none; /* Desactivar redimensionamiento en textarea */
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="bg-light rounded p-4 shadow-sm" style="max-width: 600px; margin: auto;">
-            <h1 class="text-dark mb-4 text-center">Crear/Editar Contenido</h1>
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    {{ form.as_p }}
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+    <div class="container-custom shadow-lg">
+        <!-- Iniciar formulario -->
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Encabezado con los campos en una sola fila -->
+            <div class="form-inline-container">
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    {{ form.title }}
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Guardar</button>
-                <a href="{% url 'content_list' %}" class="btn btn-secondary w-100 mt-2">Volver a Inicio</a>
-            </form>
-        </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    {{ form.category }}
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    {{ form.status }}
+                </div>
+            </div>
+
+            <!-- Área interactiva para el contenido -->
+            <div class="content-area" id="content-area">
+                <p>Selecciona una plantilla para ver el contenido aquí.</p>
+            </div>
+
+            <!-- Botones de pie: Atrás, Guardar y Seleccionar Plantilla -->
+            <div class="footer-buttons">
+                <div class="action-buttons">
+                    <a href="{% url 'content_list' %}" class="btn btn-secondary">← Atrás</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+
+                <!-- Sección para seleccionar Plantilla -->
+                <div class="form-group">
+                    <label for="plantilla">Plantilla:</label>
+                    <select name="plantilla" id="plantilla" class="form-control" onchange="loadPlantillaBlocks()">
+                        <option value="">Seleccione una plantilla</option>
+                        {% for plantilla in plantillas %}
+                            <option value="{{ plantilla.id }}" {% if selected_plantilla and selected_plantilla.id == plantilla.id %}selected{% endif %}>
+                                {{ plantilla.descripcion }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                </div>
+            </div>
+        </form>
     </div>
-    
+
     <!-- Incluir Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script para manejar la carga de bloques de la plantilla -->
+    <script>
+        function loadPlantillaBlocks() {
+            const plantillaId = document.getElementById('plantilla').value;
+
+            if (plantillaId) {
+                fetch(`/plantillas/${plantillaId}/get_blocks/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const contentArea = document.getElementById('content-area');
+                        contentArea.innerHTML = '';  // Limpiar el contenido anterior
+
+                        data.blocks.forEach(block => {
+                            const blockDiv = document.createElement('div');
+                            blockDiv.classList.add('draggable');
+                            blockDiv.style.top = block.top;
+                            blockDiv.style.left = block.left;
+                            blockDiv.style.width = block.width;
+                            blockDiv.style.height = block.height;
+                            blockDiv.innerHTML = block.content;
+                            contentArea.appendChild(blockDiv);
+                        });
+                    })
+                    .catch(error => console.error('Error cargando los bloques:', error));
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+        // Verifica si hay una plantilla seleccionada y carga sus bloques
+        const selectedPlantilla = document.getElementById('plantilla').value;
+        if (selectedPlantilla) {
+            loadPlantillaBlocks(); // Cargar los bloques si ya hay una plantilla seleccionada
+        }
+    });
+
+
+
+
+
+
+
+    </script>
 </body>
 </html>
