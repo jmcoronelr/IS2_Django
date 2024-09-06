@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Content
 from .forms import ContentForm
-from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 import datetime
+from Plantillas.models import Plantilla  # Importa el modelo Plantilla
+from django.http import JsonResponse
 
 def content_list(request):
     contents = Content.objects.all().order_by('created_at')
@@ -27,27 +28,38 @@ def content_list(request):
     categoria = request.GET.get('categoria')
     if categoria:
         contents = contents.filter(category__id=categoria)
+
     # Paginación
     paginator = Paginator(contents, 10)  # Muestra 10 contenidos por página
     page_number = request.GET.get('page')
     contents = paginator.get_page(page_number)
-    
 
     return render(request, 'content/content_list.html', {'contents': contents})
 
 def content_create(request):
+    plantillas = Plantilla.objects.all()  # Obtener todas las plantillas
     if request.method == 'POST':
         form = ContentForm(request.POST)
         if form.is_valid():
-            form.save()
+            # Guardar el contenido con la plantilla seleccionada
+            content = form.save(commit=False)
+            content.plantilla = Plantilla.objects.get(id=request.POST.get('plantilla'))  # Guardar la plantilla seleccionada
+            content.save()
             return redirect('content_list')
     else:
         form = ContentForm()
-    return render(request, 'content/content_form.html', {'form': form})
+
+    # Pasamos una plantilla vacía si no se selecciona ninguna en el formulario
+    selected_plantilla = None
+    if form['plantilla'].value():
+        selected_plantilla = Plantilla.objects.get(id=form['plantilla'].value())
+
+    return render(request, 'content/content_form.html', {'form': form, 'plantillas': plantillas, 'selected_plantilla': selected_plantilla})
 
 def content_edit(request, pk):
     content = get_object_or_404(Content, pk=pk)
-    page = request.GET.get('page', 1)  # Obtiene el número de página de la URL, si no está, asume que es la página 1
+    plantillas = Plantilla.objects.all()  # Obtener todas las plantillas
+    page = request.GET.get('page', 1)
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
@@ -55,7 +67,16 @@ def content_edit(request, pk):
             return redirect(f'{reverse("content_list")}?page={page}')
     else:
         form = ContentForm(instance=content)
-    return render(request, 'content/content_form.html', {'form': form, 'page': page})
+
+    # Aquí seleccionamos la plantilla que ya está guardada en el contenido
+    selected_plantilla = content.plantilla if content.plantilla else None
+
+    return render(request, 'content/content_form.html', {
+        'form': form,
+        'plantillas': plantillas,
+        'selected_plantilla': selected_plantilla,
+        'page': page
+    })
 
 def content_delete(request, pk):
     content = get_object_or_404(Content, pk=pk)
@@ -69,4 +90,16 @@ def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
     return render(request, 'content/content_detail.html', {'content': content})
 
-
+def get_plantilla_blocks(request, plantilla_id):
+    plantilla = get_object_or_404(Plantilla, id=plantilla_id)
+    
+    # Acceder a los bloques asociados
+    blocks = [{
+        'content': bloque.contenido,
+        'top': bloque.posicion_top,
+        'left': bloque.posicion_left,
+        'width': bloque.width,
+        'height': bloque.height,
+    } for bloque in plantilla.bloque_set.all()]  # Usar bloque_set para obtener los bloques
+    
+    return JsonResponse({'blocks': blocks})

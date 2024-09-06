@@ -2,50 +2,235 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Plantilla</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
+        .container-custom {
+            border: 1px solid #ccc;
+            border-radius: 15px;
             padding: 20px;
+            background-color: #f1f2f6;
+            width: 1233px; /* Fijar el ancho */
+            height: 743px; /* Fijar la altura */
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        form {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .content-area {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%; /* El contenedor ocupa todo el ancho */
+            height: 500px; /* Limitar la altura */
+            overflow-y: auto; /* Habilitar scroll vertical */
+            background-color: #f8f9fa;
+            position: relative;
         }
-        h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
+        .draggable {
+            width: 200px;
+            height: 100px;
+            border: 1px solid #ccc;
+            background-color: #e0e0e0;
             text-align: center;
+            line-height: 100px;
+            cursor: move;
+            position: absolute; /* Posición absoluta para reorganizar libremente */
+            resize: both; /* Hacer que el bloque sea redimensionable */
+            overflow: hidden;
         }
-        button {
-            background-color: #4CAF50;
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .footer-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .footer-buttons .btn {
+            padding: 10px 20px;
+        }
+        .delete-mode {
+            background-color: #ff4d4d;
             color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
         }
     </style>
 </head>
-<body>
-    <form method="post">
-        <h1>Crear Plantilla</h1>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Crear</button>
-    </form>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+    <div class="container-custom shadow-lg">
+<!-- Iniciar formulario -->
+<form method="POST">
+    {% csrf_token %}
+    <!-- Encabezado con Estado y Título -->
+    <div class="custom-header">
+        <div>
+            <label for="estado">Estado:</label>
+            {{ form.estado }}
+        </div>
+        <div>
+            <input type="text" name="descripcion" placeholder="Título" class="form-control" style="width: 300px;">
+        </div>
+    </div>
+
+    <!-- Botones para añadir bloques -->
+    <div class="control-buttons">
+        <button type="button" class="btn btn-primary" onclick="addTextBlock()">Añadir bloque de texto</button>
+        <button type="button" class="btn btn-secondary" onclick="addMultimediaBlock()">Añadir bloque multimedia</button>
+        <button type="button" class="btn btn-danger" id="delete-btn" onclick="toggleDeleteMode()">Borrar</button>
+        <button type="button" class="btn btn-light" id="cancel-btn" onclick="cancelDeleteMode()" style="display: none;">Cancelar</button>
+    </div>
+
+    <!-- Área interactiva para los bloques -->
+    <div class="content-area" id="content-area" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <!-- Aquí se arrastran y organizan los bloques -->
+    </div>
+
+    <!-- Botones de pie: Atrás y Crear Plantilla -->
+    <div class="footer-buttons">
+        <a href="/plantillas/list/" class="btn btn-secondary">← Atrás</a>
+        <button type="submit" class="btn btn-primary mx-auto">Crear Plantilla</button>
+    </div>
+
+    <!-- Campo oculto para los bloques -->
+    <input type="hidden" name="block_data" id="block_data">
+</form>
+        <!-- Fin del formulario -->
+    </div>
+
+    <!-- Incluir Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentId = 0;
+        let deleteMode = false;
+
+        function addTextBlock() {
+            const contentArea = document.getElementById('content-area');
+            const textBlock = document.createElement('div');
+            textBlock.classList.add('draggable');
+            textBlock.id = `block-${currentId++}`;
+            textBlock.draggable = true;
+            textBlock.innerHTML = 'Escribe aquí...';
+            textBlock.ondragstart = drag;
+            textBlock.onclick = () => handleBlockClick(textBlock);
+            contentArea.appendChild(textBlock);
+
+            // Posicionar el bloque de manera automática en el área
+            positionBlock(textBlock, contentArea);
+        }
+
+        function addMultimediaBlock() {
+            const contentArea = document.getElementById('content-area');
+            const mediaBlock = document.createElement('div');
+            mediaBlock.classList.add('draggable');
+            mediaBlock.id = `block-${currentId++}`;
+            mediaBlock.draggable = true;
+            mediaBlock.innerHTML = 'Añadir multimedia';
+            mediaBlock.ondragstart = drag;
+            mediaBlock.onclick = () => handleBlockClick(mediaBlock);
+            contentArea.appendChild(mediaBlock);
+
+            // Posicionar el bloque de manera automática en el área
+            positionBlock(mediaBlock, contentArea);
+        }
+
+        function positionBlock(block, container) {
+            const rect = container.getBoundingClientRect();
+            const blocks = container.children;
+
+            let topPosition = 0;
+            let leftPosition = 0;
+
+            if (blocks.length > 1) {
+                const lastBlock = blocks[blocks.length - 2];
+                const lastBlockRect = lastBlock.getBoundingClientRect();
+                topPosition = lastBlockRect.bottom - rect.top + 10;
+                leftPosition = lastBlockRect.left - rect.left;
+            }
+
+            block.style.top = `${topPosition}px`;
+            block.style.left = `${leftPosition}px`;
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData("text");
+            const block = document.getElementById(data);
+            const contentArea = document.getElementById('content-area');
+
+            const newLeft = event.clientX - contentArea.getBoundingClientRect().left - block.offsetWidth / 2;
+            const newTop = event.clientY - contentArea.getBoundingClientRect().top - block.offsetHeight / 2;
+
+            block.style.left = `${newLeft}px`;
+            block.style.top = `${newTop}px`;
+        }
+
+        // Modo borrar
+        function toggleDeleteMode() {
+            deleteMode = !deleteMode;
+            document.getElementById('delete-btn').style.display = 'none';
+            document.getElementById('cancel-btn').style.display = 'inline-block';
+        }
+
+        // Cancelar modo borrar
+        function cancelDeleteMode() {
+            deleteMode = false;
+            document.getElementById('delete-btn').style.display = 'inline-block';
+            document.getElementById('cancel-btn').style.display = 'none';
+        }
+
+        // Manejar clic en el bloque cuando el modo de borrado está activado
+        function handleBlockClick(block) {
+            if (deleteMode) {
+                block.remove();
+            }
+        }
+
+        function getBlockData() {
+            const blocks = document.querySelectorAll('.draggable');
+            let blockData = [];
+
+            blocks.forEach(block => {
+                const blockInfo = {
+                    type: block.innerHTML.includes('multimedia') ? 'multimedia' : 'texto',
+                    content: block.innerHTML,
+                    top: block.style.top,
+                    left: block.style.left,
+                    width: block.style.width,
+                    height: block.style.height
+                };
+                blockData.push(blockInfo);
+            });
+
+            return blockData;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('form').onsubmit = function(e) {
+                const blockData = getBlockData();
+                
+                // Crear un input hidden para enviar los datos de los bloques
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'block_data';
+                input.value = JSON.stringify(blockData);  // Convertimos los datos a JSON
+                this.appendChild(input);
+
+                // El formulario se enviará junto con el input de los bloques
+            };
+        });
+    </script>
 </body>
 </html>

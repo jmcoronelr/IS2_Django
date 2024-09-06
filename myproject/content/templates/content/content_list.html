@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Contenidos</title>
     <!-- Incluir Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         html {
-    scroll-behavior: smooth;
+            scroll-behavior: smooth;
         }
         .content-card {
             border: 1px solid #e0e0e0;
@@ -14,18 +16,10 @@
             padding: 15px;
             margin-bottom: 10px;
             text-align: center;
-            background-color: #f9f9f9;
-            width: 200px;
-            height: auto;
+            background-color: #f8f9fa;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            word-wrap: break-word;
-        }
-        .row > [class*='col-'] {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 8px;
         }
         .content-title {
             font-weight: bold;
@@ -34,7 +28,7 @@
         }
         .content-info {
             font-size: 0.85em;
-            color: #555;
+            color: #6c757d;
             margin-bottom: 10px;
         }
         .content-actions {
@@ -43,18 +37,18 @@
             justify-content: center;
             gap: 5px;
         }
-        /* Colores minimalistas */
+        /* Colores de Bootstrap */
         .btn-primary {
-            background-color: #00796b;
-            border-color: #00796b;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
         }
         .btn-warning {
-            background-color: #fbc02d;
-            border-color: #fbc02d;
+            background-color: #ffc107;
+            border-color: #ffc107;
         }
         .btn-danger {
-            background-color: #e64a19;
-            border-color: #e64a19;
+            background-color: #dc3545;
+            border-color: #dc3545;
         }
         .btn-primary:hover, .btn-warning:hover, .btn-danger:hover {
             opacity: 0.8;
@@ -65,7 +59,7 @@
             align-items: center;
             margin-bottom: 20px;
         }
-        .filter-container select {
+        .filter-container select, .filter-container button {
             margin-left: 10px;
             padding: 5px;
             font-size: 0.9em;
@@ -73,12 +67,7 @@
             border: 1px solid #ccc;
         }
         .filter-container button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            font-size: 0.9em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            background-color: #00796b;
+            background-color: #0d6efd;
             color: white;
         }
         .pagination {
@@ -86,29 +75,58 @@
             justify-content: center;
             margin-top: 20px;
         }
-        .pagination a {
-            color: #00796b;
+        .pagination .page-link {
+            color: #0d6efd;
             padding: 8px 16px;
             text-decoration: none;
             border: 1px solid #e0e0e0;
             margin: 0 4px;
             border-radius: 5px;
         }
-        .pagination a:hover {
+        .pagination .page-link:hover {
             background-color: #f1f1f1;
         }
-        .pagination .active a {
-            background-color: #00796b;
+        .pagination .active .page-link {
+            background-color: #0d6efd;
             color: white;
-            border: 1px solid #00796b;
+            border: 1px solid #0d6efd;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'sistema' %}">CMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <form action="{% url 'usuarios:logout' %}" method="post">
+                            {% csrf_token %}
+                            <button class="nav-link btn btn-link">LogOut</button>
+                        </form>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'categoria_list' %}">Categorías</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'plantilla_list'%}">Plantillas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'content_list'%}">Contenido</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
         <h1 class="mb-4">Lista de Contenidos</h1>
         <form method="GET" class="filter-container">
-            <a href="{% url 'content_create' %}" class="btn btn-success">Crear Nuevo Contenido</a>
+            <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
             <div class="filters">
                 <select name="fecha">
                     <option value="">Filtrar por fecha</option>
@@ -130,13 +148,13 @@
                     <option value="2">Categoría 2</option>
                     <!-- Añadir más categorías según sea necesario -->
                 </select>
-                <button type="submit">Filtrar</button> <!-- Botón para aplicar los filtros -->
+                <button type="submit">Filtrar</button>
             </div>
         </form>
 
-        <div class="row g-2">
+        <div class="row g-4">
             {% for content in contents %}
-            <div class="col-md-2">
+            <div class="col-md-4 col-lg-3">
                 <div class="content-card">
                     <div class="content-title">{{ content.title }}</div>
                     <div class="content-info">
@@ -145,9 +163,8 @@
                     </div>
                     <div class="content-actions">
                         <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                        <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-warning btn-sm">Editar</a>
-                        <!-- Botón que abre el modal -->
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
+                        <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
                     </div>
                 </div>
             </div>
@@ -156,7 +173,7 @@
         
         <!-- Paginación -->
         <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-4">
+            <ul class="pagination">
                 {% if contents.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="?page=1">Primera</a>
@@ -185,32 +202,25 @@
             </ul>
         </nav>
 
-
-
-
-    <!-- Modal de confirmación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar este contenido?
-                </div>
-                <div class="modal-footer">
-                    <form id="deleteForm" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="page" value="{{ request.GET.page }}"> <!-- Incluye la página actual -->
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>    
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas eliminar este contenido?
+                    </div>
+                    <div class="modal-footer">
+                        <form id="deleteForm" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="page" value="{{ request.GET.page }}"> <!-- Incluye la página actual -->
+                            <button type="submit" class="btn btn-primary">Eliminar</button>
+                        </form>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </body>
     <!-- Incluir Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -225,3 +235,4 @@
         });
     </script></body>
 </html>
+   
