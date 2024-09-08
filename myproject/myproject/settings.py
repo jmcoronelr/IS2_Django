@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -126,7 +126,7 @@ DATABASES = {
     'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'IS2',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',  # O la IP de tu servidor de base de datos
         'PORT': '5432',  # Puerto por defecto de PostgreSQL
     }
@@ -177,3 +177,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'usuarios.Usuario'
 LOGIN_REDIRECT_URL = 'sistema'  # vista o URL de inicio a la que quieras redirige después del inicio de sesión
 LOGOUT_REDIRECT_URL = 'login'  # vista o URL a la que redirige después del cierre de sesión
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+

@@ -7,75 +7,122 @@ from django.shortcuts import render
 import json
 from .models import Plantilla, Bloque  # Asegúrate de importar tus modelos correctamente
 from django.http import JsonResponse
+from django.db.models import Q  # Import necesario para realizar búsquedas
 
 def plantilla_list(request):
     """
     Vista para listar todas las plantillas
     """
-    # Ordena las plantillas por fecha de creación o cualquier otro campo relevante
-    plantillas = Plantilla.objects.all().order_by('-id')  # Ordena por id de forma descendente
-    paginator = Paginator(plantillas, 10)  # Si tienes muchas plantillas, paginarlas
+    query = request.GET.get('q')  # Obtener el valor del campo de búsqueda (si existe)
+    
+    if query:
+        # Filtrar plantillas que coincidan con la búsqueda (en la descripción)
+        plantillas = Plantilla.objects.filter(Q(descripcion__icontains=query)).order_by('-id')
+    else:
+        # Si no hay búsqueda, obtener todas las plantillas
+        plantillas = Plantilla.objects.all().order_by('-id')
+    
+    paginator = Paginator(plantillas, 10)  # Paginación
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'Plantillas/plantilla_list.html', {'plantillas': page_obj})  # Change made here
+    return render(request, 'Plantillas/plantilla_list.html', {'plantillas': page_obj})
+
 def plantilla_create(request):
     if request.method == 'POST':
-        form = PlantillaForm(request.POST)
+        form = PlantillaForm(request.POST, request.FILES)
         if form.is_valid():
-            # Save the plantilla instance first
             plantilla = form.save()
 
-            # Process the blocks data from the POST request
             block_data = request.POST.get('block_data')
             if block_data:
                 blocks = json.loads(block_data)
-
-                # Save each block to the database
                 for block in blocks:
-                    Bloque.objects.create(
+                    bloque = Bloque(
                         plantilla=plantilla,
                         tipo=block['type'],
-                        contenido=block['content'],
+                        contenido=block['content'] if block['type'] == 'texto' else '',
                         posicion_top=block['top'],
                         posicion_left=block['left'],
                         width=block['width'],
                         height=block['height']
                     )
+                    if block['type'] == 'multimedia' and 'multimedia' in request.FILES:
+                        bloque.multimedia = request.FILES['multimedia']
+                    bloque.save()
 
             return redirect('plantilla_list')
     else:
         form = PlantillaForm()
-    return render(request, 'Plantillas/plantilla_create.html', {'form': form})
 
+    return render(request, 'Plantillas/plantilla_create.html', {'form': form})
 
 
 def plantilla_edit(request, pk):
     plantilla = get_object_or_404(Plantilla, pk=pk)
     bloques = Bloque.objects.filter(plantilla=plantilla)
 
+    # Update the blocks to indicate their file types
+    for bloque in bloques:
+        if bloque.tipo == 'multimedia' and bloque.multimedia:
+            file_url = bloque.multimedia.url
+            if file_url.endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                bloque.file_type = 'image'
+            elif file_url.endswith(('.mp3', '.wav')):
+                bloque.file_type = 'audio'
+            elif file_url.endswith(('.mp4', '.webm', '.avi')):
+                bloque.file_type = 'video'
+
     if request.method == 'POST':
-        form = PlantillaForm(request.POST, instance=plantilla)
+        form = PlantillaForm(request.POST, request.FILES, instance=plantilla)
         if form.is_valid():
             form.save()
 
-            # Actualizar los bloques
-            Bloque.objects.filter(plantilla=plantilla).delete()  # Eliminar bloques previos
             block_data = request.POST.get('block_data')
+            block_ids = []
             if block_data:
                 blocks = json.loads(block_data)
+
                 for block in blocks:
-                    Bloque.objects.create(
-                        plantilla=plantilla,
-                        tipo=block['type'],
-                        contenido=block['content'],
-                        posicion_top=block['top'],
-                        posicion_left=block['left'],
-                        width=block['width'],
-                        height=block['height']
-                    )
+                    bloque_id = block.get('id')
+
+                    # Check if the block already exists
+                    if bloque_id:
+                        bloque = Bloque.objects.get(id=bloque_id)
+                    else:
+                        bloque = Bloque(plantilla=plantilla)
+
+                    # Update block positions, size, and content
+                    bloque.tipo = block['type']
+                    bloque.posicion_top = block['top']
+                    bloque.posicion_left = block['left']
+                    bloque.width = block['width']
+                    bloque.height = block['height']
+
+                    # If it's a multimedia block, handle the file upload
+                    if block['type'] == 'texto':
+                        bloque.contenido = block['content']  # Mantén el contenido del texto
+                    elif block['type'] == 'multimedia':
+                        multimedia_field_name = f'multimedia-{block.get("id") or "new"}'
+                        # Check if a new file has been uploaded
+                        if multimedia_field_name in request.FILES:
+                            bloque.multimedia = request.FILES['multimedia_field_name']
+                        # Otherwise, keep the existing file if no new one is uploaded
+                        elif bloque.multimedia:
+                            bloque.multimedia = bloque.multimedia
+                        else:
+                            bloque.multimedia=None
+
+                    bloque.save()
+
+                    block_ids.append(bloque.id)
+
+            Bloque.objects.filter(plantilla=plantilla).exclude(id__in=block_ids).delete()
 
             return redirect('plantilla_list')
+        
+        
+
     else:
         form = PlantillaForm(instance=plantilla)
 

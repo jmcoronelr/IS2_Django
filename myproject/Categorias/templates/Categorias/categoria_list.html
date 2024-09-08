@@ -5,6 +5,26 @@
     <title>Lista de Categorías</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .search-create-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre los elementos */
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            width: 250px; /* Ajusta el tamaño del input de búsqueda */
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -38,12 +58,18 @@
     </nav>
 
     <div class="container mt-4">
-        <h1 class="mb-4">Lista de Categorías</h1>
-        
-        <form method="get" action="{% url 'categoria_list' %}" class="mb-3 d-flex">
-            <input type="text" name="q"  class="form-control me-2" placeholder="Buscar categoría...">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
+        <div class="header">
+            <h1 class="mb-4">Lista de Categorías</h1>
+            <div class="search-create-container">
+                <a href="{% url 'categoria_create' %}" class="btn btn-secondary">Crear nueva categoría</a>
+                
+                <!-- Bloque de búsqueda -->
+                <form method="get" action="{% url 'categoria_list' %}" class="search-form">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar categoría...">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
 
         <ul class="list-group">
             {% for categoria in categorias %}
@@ -59,9 +85,6 @@
             {% endfor %}
         </ul>
 
-        <div class="mt-4">
-            <a href="{% url 'categoria_create' %}" class="btn btn-secondary">Crear nueva categoría</a>
-        </div>
     </div>
 
     <!-- Bootstrap JS -->
