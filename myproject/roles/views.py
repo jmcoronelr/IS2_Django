@@ -70,7 +70,11 @@ def lista_usuarios(request):
     :param request: La solicitud HTTP.
     :return: Renderiza la plantilla que muestra la lista de usuarios.
     """
-    usuarios = Usuario.objects.all()
+    query = request.GET.get('q')
+    if query:
+        usuarios = Usuario.objects.filter(email__icontains=query)
+    else:
+        usuarios = Usuario.objects.all()
     return render(request, 'roles/lista_usuarios.html', {'usuarios': usuarios})
 
 @login_required
@@ -142,7 +146,11 @@ def lista_roles(request):
     :param request: La solicitud HTTP.
     :return: Renderiza la plantilla que muestra la lista de roles.
     """
-    roles = Rol.objects.all()  # Obtenemos todos los roles
+    query = request.GET.get('q')
+    if query:
+        roles = Rol.objects.filter(nombre__icontains=query)
+    else:
+        roles = Rol.objects.all()  # Obtenemos todos los roles
     return render(request, 'roles/lista_roles.html', {
         'roles': roles,
     })
