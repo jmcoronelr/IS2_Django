@@ -6,10 +6,17 @@ from django.urls import reverse
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
 from django.http import JsonResponse
+import json
+from .models import Content, ContentBlock
 
 def content_list(request):
     contents = Content.objects.all().order_by('created_at')
     
+    # Búsqueda por título
+    query = request.GET.get('q')
+    if query:
+        contents = contents.filter(title__icontains=query)
+
     # Filtrar por fecha
     fecha = request.GET.get('fecha')
     if fecha == 'today':
@@ -36,47 +43,73 @@ def content_list(request):
 
     return render(request, 'content/content_list.html', {'contents': contents})
 
-def content_create(request):
-    plantillas = Plantilla.objects.all()  # Obtener todas las plantillas
-    if request.method == 'POST':
-        form = ContentForm(request.POST)
-        if form.is_valid():
-            # Guardar el contenido con la plantilla seleccionada
-            content = form.save(commit=False)
-            content.plantilla = Plantilla.objects.get(id=request.POST.get('plantilla'))  # Guardar la plantilla seleccionada
-            content.save()
-            return redirect('content_list')
+def content_create_edit(request, pk=None):
+    if pk:
+        content = get_object_or_404(Content, pk=pk)
     else:
-        form = ContentForm()
+        content = None
 
-    # Pasamos una plantilla vacía si no se selecciona ninguna en el formulario
-    selected_plantilla = None
-    if form['plantilla'].value():
-        selected_plantilla = Plantilla.objects.get(id=form['plantilla'].value())
+    plantillas = Plantilla.objects.all()
 
-    return render(request, 'content/content_form.html', {'form': form, 'plantillas': plantillas, 'selected_plantilla': selected_plantilla})
-
-def content_edit(request, pk):
-    content = get_object_or_404(Content, pk=pk)
-    plantillas = Plantilla.objects.all()  # Obtener todas las plantillas
-    page = request.GET.get('page', 1)
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
-            form.save()
-            return redirect(f'{reverse("content_list")}?page={page}')
+            content = form.save(commit=False)
+            plantilla_id = request.POST.get('plantilla')
+            if plantilla_id:
+                content.plantilla = Plantilla.objects.get(id=plantilla_id)
+            else:
+                content.plantilla = None
+
+            content.save()
+
+            block_data = json.loads(request.POST.get('block_data', '[]'))
+            block_ids = []
+
+            for block in block_data:
+                bloque_id = block.get('id')
+
+                # Si no hay bloque_id, creamos un nuevo bloque
+                if bloque_id:
+                    content_block = ContentBlock.objects.get(id=bloque_id)
+                else:
+                    content_block = ContentBlock(content=content)
+
+                content_block.block_type = block.get('type')
+                content_block.content_text = block.get('content') if block.get('type') == 'texto' else None
+
+                # Manejo de archivos multimedia
+                multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
+                if multimedia_file:
+                    content_block.multimedia = multimedia_file
+
+                content_block.top = block.get('top', '0px')
+                content_block.left = block.get('left', '0px')
+                content_block.width = block.get('width', '200px')
+                content_block.height = block.get('height', '100px')
+                content_block.save()
+
+                block_ids.append(content_block.id)
+
+            # Eliminar los bloques que no están en block_ids
+            ContentBlock.objects.filter(content=content).exclude(id__in=block_ids).delete()
+
+            return redirect('content_list')
     else:
         form = ContentForm(instance=content)
 
-    # Aquí seleccionamos la plantilla que ya está guardada en el contenido
-    selected_plantilla = content.plantilla if content.plantilla else None
+    blocks = ContentBlock.objects.filter(content=content) if content else []
+    selected_plantilla = content.plantilla if content and content.plantilla else None
 
     return render(request, 'content/content_form.html', {
         'form': form,
         'plantillas': plantillas,
         'selected_plantilla': selected_plantilla,
-        'page': page
+        'blocks': blocks,
     })
+
+
+
 
 def content_delete(request, pk):
     content = get_object_or_404(Content, pk=pk)
@@ -95,11 +128,14 @@ def get_plantilla_blocks(request, plantilla_id):
     
     # Acceder a los bloques asociados
     blocks = [{
-        'content': bloque.contenido,
+        'id': bloque.id,
+        'type': bloque.tipo,
+        'content_text': bloque.contenido,
+        'multimedia': bloque.multimedia.url if bloque.multimedia else None,
         'top': bloque.posicion_top,
         'left': bloque.posicion_left,
         'width': bloque.width,
-        'height': bloque.height,
-    } for bloque in plantilla.bloque_set.all()]  # Usar bloque_set para obtener los bloques
-    
+        'height': bloque.height
+    } for bloque in plantilla.bloques.all()]  # Asegúrate de usar 'bloques' si tienes related_name
+
     return JsonResponse({'blocks': blocks})

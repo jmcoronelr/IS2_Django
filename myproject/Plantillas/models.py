@@ -7,12 +7,12 @@ class Plantilla(models.Model):
 class Bloque(models.Model):
     plantilla = models.ForeignKey(Plantilla, on_delete=models.CASCADE, related_name='bloques')
     tipo = models.CharField(max_length=50)  # 'texto' o 'multimedia'
-    contenido = models.TextField()
+    contenido = models.TextField(blank=True)  # Solo para texto
+    multimedia = models.FileField(upload_to='uploads/', blank=True, null=True)  # Nuevo campo para archivos multimedia
     posicion_top = models.CharField(max_length=50)
     posicion_left = models.CharField(max_length=50)
     width = models.CharField(max_length=50, blank=True, default='200px')
-    height = models.CharField(max_length=50, blank=True, default='100px')   
+    height = models.CharField(max_length=50, blank=True, default='100px')
 
     def __str__(self):
-        return f'{self.tipo} - {self.contenido[:30]}'
-
+        return f'{self.tipo} - {self.contenido[:30] if self.contenido else "Multimedia"}'
