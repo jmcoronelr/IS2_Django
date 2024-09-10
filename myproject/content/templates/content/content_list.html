@@ -55,7 +55,7 @@
         }
         .filter-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: end;
             align-items: center;
             margin-bottom: 20px;
         }
@@ -63,75 +63,90 @@
             display: flex;
             gap: 10px;
         }
-        .filter-container select, .filter-container button, .filter-container input {
+        .filter-container select, .filter-container input {
             padding: 5px;
             font-size: 0.9em;
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-        .filter-container button {
-            background-color: #0d6efd;
-            color: white;
+        html {
+            scroll-behavior: smooth;
         }
-        .pagination {
+        .header {
             display: flex;
-            justify-content: center;
-            margin-top: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .pagination .page-link {
-            color: #0d6efd;
-            padding: 8px 16px;
-            text-decoration: none;
-            border: 1px solid #e0e0e0;
-            margin: 0 4px;
-            border-radius: 5px;
+        .header h1 {
+            font-size: calc(1.375rem + 1.5vw); /* Tamaño del título */
+            margin-bottom: 0;
         }
-        .pagination .page-link:hover {
-            background-color: #f1f1f1;
+        .search-create-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre los elementos */
         }
-        .pagination .active .page-link {
-            background-color: #0d6efd;
-            color: white;
-            border: 1px solid #0d6efd;
+        .actions .btn {
+            margin-right: 5px;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            width: 250px; /* Ajusta el tamaño del input de búsqueda */
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="mb-4">Lista de Contenidos</h1>
-        <form method="GET" class="filter-container">
-            {% load tiene_permiso%}
-            {% if request.user|tiene_permiso:"crear_contenido" %}
-            <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
-            {%endif%}
-            <div class="filters">
-                <!-- Campo de búsqueda -->
-                <input type="text" name="q" placeholder="Buscar contenido..." value="{{ request.GET.q }}">
-                <button type="submit">Buscar</button>
-
-                <!-- Filtros adicionales -->
-                <select name="fecha">
-                    <option value="">Filtrar por fecha</option>
-                    <option value="today">Hoy</option>
-                    <option value="week">Esta semana</option>
-                    <option value="month">Este mes</option>
-                </select>
-                <select name="estado">
-                    <option value="">Filtrar por estado</option>
-                    <option value="draft">Borrador</option>
-                    <option value="review">En Revisión</option>
-                    <option value="published">Publicado</option>
-                    <option value="rejected">Rechazado</option>
-                    <option value="inactive">Inactivo</option>
-                </select>
-                <select name="categoria">
-                    <option value="">Filtrar por categoría</option>
-                    <option value="1">Categoría 1</option>
-                    <option value="2">Categoría 2</option>
-                </select>
-                <button type="submit">Filtrar</button>
+    <div class="container mt-5">
+        <div class="header">
+            <h1 class="mb-4">Lista de Contenidos</h1>
+            <div class="search-create-container">
+                {% load tiene_permiso%}
+                {% if request.user|tiene_permiso:"crear_contenido" %}
+                <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
+                {%endif%}
+                
+                <!-- Bloque de búsqueda -->
+                <form method="get" action="{% url 'content_list' %}" class="search-form">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar Contenido..." value="{{ request.GET.q }}" required>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
             </div>
-        </form>
+            
+        </div>
+        <div class="filter-container">
+            <form method="get" action="{% url 'content_list'%}">
+            
+                <div class="filters">
+    
+                    <!-- Filtros adicionales -->
+                    <select name="fecha">
+                        <option value="">Filtrar por fecha</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                    </select>
+                    <select name="estado">
+                        <option value="">Filtrar por estado</option>
+                        <option value="draft">Borrador</option>
+                        <option value="review">En Revisión</option>
+                        <option value="published">Publicado</option>
+                        <option value="rejected">Rechazado</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                    <select name="categoria">
+                        <option value="">Filtrar por categoría</option>
+                        <option value="1">Categoría 1</option>
+                        <option value="2">Categoría 2</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
+                </div>
+            </form>
+        </div>
+        
 
         <div class="row g-4">
             {% for content in contents %}
@@ -159,7 +174,7 @@
         
         <!-- Paginación -->
         <nav aria-label="Page navigation">
-            <ul class="pagination">
+            <ul class="pagination justify-content-center mt-5">
                 {% if contents.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="?page=1">Primera</a>
