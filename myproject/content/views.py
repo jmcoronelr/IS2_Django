@@ -37,7 +37,7 @@ def content_list(request):
         contents = contents.filter(category__id=categoria)
 
     # Paginación
-    paginator = Paginator(contents, 10)  # Muestra 10 contenidos por página
+    paginator = Paginator(contents, 8)  # Muestra 10 contenidos por página
     page_number = request.GET.get('page')
     contents = paginator.get_page(page_number)
 
