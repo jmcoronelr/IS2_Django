@@ -1,6 +1,54 @@
 {%extends 'base.html'%} {%block content%}
-    <div class="container mt-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: calc(1.375rem + 1.5vw); /* Tamaño del título */
+            margin-bottom: 0;
+        }
+        .search-create-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre los elementos */
+        }
+        .actions .btn {
+            margin-right: 5px;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            width: 250px; /* Ajusta el tamaño del input de búsqueda */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+    <div class="header">
         <h1 class="mb-4">Lista de Roles</h1>
+        <div class="search-create-container">
+            <a href="{% url 'crear_rol' %}" class="btn btn-secondary">Crear Nuevo Rol</a>
+            
+            <!-- Bloque de búsqueda -->
+            <form method="get" action="{% url 'lista_roles' %}" class="search-form">
+                <input type="text" name="q" class="form-control" placeholder="Buscar Rol..." value="{{ request.GET.q }}" required>
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+        </div>
+    </div>
 
         <ul class="list-group">
             {% for rol in roles %}
@@ -14,6 +62,8 @@
             {% endfor %}
         </ul>
 
-        <a href="{% url 'crear_rol' %}" class="btn btn-primary mt-3">Crear Nuevo Rol</a>
+       
     </div>
+</body>
+</html>
 {%endblock%}
