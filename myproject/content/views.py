@@ -2,13 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from .models import Content
 from .forms import ContentForm
-from django.urls import reverse
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
 from django.http import JsonResponse
 import json
 from .models import Content, ContentBlock
-
+from Categorias.models import Categorias
 def content_list(request):
     contents = Content.objects.all().order_by('created_at')
     
@@ -50,16 +49,26 @@ def content_create_edit(request, pk=None):
         content = None
 
     plantillas = Plantilla.objects.all()
+    categorias = Categorias.objects.all()  # Obtener las categorías disponibles
 
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
             content = form.save(commit=False)
+            
+            # Asignar plantilla seleccionada
             plantilla_id = request.POST.get('plantilla')
             if plantilla_id:
                 content.plantilla = Plantilla.objects.get(id=plantilla_id)
             else:
                 content.plantilla = None
+
+            # Asignar categoría seleccionada
+            categoria_id = request.POST.get('categoria')
+            if categoria_id:
+                content.categoria = Categorias.objects.get(id=categoria_id)
+            else:
+                content.categoria = None
 
             content.save()
 
@@ -100,13 +109,17 @@ def content_create_edit(request, pk=None):
 
     blocks = ContentBlock.objects.filter(content=content) if content else []
     selected_plantilla = content.plantilla if content and content.plantilla else None
+    selected_categoria = content.categoria if content and content.categoria else None
 
     return render(request, 'content/content_form.html', {
         'form': form,
         'plantillas': plantillas,
+        'categorias': categorias,  # Enviar las categorías al template
         'selected_plantilla': selected_plantilla,
+        'selected_categoria': selected_categoria,  # Enviar la categoría seleccionada
         'blocks': blocks,
     })
+
 
 
 

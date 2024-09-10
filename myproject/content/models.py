@@ -1,13 +1,6 @@
 from django.db import models
 from Plantillas.models import Plantilla  # Importa el modelo de Plantilla
-
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name
-
+from Categorias.models import Categorias
 class Content(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Borrador'),
@@ -19,7 +12,7 @@ class Content(models.Model):
     
     title = models.CharField(max_length=200)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categorias, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     plantilla = models.ForeignKey(Plantilla, on_delete=models.SET_NULL, null=True, blank=True)  # Relación con Plantilla
     created_at = models.DateTimeField(auto_now_add=True)

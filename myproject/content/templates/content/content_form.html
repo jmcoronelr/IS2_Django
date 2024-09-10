@@ -181,7 +181,14 @@
                 </div>
                 <div class="form-group">
                     <label for="categoria">Categoría</label>
-                    {{ form.category }}
+                    <select name="categoria" id="categoria">
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if selected_categoria and selected_categoria.id == categoria.id %}selected{% endif %}>
+                                {{ categoria.descripcionLarga }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
                 </div>
                 <div class="form-group">
                     <label for="status">Status</label>
