@@ -48,7 +48,7 @@
                 
                 <!-- Bloque de búsqueda -->
                 <form method="get" action="{% url 'plantilla_list' %}" class="search-form">
-                    <input type="text" name="q" class="form-control" placeholder="Buscar plantilla por descripción..." value="{{ request.GET.q }}">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar plantilla por descripción..." value="{{ request.GET.q }}" required>
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </form>
             </div>
