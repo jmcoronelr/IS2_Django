@@ -1,5 +1,37 @@
 {%extends 'base.html'%} {%block content%}
-    <div class="container mt-4">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Categorias</title>
+    <style>
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: calc(1.375rem + 1.5vw); /* Tamaño del título */
+            margin-bottom: 0;
+        }
+        .search-create-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Espacio entre los elementos */
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form input {
+            width: 250px; /* Ajusta el tamaño del input de búsqueda */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
         <div class="header">
             <h1 class="mb-4">Lista de Categorías</h1>
             <div class="search-create-container">
@@ -7,7 +39,7 @@
                 
                 <!-- Bloque de búsqueda -->
                 <form method="get" action="{% url 'categoria_list' %}" class="search-form">
-                    <input type="text" name="q" class="form-control" placeholder="Buscar categoría...">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar Categoría..." required>
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </form>
             </div>
@@ -28,4 +60,6 @@
         </ul>
 
     </div>
+</body>
+</html>    
 {%endblock%}
