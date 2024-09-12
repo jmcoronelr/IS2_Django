@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario
+from .models import Usuario, Profile
 
 class RegistroUsuarioForm(forms.ModelForm):
     """
@@ -41,5 +41,34 @@ class RegistroUsuarioForm(forms.ModelForm):
         if not password:
             raise forms.ValidationError('La contraseña es obligatoria.')
         return password
+
+
+
+class UpdateUserForm(forms.ModelForm):
+  """
+  Falta añadir comentarios[][]][][][]
+  """
+  
+  username = forms.CharField(max_length=100,
+                               required=True,
+                               widget=forms.TextInput(attrs={'class': 'form-control'}))
+  email = forms.EmailField(required=True,
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
+
+  class Meta:
+    model = Usuario
+    fields = ['username', 'email' , 'nombre', 'apellido']
+
+
+class UpdateProfileForm(forms.ModelForm):
+  """
+  Falta añadir comentarios[]][][][][]
+  """
+  avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
+  bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+
+  class Meta:
+    model = Profile
+    fields = ['avatar', 'bio']
 
 

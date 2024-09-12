@@ -1,11 +1,15 @@
-from django.shortcuts import redirect, render
-from .forms import RegistroUsuarioForm
-from django.views.generic.edit import FormView
-from django.contrib.auth import login
-from django.contrib.auth.views import LogoutView
-from django.contrib.auth.forms import AuthenticationForm
-from django.urls import reverse_lazy
 from allauth.socialaccount.providers.google.views import oauth2_login
+from django.contrib import messages
+from django.contrib.auth import login
+from django.contrib.auth.views import LogoutView, PasswordResetView, PasswordChangeView
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect, render
+from django.urls import reverse_lazy
+from django.views.generic.edit import FormView
+
+from .forms import RegistroUsuarioForm, UpdateUserForm, UpdateProfileForm
 
 def google_login_redirect(request):
     return oauth2_login(request)
@@ -85,3 +89,47 @@ class CustomLogoutView(LogoutView):
     - next_page: URL a la que se redirige después de que el usuario cierra sesión.
     """
     next_page = reverse_lazy('home')  # Redirige a la página principal después del logout
+
+
+class RecuperarUsuario(SuccessMessageMixin, PasswordResetView):
+    """
+    Falta añadir comentarios[]][][][][]
+    """
+    template_name = 'usuarios/password_reset.html'
+    email_template_name = 'usuarios/recuperar_usuario_email.html'
+    subject_template_name = 'usuarios/recuperar_usuario_asunto.txt'
+    success_message = "Te hemos enviado las instrucciones para reinicar tu contraseña, " \
+                      "Si existe un usuario con el correo ingresado, deberias recibir el mensaje pronto" \
+                      " Si no recibes un correo, " \
+                      "asegurate de que ingresaste el correo con el que te registraste y mira la carpeta de spam."
+    success_url = reverse_lazy('home')
+
+
+@login_required
+def profile(request):
+    """
+    Falta añadir comentarios[]][][][][]
+    """
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, 'Tu perfil ha sido actualizado!')
+            return redirect(to='users_profile')
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+        profile_form = UpdateProfileForm(instance=request.user.profile)
+
+    return render(request, 'usuarios/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    """
+    Falta añadir comentarios[]][][][][]
+    """
+    template_name = 'usuarios/change_password.html'
+    success_message = "Successfully Changed Your Password"
+    success_url = reverse_lazy('home')
