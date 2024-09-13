@@ -2,7 +2,7 @@
     Para iniciar la recuperacion de la contraseña de la cuenta {{ user.email }},
     Has click en el link de abajo:
 
-    {{ protocol }}://127.0.0.1:8000{% url 'usuarios:password_reset_confirm' uidb64=uid token=token %}
+    {{ protocol }}://{{ domain }}{% url 'usuarios:password_reset_confirm' uidb64=uid token=token %}
 
     Si el link proveido no funciona, puede copiar y pegar el url prooveido en una 
     nueva ventana.
