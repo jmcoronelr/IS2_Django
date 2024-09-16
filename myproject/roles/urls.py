@@ -8,6 +8,7 @@ urlpatterns = [
     path('crear_rol/', views.crear_rol, name='crear_rol'),
     path('<int:rol_id>/asignar_permisos/', views.asignar_permisos, name='asignar_permisos'),
     path('<int:rol_id>/', views.ver_rol, name='ver_rol'),  # Ver un rol
+    path('eliminar/<int:rol_id>/', views.eliminar_rol, name='eliminar_rol'),  # Eliminar un rol
     path('', views.lista_roles, name='lista_roles'),  # Listar todos los roles
 ]
 

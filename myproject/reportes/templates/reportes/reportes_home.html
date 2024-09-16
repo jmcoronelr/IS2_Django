@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block Titulo %}
+Reportes
+{% endblock %}
+
+{% block content %}
+{% load tiene_permiso %}
+<style>
+  /* Sidebar con glassmorphism y estilo estático */
+  .sidebar {
+    width: 80px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.124); /* Fondo gris translúcido */
+    border-radius: 50px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%); /* Posición estática */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Bordes blancos suaves */
+  }
+
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon-item p {
+    font-size: 1rem;
+    color: #000;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .create-icon, .flujos-icon, .reportes-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+
+  .create-icon img, .flujos-icon img, .reportes-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .create-icon:hover, .flujos-icon:hover, .reportes-icon:hover {
+    transform: scale(1.1);
+    background-color: #d0d0d0;
+  }
+
+  /* Estilo para destacar el ícono activo de Reportes */
+  .active-icon {
+    background-color: #c0c0c0; /* Color más oscuro para el sombreado */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Agregar sombra */
+  }
+
+  /* Estilos de la página de reportes */
+  .reportes-container {
+    margin-left: 100px; /* Ajuste para que no se solape con el sidebar */
+    padding: 20px;
+  }
+
+  .reportes-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px; /* Espacio entre los elementos */
+  }
+
+  .reportes-header input, .reportes-header button, .reportes-header select {
+    padding: 8px;
+    margin-right: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  .reportes-header input[type="date"] {
+    width: 120px; /* Opcional: Reduce el tamaño de los inputs de fecha */
+  }
+
+  .chart-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .report-list {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+  }
+
+  .report-list h3 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .report-list p {
+    margin: 10px 0;
+  }
+</style>
+
+{% if request.user|tiene_permiso:"administrar_sitio" %}
+<div class="sidebar" id="sidebar">
+  <!-- Botón Crear -->
+  <div class="icon-item">
+    <a href="{% url 'content_create' %}" class="create-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Crear Icon" />
+    </a>
+    <p>Crear</p>
+  </div>
+
+  <!-- Botón Flujos -->
+  <div class="icon-item">
+    <a href="{% url 'flujos_home' %}" class="flujos-icon">
+      <img src="https://cdn-icons-png.freepik.com/512/481/481268.png" alt="Flujos Icon" />
+    </a>
+    <p>Flujos</p>
+  </div>
+
+  <!-- Botón Reportes -->
+  <div class="icon-item">
+    <a href="{% url 'reportes_home' %}" class="reportes-icon active-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/3093/3093748.png" alt="Reportes Icon" />
+    </a>
+    <p>Reportes</p>
+  </div>
+</div>
+{% endif %}
+
+<div class="reportes-container">
+  <!-- Encabezado de filtros -->
+  <div class="reportes-header">
+    <select>
+      <option value="">Tipo</option>
+      <option value="categoria">Categoría</option>
+    </select>
+    <select>
+      <option value="">Subtipo</option>
+      <option value="categoria">Categoría</option>
+    </select>
+    <input type="date" name="start" />
+    <input type="date" name="end" />
+    <button>Exportar</button>
+  </div>
+
+  <!-- Cuerpo con gráfico y lista de reportes -->
+  <div class="chart-container">
+    <h2>Gráfico de barras</h2>
+    <p>Visualización del gráfico aquí</p>
+  </div>
+
+  <div class="report-list">
+    <h3>Lista de reporte</h3>
+    <p>Datos</p>
+    <p>Datos</p>
+    <p>Datos</p>
+  </div>
+</div>
+
+{% endblock %}

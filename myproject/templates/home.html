@@ -10,37 +10,127 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
+    <style>
+      /* Contenedor para centrar el contenido principal */
+      .home-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        text-align: center;
+      }
+
+      .home-container h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .home-container p {
+        font-size: 1.25rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Botón de inicio de sesión alineado a la derecha */
+      .navbar .navbar-nav {
+        margin-left: auto;
+      }
+
+      /* Sección inferior estilo rectángulo de información */
+      .info-section {
+        background-color: #1b2b3a;
+        color: #ffffff;
+        padding: 2rem 0;
+        display: flex;
+        justify-content: space-around;
+      }
+
+      .info-column {
+        flex: 1;
+        margin: 0 20px;
+      }
+
+      .info-column h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .info-column p {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .info-column a {
+        color: #ffffff;
+        text-decoration: none;
+      }
+
+      .info-column a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{% url 'home' %}">CMS</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-            <a class="nav-link" href="{% url 'usuarios:login'%}">Iniciar Sesion</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'usuarios:registro'%}">Registrarse</a>
-          </li>
-        </ul>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'home' %}">CMS</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'usuarios:login' %}">Iniciar Sesión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'usuarios:registro' %}">Registrarse</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenido principal centrado -->
+    <div class="home-container">
+      <h1>Bienvenido a CMS System</h1>
+      <p>Administra tu contenido de manera eficiente con nuestras herramientas avanzadas.</p>
+      <a href="{% url 'usuarios:login' %}" class="btn btn-primary">Iniciar Sesión</a>
+    </div>
+
+    <!-- Sección inferior estilo rectángulo de información -->
+    <div class="info-section">
+      <div class="info-column">
+        <h3>Funciones populares</h3>
+        <p><a href="#">Creador de páginas web</a></p>
+        <p><a href="#">Plantillas de correos</a></p>
+        <p><a href="#">Herramientas de redes sociales</a></p>
+      </div>
+      <div class="info-column">
+        <h3>Herramientas gratuitas</h3>
+        <p><a href="#">Generador de ideas para blogs</a></p>
+        <p><a href="#">Creador de videos</a></p>
+        <p><a href="#">Website Grader</a></p>
+      </div>
+      <div class="info-column">
+        <h3>Empresa</h3>
+        <p><a href="#">Sobre nosotros</a></p>
+        <p><a href="#">Trabaja con nosotros</a></p>
+        <p><a href="#">Clientes</a></p>
       </div>
     </div>
-  </nav>
-  <script
-  src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-  crossorigin="anonymous"
-></script>
-</body>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>

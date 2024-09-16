@@ -30,6 +30,9 @@ urlpatterns = [
     path('sistema/', views.sistema, name="sistema"),
     path('accounts/', include('allauth.urls')),
     path('categorias/', include('Categorias.urls')),
+    path('flujos/', include('flujos.urls')),
+    path('reportes/', include('reportes.urls')), 
+    path('historial/', include('historial.urls')), 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

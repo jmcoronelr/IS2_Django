@@ -1,25 +1,28 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asignar Permisos</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-4">
-        <h2 class="mb-4">Asignar Permisos al Rol: {{ rol.nombre }}</h2>
+{% extends 'base.html' %}
 
-        <form method="post" class="bg-light p-4 rounded border mb-4">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Asignar Permisos</button>
-        </form>
+{% block Titulo %}
+  Asignar Permisos
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="text-center mb-4">Asignar Permisos al Rol: <strong>{{ rol.nombre }}</strong></h2>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="submit" class="btn btn-primary">Asignar Permisos</button>
+                            <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-
+</div>
+{% endblock %}

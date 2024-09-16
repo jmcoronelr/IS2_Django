@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
+        
         .container-custom {
             border: 1px solid #ccc;
             border-radius: 15px;
@@ -245,7 +246,7 @@
             <!-- Botones de pie: Atrás, Guardar y Seleccionar Plantilla -->
             <div class="footer-buttons">
                 <div class="action-buttons">
-                    <a href="{% url 'content_list' %}" class="btn btn-secondary">← Atrás</a>
+                    <a href="{% if request.GET.next %}{{ request.GET.next }}{% else %}{% url 'content_list' %}{% endif %}" class="btn btn-secondary">← Volver atrás</a>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
 
@@ -483,22 +484,6 @@
         contentArea.innerHTML = '<p>Selecciona una plantilla para ver el contenido aquí.</p>';
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         document.querySelector('form').onsubmit = function (e) {

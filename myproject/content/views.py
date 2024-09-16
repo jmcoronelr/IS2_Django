@@ -8,6 +8,8 @@ from django.http import JsonResponse
 import json
 from .models import Content, ContentBlock
 from Categorias.models import Categorias
+from django.views.decorators.csrf import csrf_exempt
+
 def content_list(request):
     contents = Content.objects.all().order_by('created_at')
     
@@ -42,14 +44,18 @@ def content_list(request):
 
     return render(request, 'content/content_list.html', {'contents': contents})
 
+from historial.models import Historial  # Importa el modelo Historial
+
 def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
+        accion = 'editado'  # Acción para historial
     else:
         content = None
+        accion = 'creado'  # Acción para historial
 
     plantillas = Plantilla.objects.all()
-    categorias = Categorias.objects.all()  # Obtener las categorías disponibles
+    categorias = Categorias.objects.filter(estado=True)  # Solo las categorías activas
 
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
@@ -103,6 +109,14 @@ def content_create_edit(request, pk=None):
             # Eliminar los bloques que no están en block_ids
             ContentBlock.objects.filter(content=content).exclude(id__in=block_ids).delete()
 
+            # Registrar el cambio en el historial
+            Historial.objects.create(
+                content=content,
+                user=request.user,  # Usuario que realizó el cambio
+                cambio=f"El contenido '{content.title}' fue {accion}.",
+                version=Historial.objects.filter(content=content).count() + 1  # Versión secuencial
+            )
+
             return redirect('content_list')
     else:
         form = ContentForm(instance=content)
@@ -134,7 +148,14 @@ def content_delete(request, pk):
 
 def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
-    return render(request, 'content/content_detail.html', {'content': content})
+    
+    # Obtén la URL anterior o utiliza una URL predeterminada (por ejemplo, '/content') si no existe 'next'
+    next_url = request.GET.get('next', '/content')
+    
+    return render(request, 'content/content_detail.html', {
+        'content': content,
+        'next_url': next_url  # Pasar el valor de next a la plantilla
+    })
 
 def get_plantilla_blocks(request, plantilla_id):
     plantilla = get_object_or_404(Plantilla, id=plantilla_id)

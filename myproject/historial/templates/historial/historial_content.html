@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block Titulo %} Historial de Cambios {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Historial de Cambios para "{{ content.title }}"</h1>
+    <ul class="timeline">
+        {% for cambio in historial %}
+        <li>
+            <div class="version">
+                <span>v{{ cambio.version|floatformat:1 }}</span> <!-- Asegura que la versión tenga 1 decimal -->
+                <strong>{{ cambio.cambio }}</strong> - {{ cambio.timestamp|date:"d M, Y H:i" }} por {{ cambio.user.username }}
+            </div>
+        </li>
+        {% empty %}
+        <li>No hay cambios registrados para este contenido.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<style>
+    .timeline {
+        list-style-type: none;
+        position: relative;
+        padding-left: 40px; /* Espacio para la línea de tiempo */
+    }
+
+    /* Línea vertical de la cronología */
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px; /* Alineado con los puntos */
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: #3F72AF; /* Color de la línea */
+    }
+
+    .timeline li {
+        margin-bottom: 20px;
+        position: relative;
+        padding-left: 20px; /* Espacio para el contenido después del punto */
+    }
+
+    .timeline li::before {
+        content: "";
+        position: absolute;
+        left: 11px; /* Posición del círculo */
+        top: 5px;
+        width: 16px;
+        height: 16px;
+        background-color: #3F72AF;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+
+    .version {
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .version span {
+        background-color: #3F72AF;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}

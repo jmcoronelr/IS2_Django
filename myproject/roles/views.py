@@ -154,3 +154,15 @@ def lista_roles(request):
     return render(request, 'roles/lista_roles.html', {
         'roles': roles,
     })
+
+@login_required
+def eliminar_rol(request, rol_id):
+    """ Eliminar un rol con confirmación previa """
+    rol = get_object_or_404(Rol, id=rol_id)
+    
+    if request.method == 'POST':
+        rol.delete()
+        messages.success(request, f'El rol {rol.nombre} ha sido eliminado exitosamente.')
+        return redirect('lista_roles')
+    
+    return render(request, 'roles/confirmar_eliminar.html', {'rol': rol})

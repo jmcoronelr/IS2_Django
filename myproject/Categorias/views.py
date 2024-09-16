@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import Form_Categorias
 from .models import Categorias
+from django.contrib import messages
 
 def categoria_create(request):
     """
@@ -76,25 +77,17 @@ def categoria_edit(request, pk):
 
     return render(request, 'Categorias/categoria_edit.html', {'form': form})
 
-def categoria_delete(request, pk):
-    """
-    Vista para eliminar una categoría existente.
 
-    Maneja la solicitud GET para mostrar una página de confirmación de eliminación y 
-    la solicitud POST para procesar la eliminación de la instancia de Categoria.
-    
-    Args:
-        request: El objeto HttpRequest que contiene los datos de la solicitud.
-        pk (int): Clave primaria de la categoría a eliminar.
-    
-    Returns:
-        HttpResponse: Redirige a la lista de categorías tras la eliminación exitosa o 
-        renderiza la página de confirmación de eliminación si la solicitud es GET.
-    """
+
+
+def categoria_delete(request, pk):
     categoria = get_object_or_404(Categorias, pk=pk)
 
+    if categoria.content_set.exists():  # Verifica si hay contenidos asociados
+        messages.error(request, "No puedes eliminar esta categoría porque tiene contenidos asociados.")
+        return redirect('categoria_list')
+    
     if request.method == 'POST':
         categoria.delete()
+        messages.success(request, "Categoría eliminada con éxito.")
         return redirect('categoria_list')
-
-    return render(request, 'Categorias/categoria_confirm_delete.html', {'categoria': categoria})
