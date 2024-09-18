@@ -246,7 +246,8 @@
             <!-- Botones de pie: Atrás, Guardar y Seleccionar Plantilla -->
             <div class="footer-buttons">
                 <div class="action-buttons">
-                    <a href="{% if request.GET.next %}{{ request.GET.next }}{% else %}{% url 'content_list' %}{% endif %}" class="btn btn-secondary">← Volver atrás</a>
+                    <!-- Reemplazar el enlace fijo con history.back() -->
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">← Volver atrás</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
 
@@ -256,7 +257,7 @@
                     <select name="plantilla" id="plantilla" class="form-control" onchange="loadPlantillaBlocks()">
                         <option value="">Seleccione una plantilla</option>
                         {% for plantilla in plantillas %}
-                            <option value="{{ plantilla.id }}" {% if selected_plantilla and selected_plantilla.id == plantilla.id %}selected{% endif %}>
+                            <option value="{{ plantilla.id }}" {% if selected_plantilla and selected_plantilla.id == selected_plantilla.id %}selected{% endif %}>
                                 {{ plantilla.descripcion }}
                             </option>
                         {% endfor %}

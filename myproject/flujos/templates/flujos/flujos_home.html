@@ -94,6 +94,16 @@ Flujos - Tablero Kanban
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .edit-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
   }
 </style>
 
@@ -128,7 +138,12 @@ Flujos - Tablero Kanban
   <div class="kanban-column" id="draft">
     <h2>Borrador</h2>
     {% for content in borradores %}
-    <div class="kanban-task" data-id="{{ content.id }}">{{ content.title }}</div>
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
     {% endfor %}
   </div>
 
@@ -136,7 +151,12 @@ Flujos - Tablero Kanban
   <div class="kanban-column" id="review">
     <h2>Revisión</h2>
     {% for content in en_revision %}
-    <div class="kanban-task" data-id="{{ content.id }}">{{ content.title }}</div>
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
     {% endfor %}
   </div>
 
@@ -144,7 +164,12 @@ Flujos - Tablero Kanban
   <div class="kanban-column" id="published">
     <h2>Publicado</h2>
     {% for content in publicados %}
-    <div class="kanban-task" data-id="{{ content.id }}">{{ content.title }}</div>
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
     {% endfor %}
   </div>
 
@@ -152,7 +177,12 @@ Flujos - Tablero Kanban
   <div class="kanban-column" id="rejected">
     <h2>Rechazado</h2>
     {% for content in rechazados %}
-    <div class="kanban-task" data-id="{{ content.id }}">{{ content.title }}</div>
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
     {% endfor %}
   </div>
 </div>

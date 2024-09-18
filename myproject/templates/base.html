@@ -20,7 +20,7 @@
       }        
       
       .navbar {
-            height: 70px;
+            height: 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -70,15 +70,11 @@
         }
 
         .nav-link.active {
-            background-color: #6c757d;
-            color: #fff !important;
+            background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+            backdrop-filter: blur(10px); /* Efecto glassmorphism */
+            -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
+            color: #000000 !important;
             font-weight: 500;
-        }
-
-        .nav-link:hover {
-            background-color: #d3d3d3;
-            color: #000;
-            font-weight: 400;
         }
 
         .settings-icon {
@@ -103,7 +99,10 @@
             </li>
         </ul>
 
-        <a class="navbar-brand" href="{% url 'sistema' %}">CMS</a>
+        <!-- Logo en lugar de "CMS" -->
+        <a class="navbar-brand" href="{% url 'sistema' %}">
+            <img src="https://i.ibb.co/fq2BvCV/blinq-logo.png" alt="Logo" height="40">
+        </a>
 
         <ul class="navbar-nav navbar-nav-right">
             {% load tiene_permiso %}

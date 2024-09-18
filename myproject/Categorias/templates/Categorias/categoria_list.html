@@ -94,15 +94,17 @@
 
         <!-- Mostrar mensajes si existen -->
         {% if messages %}
-            <div>
-                {% for message in messages %}
+        <div>
+            {% for message in messages %}
+                {% if 'category_message' in message.tags %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
 
         <ul class="list-group">
             {% for categoria in categorias %}
