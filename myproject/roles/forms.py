@@ -25,4 +25,3 @@ class AsignarPermisoForm(forms.ModelForm):
     class Meta:
         model = Rol
         fields = ['permisos']  # Asegúrate de que 'permisos' sea el campo correcto para tu relación
-

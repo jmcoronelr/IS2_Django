@@ -182,3 +182,4 @@ class RolesViewsTestCase(TestCase):
         except AssertionError as e:
             log_unittest('ListaRolesView', 'test_lista_roles_view', 'FAILED')
             raise e
+
