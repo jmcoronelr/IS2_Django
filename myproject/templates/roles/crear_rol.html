@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block Titulo %}
+    Crear Rol
+{% endblock %}
+
+{% block content %}
+    <style>
+        /* Estilos generales */
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            opacity: 0; /* Inicialmente invisible */
+            transform: scale(0); /* Inicialmente escalado a 0 */
+            animation: popup-in 0.5s forwards; /* Animación de entrada */
+        }
+
+        /* Título del formulario */
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Botones alineados verticalmente */
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-group-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-group-vertical .btn {
+            margin-bottom: 10px;
+        }
+
+        /* Animación de entrada */
+        @keyframes popup-in {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animación de salida */
+        @keyframes popup-out {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+        }
+
+    </style>
+
+    <div class="form-container" id="formContainer">
+        <!-- Título centrado -->
+        <h1 class="form-title">Crear Rol</h1>
+
+        <!-- Formulario -->
+        <form method="post" id="form">
+            {% csrf_token %}
+            {{ form.as_p }}
+
+            <!-- Botón de Crear -->
+            <div class="btn-group-vertical">
+                <button type="submit" class="btn btn-primary btn-block">Crear Rol</button>
+                <a href="#" class="btn btn-secondary btn-block" id="backButton">Volver a la lista</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Animación de salida cuando se hace clic en "Volver a la lista"
+        document.getElementById('backButton').addEventListener('click', function(e) {
+            e.preventDefault(); // Evitar la acción por defecto del enlace
+            const formContainer = document.getElementById('formContainer');
+
+            // Cambiar la animación a la de salida
+            formContainer.style.animation = 'popup-out 0.5s forwards';
+
+            // Redirigir después de que la animación de salida haya terminado
+            setTimeout(function() {
+                window.location.href = "{% url 'lista_roles' %}"; // URL de redirección
+            }, 500); // La duración de la animación debe coincidir (0.5s)
+        });
+    </script>
+{% endblock %}

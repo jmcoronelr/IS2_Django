@@ -16,6 +16,12 @@ pip install -r requirements.txt
 :: Ejecuta las migraciones
 python manage.py migrate
 
+:: Ejecuta la creacion de permisos
+python permisosBd.py
+
+:: Ejecuta el script para crear el superusuario
+python crear_superusuario.py
+
 :: Inicia el servidor de desarrollo
 python manage.py runserver
 

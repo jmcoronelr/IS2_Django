@@ -1,18 +1,27 @@
-# forms.py
-
 from django import forms
-from .models import Role
+from .models import Rol,Permiso
+from Categorias.models import Categorias
 
-class RoleForm(forms.ModelForm):
+
+class AsignarRolForm(forms.Form):
+    categoria = forms.ModelChoiceField(queryset=Categorias.objects.all(), label="Categoría")
+    rol = forms.ModelChoiceField(queryset=Rol.objects.all(), label="Rol")
+
+
+class CrearRolForm(forms.ModelForm):
     class Meta:
-        model = Role
-        fields = ['name', 'description']
+        model = Rol
+        fields = ['nombre', 'descripcion']
 
-    def clean_name(self):
-        # Convertir el nombre a minúsculas para la validación de unicidad
-        name = self.cleaned_data.get('name').lower()
-        # Excluir el rol actual de la verificación
-        if Role.objects.filter(name__iexact=name).exclude(id=self.instance.id).exists():
-            raise forms.ValidationError("Este rol ya existe.")
-        return name
 
+class AsignarPermisoForm(forms.ModelForm):
+    permisos = forms.ModelMultipleChoiceField(
+        queryset=Permiso.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+        label="Permisos"
+    )
+
+    class Meta:
+        model = Rol
+        fields = ['permisos']  # Asegúrate de que 'permisos' sea el campo correcto para tu relación

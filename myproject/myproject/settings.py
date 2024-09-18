@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-=hozz9%=@vwx5$=ye41!=l63r&yvybw#v*^q-&fudgkxwb-_io'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -42,7 +42,11 @@ INSTALLED_APPS = [
     'usuarios',
     'widget_tweaks',
     'Categorias',
+    'roles',
+    'flujos',
+    'reportes',
     'Plantillas',
+    'historial',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -102,7 +106,7 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,  # Asegúrate de que esto esté habilitado
         'DIRS': ['templates'],
         'APP_DIRS': True,
@@ -191,3 +195,14 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'vitoulises@fpuna.edu.py'
+EMAIL_HOST_PASSWORD = 'rzge rdnm yatc dayt'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

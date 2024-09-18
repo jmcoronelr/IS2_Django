@@ -1,39 +1,214 @@
-{%extends 'base.html'%} {%block content%}
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'sistema' %}">CMS</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-      aria-controls="navbarNav"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <form action="{% url 'usuarios:logout' %}" method="post">
-            {% csrf_token %}
-            <button class="nav-link">LogOut</button>
-          </form>
-          {% endif %}
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'categoria_list' %}">Categorias</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'plantilla_list'%}">Plantillas</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'content_list'%}">Contenido</a>
-        </li>
-      </ul>
-    </div>
+{% extends 'base.html' %}
+
+{% block Titulo %}
+CMS
+{% endblock %}
+
+{% block content %}
+{% load tiene_permiso %}
+<style>
+  .sidebar {
+    width: 80px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.124); /* Fondo gris translúcido */
+    border-radius: 50px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%) translateX(-100px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+    transition: transform 0.6s ease-out;
+    backdrop-filter: blur(10px); /* Efecto de desenfoque */
+    -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Bordes blancos suaves */
+}
+
+
+
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon-item p {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #000;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .create-icon, .flujos-icon, .reportes-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+
+  .create-icon img, .flujos-icon img, .reportes-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .create-icon:hover, .flujos-icon:hover, .reportes-icon:hover {
+    transform: scale(1.1);
+    background-color: #d0d0d0;
+  }
+
+  .sidebar.visible {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  /* Estilo para el feed de contenido */
+  .content-feed {
+    margin-left: 100px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .content-feed h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .content-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .content-item {
+    background-color: #e0e0e0;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    width: 300px;
+    height: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    flex-direction: column;
+  }
+
+  .content-image {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .content-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 15px;
+  }
+
+  .content-category {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .content-details {
+    text-align: left;
+    width: 100%;
+  }
+
+  .content-details h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  .content-details a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+    position: absolute;
+    bottom: 10px;
+  }
+
+  .content-details a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+{% if request.user|tiene_permiso:"administrar_sitio" %}
+<div class="sidebar" id="sidebar">
+  <div class="icon-item">
+    <a href="{% url 'content_create' %}?next={{ request.path }}" class="create-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Crear Icon" />
+  </a>
+    <p>Crear</p>
   </div>
-</nav>
-{%endblock%}
+
+  <div class="icon-item">
+    <a href="{% url 'flujos_home' %}" class="flujos-icon">
+      <img src="https://cdn-icons-png.freepik.com/512/481/481268.png" alt="Flujos Icon" />
+    </a>
+    <p>Flujos</p>
+  </div>
+
+  <div class="icon-item">
+    <a href="{% url 'reportes_home' %}" class="reportes-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/3093/3093748.png" alt="Reportes Icon" />
+    </a>
+    <p>Reportes</p>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('sidebar');
+    setTimeout(function() {
+      sidebar.classList.add('visible');
+    }, 100);
+  });
+</script>
+{% endif %}
+
+<div class="content-feed">
+  <h2>Últimos Contenidos</h2>
+  <div class="content-grid">
+    {% for contenido in contenidos %}
+    <div class="content-item">
+      <div class="content-category">{{ contenido.category }}</div>
+      <div class="content-image">
+        {% if contenido.image %}
+        <img src="{{ contenido.image.url }}" alt="Imagen de {{ contenido.title }}">
+        {% else %}
+        <span>Sin imagen</span>
+        {% endif %}
+      </div>
+      <div class="content-details">
+        <h3>{{ contenido.title }}</h3>
+        <div class="description">{{ contenido.description }}</div>
+        <a href="{% if contenido.pk %}{% url 'content_detail' contenido.pk %}?next={{ request.path }}{% endif %}">Ver más</a>
+      </div>
+    </div>
+    {% empty %}
+    <p>No hay contenidos disponibles.</p>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

@@ -4,25 +4,502 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear/Editar Contenido</title>
-    <!-- Incluir Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="bg-light rounded p-4 shadow-sm" style="max-width: 600px; margin: auto;">
-            <h1 class="text-dark mb-4 text-center">Crear/Editar Contenido</h1>
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    {{ form.as_p }}
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Guardar</button>
-                <a href="{% url 'content_list' %}" class="btn btn-secondary w-100 mt-2">Volver a Inicio</a>
-            </form>
-        </div>
-    </div>
     
-    <!-- Incluir Bootstrap JS -->
+    <style>
+        
+        .container-custom {
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            padding: 20px;
+            background-color: #f1f2f6;
+            width: 1233px;
+            height: 743px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .content-area {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            width: 100%;
+            height: 500px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+
+        .draggable {
+            border: 1px solid #ccc;
+            background-color: #e0e0e0;
+            position: absolute;
+            min-width: 200px;
+            min-height: 100px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .resize-handle {
+            width: 10px;
+            height: 10px;
+            background-color: #000;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            cursor: se-resize;
+        }
+
+        .draggable img, .draggable video, .draggable audio {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .drag-icon {
+            width: 25px;
+            height: 25px;
+            background-color: #ddd;
+            position: absolute;
+            left: -30px;
+            top: 10px;
+            cursor: move;
+            z-index: 10;
+        }
+
+        .control-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .footer-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px; /* Ajuste para subir los botones */
+        }
+
+        .footer-buttons .btn {
+            padding: 10px 20px;
+        }
+
+        .form-inline-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+
+        .form-inline-container .form-group {
+            flex: 1;
+            text-align: center;
+        }
+
+        /* Estilo redondeado para los inputs, selects y textarea */
+        .form-inline-container input, .form-inline-container select, .form-inline-container textarea {
+            width: 100%;
+            height: 40px;
+            resize: none;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            padding: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
+            outline: none;
+        }
+        .form-inline-container input:focus, .form-inline-container select:focus, .form-inline-container textarea:focus {
+            border-color: #8e8e8e;
+        }
+
+
+
+        /* Estilo para el modo de eliminación */
+        .delete-mode {
+            border: 2px solid red;
+            background-color: #ffcccc;
+        }
+
+        /* Estilo personalizado para la sección de Plantilla */
+        .form-group-inline {
+            display: flex;
+            align-items: center; /* Para alinear verticalmente */
+        }
+
+        .form-group-inline label {
+            margin-right: 10px; /* Espacio entre el label y el desplegable */
+        }
+
+        .form-group-inline select {
+            width: auto; /* Evitar que el select ocupe todo el ancho */
+        }
+
+        /* Ajuste para la previsualización de archivos multimedia */
+        .block-info {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .block-info p {
+            margin-bottom: 0;
+            font-size: 12px;
+        }
+
+        .block-info img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        /* Estilo para la sección de detalles multimedia */
+        .multimedia-details {
+            font-size: 0.8rem;
+            padding: 5px;
+            text-align: left;
+            background-color: #f8f9fa;
+        }
+
+        .multimedia-details input {
+            width: auto;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center vh-100">
+    <div class="container-custom shadow-lg">
+        <!-- Iniciar formulario -->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!-- Encabezado con los campos en una sola fila -->
+            <div class="form-inline-container">
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select name="categoria" id="categoria">
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if selected_categoria and selected_categoria.id == categoria.id %}selected{% endif %}>
+                                {{ categoria.descripcionLarga }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    {{ form.status }}
+                </div>
+            </div>
+
+            <!-- Botones para añadir bloques -->
+            <div class="control-buttons">
+                <button type="button" class="btn btn-primary" onclick="addTextBlock()">Añadir bloque de texto</button>
+                <button type="button" class="btn btn-secondary" onclick="addMultimediaBlock()">Añadir bloque multimedia</button>
+                <button type="button" class="btn btn-danger" id="delete-btn" onclick="toggleDeleteMode()">Borrar</button>
+                <button type="button" class="btn btn-light" id="cancel-btn" onclick="cancelDeleteMode()" style="display: none;">Cancelar</button>
+            </div>
+
+            <!-- Área interactiva para el contenido -->
+            <div class="content-area" id="content-area">
+                {% if blocks %}
+                    {% for bloque in blocks %}
+                        <div class="draggable" 
+                            id="block-{{ bloque.id }}" 
+                            style="top: {{ bloque.top }}; left: {{ bloque.left }}; width: {{ bloque.width }}; height: {{ bloque.height }};">
+                            
+                            <div class="drag-icon">
+                                <img src="https://static-00.iconduck.com/assets.00/drag-icon-2048x2048-l70ogpuu.png" style="width: 25px; height: 25px;">
+                            </div>
+                            
+                            {% if bloque.block_type == 'texto' %}
+                                <textarea style="width:100%; height:100%;">{{ bloque.content_text }}</textarea>
+                                {% elif bloque.block_type == 'multimedia' %}
+                                <!-- Previsualizar archivo multimedia -->
+                                {% if bloque.multimedia and bloque.multimedia.name %}
+                                    <img src="{{ bloque.multimedia.url }}" alt="Imagen subida" style="max-width: 100%; max-height: 100%;">
+                                {% else %}
+                                    <p>No hay archivo multimedia cargado</p>
+                                {% endif %}
+                            
+                                <!-- Información adicional y selección de archivos debajo del contenido -->
+                                <div class="multimedia-details">
+                                    <input type="file" name="multimedia-{{ bloque.id }}" accept="image/*,video/*,audio/*">
+                                    {% if bloque.multimedia %}
+                                        <p>Archivo actual: {{ bloque.multimedia.url }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="resize-handle"></div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Selecciona una plantilla para ver el contenido aquí.</p>
+                {% endif %}
+            </div>
+                        
+            <!-- Botones de pie: Atrás, Guardar y Seleccionar Plantilla -->
+            <div class="footer-buttons">
+                <div class="action-buttons">
+                    <!-- Reemplazar el enlace fijo con history.back() -->
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">← Volver atrás</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+
+                <!-- Sección para seleccionar Plantilla -->
+                <div class="form-group-inline">
+                    <label for="plantilla">Plantilla:</label>
+                    <select name="plantilla" id="plantilla" class="form-control" onchange="loadPlantillaBlocks()">
+                        <option value="">Seleccione una plantilla</option>
+                        {% for plantilla in plantillas %}
+                            <option value="{{ plantilla.id }}" {% if selected_plantilla and selected_plantilla.id == selected_plantilla.id %}selected{% endif %}>
+                                {{ plantilla.descripcion }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let deleteMode = false;
+
+        function initializeExistingBlocks() {
+            const blocks = document.querySelectorAll('.draggable');
+            blocks.forEach(block => {
+                const resizeHandle = block.querySelector('.resize-handle');
+                makeDraggable(block);
+                makeResizable(block, resizeHandle);
+            });
+        }
+
+        function addTextBlock() {
+            const contentArea = document.getElementById('content-area');
+            const textBlock = document.createElement('div');
+            textBlock.classList.add('draggable');
+            textBlock.innerHTML = `
+                <textarea style="width:100%; height:100%;">Escribe aquí...</textarea>
+                <div class="drag-icon"><img src="https://static-00.iconduck.com/assets.00/drag-icon-2048x2048-l70ogpuu.png" style="width: 25px; height: 25px;"></div>
+                <div class="resize-handle"></div>
+            `;
+            textBlock.style.width = '200px';
+            textBlock.style.height = '100px';
+            textBlock.style.top = '50px';
+            textBlock.style.left = '50px';
+            contentArea.appendChild(textBlock);
+            makeDraggable(textBlock);
+            makeResizable(textBlock);
+        }
+
+        let blockCounter = 0;  // Contador global para manejar IDs únicos
+        function addMultimediaBlock() {
+            blockCounter++;
+            const contentArea = document.getElementById('content-area');
+            const mediaBlock = document.createElement('div');
+            mediaBlock.classList.add('draggable');
+            mediaBlock.setAttribute('id', `block-new-${blockCounter}`);  // ID único
+            mediaBlock.innerHTML = `
+                <input type="file" name="multimedia" accept="image/*,video/*,audio/*">
+                <div class="drag-icon"><img src="https://static-00.iconduck.com/assets.00/drag-icon-2048x2048-l70ogpuu.png" style="width: 25px; height: 25px;"></div>
+                <div class="resize-handle"></div>
+            `;
+            mediaBlock.style.width = '200px';
+            mediaBlock.style.height = '100px';
+            mediaBlock.style.top = '50px';
+            mediaBlock.style.left = '50px';
+            contentArea.appendChild(mediaBlock);
+            makeDraggable(mediaBlock);
+            makeResizable(mediaBlock);
+        }
+
+        function makeDraggable(block) {
+            const dragIcon = block.querySelector('.drag-icon');
+            dragIcon.onmousedown = function (e) {
+                if (!deleteMode) {
+                    let isDragging = true;
+                    let dragOffsetX = e.clientX - block.getBoundingClientRect().left;
+                    let dragOffsetY = e.clientY - block.getBoundingClientRect().top;
+                    document.onmousemove = function (event) {
+                        if (isDragging) {
+                            block.style.left = (event.clientX - dragOffsetX) + 'px';
+                            block.style.top = (event.clientY - dragOffsetY) + 'px';
+                        }
+                    };
+                    document.onmouseup = function () {
+                        isDragging = false;
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    };
+                }
+            };
+        }
+
+        function makeResizable(block) {
+            const resizeHandle = block.querySelector('.resize-handle');
+            resizeHandle.onmousedown = function (e) {
+                if (!deleteMode) {
+                    let isResizing = true;
+                    let initialWidth = block.offsetWidth;
+                    let initialHeight = block.offsetHeight;
+                    let initialX = e.clientX;
+                    let initialY = e.clientY;
+                    document.onmousemove = function (event) {
+                        if (isResizing) {
+                            const newWidth = initialWidth + (event.clientX - initialX);
+                            const newHeight = initialHeight + (event.clientY - initialY);
+                            block.style.width = newWidth + 'px';
+                            block.style.height = newHeight + 'px';
+                        }
+                    };
+                    document.onmouseup = function () {
+                        isResizing = false;
+                        document.onmousemove = null;
+                        document.onmouseup = null;
+                    };
+                }
+            };
+        }
+
+        function toggleDeleteMode() {
+            deleteMode = !deleteMode;
+            const blocks = document.querySelectorAll('.draggable');
+            blocks.forEach(block => {
+                block.classList.toggle('delete-mode');
+                if (deleteMode) {
+                    block.onclick = function () {
+                        block.remove();
+                    };
+                } else {
+                    block.onclick = null;
+                }
+            });
+            document.getElementById('delete-btn').style.display = deleteMode ? 'none' : 'inline-block';
+            document.getElementById('cancel-btn').style.display = deleteMode ? 'inline-block' : 'none';
+        }
+
+        function cancelDeleteMode() {
+            deleteMode = false;
+            document.getElementById('delete-btn').style.display = 'inline-block';
+            document.getElementById('cancel-btn').style.display = 'none';
+            const blocks = document.querySelectorAll('.draggable');
+            blocks.forEach(block => {
+                block.classList.remove('delete-mode');
+                block.onclick = null;
+            });
+        }
+
+        function getBlockData() {
+            const blocks = document.querySelectorAll('.draggable');
+            let blockData = [];
+            blocks.forEach(block => {
+                const blockInfo = {
+                    id: block.id.includes('new') ? null : block.id.split('-')[1],  // Diferenciar entre bloques nuevos y existentes
+                    type: block.querySelector('textarea') ? 'texto' : 'multimedia',
+                    content: block.querySelector('textarea') ? block.querySelector('textarea').value : '',
+                    top: block.style.top,
+                    left: block.style.left,
+                    width: block.style.width,
+                    height: block.style.height
+                };
+                blockData.push(blockInfo);
+            });
+            return blockData;
+        }
+
+
+        function loadPlantillaBlocks() {
+    const plantillaId = document.getElementById('plantilla').value;
+    const contentArea = document.getElementById('content-area');
+
+    if (plantillaId) {
+        fetch(`/content/${plantillaId}/get_blocks/`)
+            .then(response => response.json())
+            .then(data => {
+                // Limpiar el área de contenido antes de cargar los nuevos bloques
+                contentArea.innerHTML = '';
+
+                data.blocks.forEach(block => {
+                    const newBlock = document.createElement('div');
+                    newBlock.classList.add('draggable');
+                    newBlock.style.top = block.top;
+                    newBlock.style.left = block.left;
+                    newBlock.style.width = block.width;
+                    newBlock.style.height = block.height;
+
+                    // Icono de mover
+                    const dragIcon = document.createElement('div');
+                    dragIcon.classList.add('drag-icon');
+                    dragIcon.innerHTML = '<img src="https://static-00.iconduck.com/assets.00/drag-icon-2048x2048-l70ogpuu.png" style="width: 25px; height: 25px;">';
+                    newBlock.appendChild(dragIcon);
+
+                    // Comprobar si el bloque es de texto o multimedia
+                    if (block.type === 'texto') {
+                        const textarea = document.createElement('textarea');
+                        textarea.style.width = '100%';
+                        textarea.style.height = '100%';
+                        textarea.value = block.content_text || '';
+                        newBlock.appendChild(textarea);
+                    } else if (block.type === 'multimedia') {
+                        const img = document.createElement('img');
+                        img.src = block.multimedia || '';
+                        img.style.maxWidth = '100%';
+                        img.style.maxHeight = '100%';
+                        newBlock.appendChild(img);
+
+                        const multimediaDetails = document.createElement('div');
+                        multimediaDetails.classList.add('multimedia-details');
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.name = `multimedia-${block.id}`;
+                        fileInput.accept = 'image/*,video/*,audio/*';
+                        multimediaDetails.appendChild(fileInput);
+
+                        if (block.multimedia) {
+                            const fileLabel = document.createElement('p');
+                            fileLabel.textContent = `Archivo actual: ${block.multimedia}`;
+                            multimediaDetails.appendChild(fileLabel);
+                        }
+
+                        newBlock.appendChild(multimediaDetails);
+                    }
+
+                    const resizeHandle = document.createElement('div');
+                    resizeHandle.classList.add('resize-handle');
+                    newBlock.appendChild(resizeHandle);
+
+                    contentArea.appendChild(newBlock);
+                    makeDraggable(newBlock);
+                    makeResizable(newBlock);
+                });
+            });
+    } else {
+        // Si no hay plantilla seleccionada, limpiar el área de contenido
+        contentArea.innerHTML = '<p>Selecciona una plantilla para ver el contenido aquí.</p>';
+    }
+}
+
+
+        document.querySelector('form').onsubmit = function (e) {
+            const blockData = getBlockData();
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'block_data';
+            input.value = JSON.stringify(blockData);
+            this.appendChild(input);
+        };
+
+        // Inicializar los bloques existentes al cargar la página
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeExistingBlocks();
+        });
+    </script>
 </body>
 </html>

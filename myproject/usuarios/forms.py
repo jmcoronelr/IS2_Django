@@ -1,5 +1,5 @@
 from django import forms
-from .models import Usuario, Rol
+from .models import Usuario, Profile
 
 class RegistroUsuarioForm(forms.ModelForm):
     """
@@ -43,16 +43,32 @@ class RegistroUsuarioForm(forms.ModelForm):
         return password
 
 
-class AsignarRolForm(forms.Form):
-    """
-    Formulario para asignar un rol a un usuario existente.
-    Utiliza campos de selección basados en los modelos `Usuario` y `Rol`.
 
-    Atributos:
-    - usuario: Campo de selección de un usuario del queryset de todos los usuarios.
-    - rol: Campo de selección de un rol del queryset de todos los roles.
-    """
+class UpdateUserForm(forms.ModelForm):
+  """
+  Falta añadir comentarios[][]][][][]
+  """
+  
+  username = forms.CharField(max_length=100,
+                               required=True,
+                               widget=forms.TextInput(attrs={'class': 'form-control'}))
+  email = forms.EmailField(required=True,
+                             widget=forms.TextInput(attrs={'class': 'form-control'}))
 
-    usuario = forms.ModelChoiceField(queryset=Usuario.objects.all())
-    rol = forms.ModelChoiceField(queryset=Rol.objects.all())
+  class Meta:
+    model = Usuario
+    fields = ['username', 'email' , 'nombre', 'apellido']
+
+
+class UpdateProfileForm(forms.ModelForm):
+  """
+  Falta añadir comentarios[]][][][][]
+  """
+  avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
+  bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+
+  class Meta:
+    model = Profile
+    fields = ['avatar', 'bio']
+
 

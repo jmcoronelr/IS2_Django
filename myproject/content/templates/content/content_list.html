@@ -1,179 +1,246 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Contenidos</title>
-    <!-- Incluir Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        .content-card {
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            text-align: center;
-            background-color: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        .content-title {
-            font-weight: bold;
-            font-size: 1em;
-            margin-bottom: 5px;
-        }
-        .content-info {
-            font-size: 0.85em;
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-        .content-actions {
-            margin-top: 5px;
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-        }
-        /* Colores de Bootstrap */
-        .btn-primary {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-        }
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-        .btn-primary:hover, .btn-warning:hover, .btn-danger:hover {
-            opacity: 0.8;
-        }
-        .filter-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .filter-container select, .filter-container button {
-            margin-left: 10px;
-            padding: 5px;
-            font-size: 0.9em;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .filter-container button {
-            background-color: #0d6efd;
-            color: white;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-        .pagination .page-link {
-            color: #0d6efd;
-            padding: 8px 16px;
-            text-decoration: none;
-            border: 1px solid #e0e0e0;
-            margin: 0 4px;
-            border-radius: 5px;
-        }
-        .pagination .page-link:hover {
-            background-color: #f1f1f1;
-        }
-        .pagination .active .page-link {
-            background-color: #0d6efd;
-            color: white;
-            border: 1px solid #0d6efd;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-5">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'sistema' %}">CMS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <form action="{% url 'usuarios:logout' %}" method="post">
-                            {% csrf_token %}
-                            <button class="nav-link btn btn-link">LogOut</button>
-                        </form>
-                    </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'categoria_list' %}">Categorías</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'plantilla_list'%}">Plantillas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'content_list'%}">Contenido</a>
-                    </li>
-                </ul>
+{% extends 'base.html' %}
+{% block Titulo%} 
+  Contenido
+{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <style>
+            html {
+                scroll-behavior: smooth;
+            }
+            
+            /* Paleta de colores personalizada */
+            .btn-primary {
+                background-color: #3F72AF;
+                border-color: #3F72AF;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #365f91;
+                border-color: #365f91;
+            }
+
+            .btn-secondary {
+                background-color: #F5F5F5;
+                border-color: #D9D9D9;
+                color: #333;
+            }
+
+            .btn-secondary:hover {
+                background-color: #E0E0E0;
+                border-color: #BFBFBF;
+            }
+
+            .btn-danger {
+                background-color: #D32F2F;
+                border-color: #D32F2F;
+            }
+
+            .btn-danger:hover {
+                background-color: #B71C1C;
+                border-color: #B71C1C;
+            }
+
+            /* Paginación personalizada */
+            .pagination .page-link {
+                color: #333;
+                background-color: #F5F5F5;
+                border-color: #D9D9D9;
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #3F72AF;
+                border-color: #3F72AF;
+                color: white;
+            }
+
+            .content-card {
+                border: 1px solid #e0e0e0;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 10px;
+                text-align: center;
+                background-color: #f8f9fa;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .content-title {
+                font-weight: bold;
+                font-size: 1em;
+                margin-bottom: 5px;
+                position: relative;
+                text-align: center;
+            }
+
+            .delete-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                cursor: pointer;
+                margin: 10px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .delete-icon:hover {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            .delete-icon:hover img {
+                filter: brightness(0) saturate(100%) invert(41%) sepia(60%) saturate(746%) hue-rotate(150deg) brightness(95%) contrast(102%);
+            }
+
+            .content-info {
+                font-size: 0.85em;
+                color: #6c757d;
+                margin-bottom: 10px;
+            }
+
+            .content-actions {
+                margin-top: 5px;
+                display: flex;
+                justify-content: center;
+                gap: 5px;
+            }
+
+            .filter-container {
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .filters {
+                display: flex;
+                gap: 10px;
+            }
+
+            .filter-container select, .filter-container input {
+                padding: 5px;
+                font-size: 0.9em;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: calc(1.375rem + 1.5vw);
+                margin-bottom: 0;
+            }
+
+            .search-create-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 10px;
+            }
+
+            .search-form input {
+                width: 250px;
+            }
+
+            .history-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                cursor: pointer;
+                margin: 10px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .history-icon:hover {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+        </style>
+
+        <div class="header">
+            <h1 class="mb-4">Lista de Contenidos</h1>
+            <div class="search-create-container">
+                {% load tiene_permiso %}
+                {% if request.user|tiene_permiso:"crear_contenido" %}
+                <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
+                {% endif %}
+                
+                <form method="get" action="{% url 'content_list' %}" class="search-form">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar Contenido..." value="{{ request.GET.q }}" required>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
             </div>
         </div>
-    </nav>
-    <div class="container">
-        <h1 class="mb-4">Lista de Contenidos</h1>
-        <form method="GET" class="filter-container">
-            <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
-            <div class="filters">
-                <select name="fecha">
-                    <option value="">Filtrar por fecha</option>
-                    <option value="today">Hoy</option>
-                    <option value="week">Esta semana</option>
-                    <option value="month">Este mes</option>
-                </select>
-                <select name="estado">
-                    <option value="">Filtrar por estado</option>
-                    <option value="draft">Borrador</option>
-                    <option value="review">En Revisión</option>
-                    <option value="published">Publicado</option>
-                    <option value="rejected">Rechazado</option>
-                    <option value="inactive">Inactivo</option>
-                </select>
-                <select name="categoria">
-                    <option value="">Filtrar por categoría</option>
-                    <option value="1">Categoría 1</option>
-                    <option value="2">Categoría 2</option>
-                    <!-- Añadir más categorías según sea necesario -->
-                </select>
-                <button type="submit">Filtrar</button>
-            </div>
-        </form>
+
+        <div class="filter-container">
+            <form method="get" action="{% url 'content_list' %}">
+                <div class="filters">
+                    <select name="fecha">
+                        <option value="">Filtrar por fecha</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                    </select>
+                    <select name="estado">
+                        <option value="">Filtrar por estado</option>
+                        <option value="draft">Borrador</option>
+                        <option value="review">En Revisión</option>
+                        <option value="published">Publicado</option>
+                        <option value="rejected">Rechazado</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                    <select name="categoria">
+                        <option value="">Filtrar por categoría</option>
+                        <option value="1">Categoría 1</option>
+                        <option value="2">Categoría 2</option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
+                </div>
+            </form>
+        </div>
 
         <div class="row g-4">
             {% for content in contents %}
             <div class="col-md-4 col-lg-3">
                 <div class="content-card">
-                    <div class="content-title">{{ content.title }}</div>
+                    <div class="content-title">
+                        <a href="{% url 'historial_content' content.pk %}">
+                            <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
+                                 alt="Historia" class="history-icon" width="20" height="20">
+                        </a>                      
+                        {{ content.title }}
+                        <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
+                    </div>
                     <div class="content-info">
-                        <p>Categoría: {{ content.category.name }}</p>
+                        <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
                         <p>Estado: {{ content.get_status_display }}</p>
                     </div>
                     <div class="content-actions">
                         <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
+                        {% if request.user|tiene_permiso:"editar" %}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">Eliminar</button>
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"publicar_contenido" and content.status != 'published' %}
+                        <a href="" class="btn btn-primary btn-sm">Publicar</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-        
-        <!-- Paginación -->
+                
         <nav aria-label="Page navigation">
-            <ul class="pagination">
+            <ul class="pagination justify-content-center mt-5">
                 {% if contents.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="?page=1">Primera</a>
@@ -216,23 +283,25 @@
                     <div class="modal-footer">
                         <form id="deleteForm" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="page" value="{{ request.GET.page }}"> <!-- Incluye la página actual -->
+                            <input type="hidden" name="page" value="{{ request.GET.page }}">
                             <button type="submit" class="btn btn-primary">Eliminar</button>
                         </form>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        </body>
-    <!-- Incluir Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Script para manejar el botón de eliminación y el formulario del modal
-        var deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var contentId = button.getAttribute('data-bs-content-id');
-            var deleteForm = document.getElementById('deleteForm');
-            var currentPage = "{{ request.GET.page|default:1 }}"; // Obtiene la página actual
-            deleteForm.action = '/content/delete/' + contentId + '/?page=' + currentPage;
-        });
-    </script></body>
-</html>
-   
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var contentId = button.getAttribute('data-bs-content-id');
+                var deleteForm = document.getElementById('deleteForm');
+                var currentPage = "{{ request.GET.page|default:1 }}"; 
+                deleteForm.action = '/content/delete/' + contentId + '/?page=' + currentPage;
+            });
+        </script>
+    </div>
+{% endblock %}

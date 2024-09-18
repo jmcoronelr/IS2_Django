@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from PIL import Image
 
 class UsuarioManager(BaseUserManager):
     """
@@ -84,8 +85,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=150, unique=True, default='')
     email = models.EmailField(max_length=255, unique=True)
-    nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -97,80 +98,26 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-class Rol(models.Model):
+
+class Profile(models.Model):
     """
-    Modelo que define un rol en el sistema. Cada rol tiene un nombre único y una
-    descripción opcional.
-
-    Atributos:
-    - nombre: Nombre único del rol.
-    - descripcion: Descripción opcional del rol.
-
-    Métodos:
-    - __str__: Retorna el nombre del rol.
+    Falta añadir comentarios[]][][][][]
     """
+    user = models.OneToOneField(Usuario, on_delete=models.CASCADE)
 
-    nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
+    avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
+    bio = models.TextField()
 
     def __str__(self):
-        return self.nombre
+        return self.user.username
+    
+    # Ajustar tamaño de imagenes
+    def save(self, *args, **kwargs):
+        super().save()
 
-class Permiso(models.Model):
-    """
-    Modelo que define un permiso en el sistema. Cada permiso tiene un nombre único y una
-    descripción opcional.
+        img = Image.open(self.avatar.path)
 
-    Atributos:
-    - nombre: Nombre único del permiso.
-    - descripcion: Descripción opcional del permiso.
-
-    Métodos:
-    - __str__: Retorna el nombre del permiso.
-    """
-
-    nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
-
-class UsuarioRol(models.Model):
-    """
-    Modelo intermedio para establecer la relación entre el modelo Usuario y el modelo Rol.
-    Representa una relación muchos a muchos.
-
-    Atributos:
-    - usuario: Relación con el modelo Usuario.
-    - rol: Relación con el modelo Rol.
-
-    Meta:
-    - unique_together: Garantiza que cada combinación de usuario y rol sea única.
-    """
-
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('usuario', 'rol')
-
-class RolPermiso(models.Model):
-    """
-    Modelo intermedio para establecer la relación entre el modelo Rol y el modelo Permiso.
-    Representa una relación muchos a muchos.
-
-    Atributos:
-    - rol: Relación con el modelo Rol.
-    - permiso: Relación con el modelo Permiso.
-
-    Meta:
-    - unique_together: Garantiza que cada combinación de rol y permiso sea única.
-    """
-
-    rol = models.ForeignKey(Rol, on_delete=models.CASCADE)
-    permiso = models.ForeignKey(Permiso, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('rol', 'permiso')
-
-
+        if img.height > 100 or img.width > 100:
+            new_img = (100, 100)
+            img.thumbnail(new_img)
+            img.save(self.avatar.path)

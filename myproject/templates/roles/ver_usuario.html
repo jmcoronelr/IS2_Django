@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2 class="mb-4">Roles del Usuario: {{ usuario.nombre }} {{ usuario.apellido }}</h2>
+
+    <ul class="list-group mb-4">
+      {% for rol_en_categoria in roles_en_categoria %}
+        <li class="list-group-item">
+          Rol: <strong>{{ rol_en_categoria.rol.nombre }}</strong> en la categoría: {{ rol_en_categoria.categoria.descripcionCorta }}
+        </li>
+      {% empty %}
+        <li class="list-group-item">El usuario no tiene roles asignados.</li>
+      {% endfor %}
+    </ul>
+
+    <div class="d-flex justify-content-between">
+      <a href="javascript:history.back()" class="btn btn-outline-secondary">← Volver atrás</a>
+      <div>
+        <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
+        <a href="{% url 'asignar_rol' usuario_id=usuario.id %}" class="btn btn-secondary">Asignar Rol</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

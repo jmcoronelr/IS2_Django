@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block Titulo %}
+Flujos - Tablero Kanban
+{% endblock %}
+
+{% block content %}
+{% load tiene_permiso %}
+<style>
+  /* Sidebar */
+  .sidebar {
+    width: 80px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.124);
+    border-radius: 50px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .icon-item p {
+    font-size: 1rem;
+    color: #000;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .create-icon, .flujos-icon, .reportes-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  }
+
+  .create-icon img, .flujos-icon img, .reportes-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .create-icon:hover, .flujos-icon:hover, .reportes-icon:hover {
+    transform: scale(1.1);
+    background-color: #d0d0d0;
+  }
+
+  .active-icon {
+    background-color: #c0c0c0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .sidebar.visible {
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .kanban-board {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-left: 100px;
+    padding: 20px;
+  }
+
+  .kanban-column {
+    width: 180px;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .kanban-column h2 {
+    text-align: center;
+  }
+
+  .kanban-task {
+    background-color: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+
+  .edit-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+</style>
+
+{% if request.user|tiene_permiso:"administrar_sitio" %}
+<div class="sidebar" id="sidebar">
+  <div class="icon-item">
+    <a href="{% url 'content_create' %}" class="create-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Crear Icon" />
+    </a>
+    <p>Crear</p>
+  </div>
+
+  <div class="icon-item">
+    <a href="{% url 'flujos_home' %}" class="flujos-icon active-icon">
+      <img src="https://cdn-icons-png.freepik.com/512/481/481268.png" alt="Flujos Icon" />
+    </a>
+    <p>Flujos</p>
+  </div>
+
+  <div class="icon-item">
+    <a href="{% url 'reportes_home' %}" class="reportes-icon">
+      <img src="https://cdn-icons-png.flaticon.com/512/3093/3093748.png" alt="Reportes Icon" />
+    </a>
+    <p>Reportes</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- Tablero Kanban -->
+<div class="kanban-board">
+  <!-- Columna Borrador -->
+  <div class="kanban-column" id="draft">
+    <h2>Borrador</h2>
+    {% for content in borradores %}
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Columna En Revisión -->
+  <div class="kanban-column" id="review">
+    <h2>Revisión</h2>
+    {% for content in en_revision %}
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Columna Publicado -->
+  <div class="kanban-column" id="published">
+    <h2>Publicado</h2>
+    {% for content in publicados %}
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Columna Rechazado -->
+  <div class="kanban-column" id="rejected">
+    <h2>Rechazado</h2>
+    {% for content in rechazados %}
+    <div class="kanban-task" data-id="{{ content.id }}">
+      {{ content.title }}
+      <a href="{% url 'content_edit' content.id %}?page={{ request.GET.page }}">
+        <img src="https://cdn.icon-icons.com/icons2/37/PNG/512/edit_4218.png" alt="Editar" class="edit-icon">
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Incluir SortableJS -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script>
+  // Inicializamos Sortable en las columnas
+  const columns = document.querySelectorAll('.kanban-column');
+
+  columns.forEach((column) => {
+    new Sortable(column, {
+      group: 'kanban',
+      animation: 150,
+      filter: 'h2',  // Excluir títulos de las columnas (h2)
+      preventOnFilter: false,
+      onEnd: function (evt) {
+        const contentId = evt.item.getAttribute('data-id');
+        const newStatus = evt.to.id;
+
+        // Enviar solicitud al backend para actualizar el estado
+        fetch('{% url "update_content_status" %}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+          },
+          body: JSON.stringify({ content_id: contentId, new_status: newStatus }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'ok') {
+            console.log('Estado actualizado correctamente');
+          } else {
+            console.log('Error al actualizar el estado');
+          }
+        });
+      },
+    });
+  });
+</script>
+
+{% endblock %}
