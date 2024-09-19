@@ -1,159 +1,154 @@
-{%extends 'base.html'%} 
-{%block Titulo%} 
+{% extends 'base.html' %}
+{% block Titulo %}
   Editar perfil
-{%endblock%}
+{% endblock %}
 {% block content %}
-  <style>
-    body {
-        background-color: #f0f0f0;
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Desactiva la barra de desplazamiento */
-    }
+<style>
+  body {
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+  }
 
-
-    .parent {
-        min-height: 93vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
-        overflow-y: auto; /* Permitir desplazamiento solo cuando sea necesario */
-    }
-
-
-    .container {
-      width: 100%;
-      max-width: 600px;
-      padding: 30px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-
-    .account-img-container {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 30px;
-    }
-
-    .account-img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid #ddd;
-    }
-
-    .edit-icon {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 30px;
-      height: 30px;
-      background-color: white;
-      border-radius: 50%;
-      border: 2px solid #ddd;
+  .parent {
+      min-height: 93vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      cursor: pointer;
-    }
+      padding: 20px;
+  }
 
-    .edit-icon img {
-      width: 16px;
-      height: 16px;
-    }
+  .container {
+    width: 100%;
+    max-width: 600px;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
 
-    /* Espaciado entre los bloques del formulario */
-    .form-group {
-      margin-bottom: 20px;
-    }
+  .account-img-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 30px;
+  }
 
-    .form-group label {
-      font-size: 0.9rem;
-      color: #333;
-      display: block;
-      margin-bottom: 8px;
-    }
+  .account-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #ddd;
+  }
 
-    .form-control {
-      margin-bottom: 10px;
-    }
+  .form-group {
+    margin-bottom: 20px;
+  }
 
-    .buttons {
-      display: inline-block;
-      margin: 10px 10px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+  .form-group label {
+    font-size: 0.9rem;
+    color: #333;
+    display: block;
+    margin-bottom: 8px;
+  }
 
-    .buttons:hover {
-      background-color: #0056b3;
-    }
+  .form-control {
+    margin-bottom: 10px;
+  }
 
-    .buttons.secondary {
-      background-color: #6c757d;
-    }
+  .buttons {
+    display: inline-block;
+    margin: 10px 10px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: #3F72AF;      
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
 
-    /* Estilo para los enlaces */
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
+  .buttons:hover {
+    background-color: #0056b3;
+  }
 
-    a:hover {
-      text-decoration: underline;
-    }
+  .buttons.secondary {
+    background-color: #6c757d;
+  }
 
-    /* Mensajes de error */
-    .alert {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 15px;
-    }
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
 
-    .alert button {
-      background: transparent;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-  </style>
+  a:hover {
+    text-decoration: underline;
+  }
+
+  .alert {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .alert button {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  /* Estilo para el popup de mensajes centrado en el medio de la pantalla */
+  .popup-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(40, 167, 69, 0.8); /* Verde transparente */
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: none; /* Se muestra dinámicamente */
+    text-align: center;
+    font-size: 1.2rem;
+  }
+</style>
+
 
   <div class="parent">
     <div class="container">
       <!-- Contenedor de imagen de perfil y icono de editar -->
       <div class="account-img-container">
-        <img class="account-img" src="{{ user.profile.avatar.url }}" alt="Avatar" />
-        <label for="avatar" class="edit-icon">
-          <img src="https://cdn-icons-png.freepik.com/512/4898/4898440.png" alt="Editar Avatar">
-        </label>
-        <input type="file" id="avatar" name="avatar" style="display: none;"> <!-- Campo de cambio de avatar oculto -->
+        <img id="profile-image" class="account-img" src="{{ user.profile.avatar.url }}" alt="Avatar" />
       </div>
 
       <!-- Mostrar errores -->
       {% if user_form.errors %}
       <div class="alert alert-danger" role="alert">
-        {% for key, value in user_form.errors.items %}
-          <strong>{{ value }}</strong>
+        {% for field in user_form %}
+        {% if field.errors %}
+            <div class="alert alert-danger">
+                <strong>{{ field.label }}: {{ field.errors }}</strong>
+            </div>
+        {% endif %}
         {% endfor %}
+    
         <button type="button" aria-label="Close">&times;</button>
       </div>
       {% endif %}
 
+      <!-- Formulario de perfil -->
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
+        <input type="file" id="avatar" name="avatar">  <!-- El atributo name es clave -->
+
         <div class="form-group">
           <label for="username">Username:</label>
           {{ user_form.username }}
@@ -174,10 +169,35 @@
         </div>
 
         <div class="form-group">
-          <button type="submit" class="buttons">Save Changes</button>
+          <button type="submit" class="buttons">Guardar</button>
           <button type="reset" class="buttons secondary">Reset</button>
         </div>
       </form>
     </div>
   </div>
-{%endblock%}
+
+  <!-- Contenedor del popup de mensajes -->
+  <div id="popup-message" class="popup-message">
+    {% if messages %}
+      {% for message in messages %}
+        {% if 'profile' in message.tags %}
+          <p>{{ message }}</p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Script para mostrar el popup de mensajes -->
+  <script>
+    window.onload = function() {
+      const messageDiv = document.getElementById('popup-message');
+      if (messageDiv && messageDiv.textContent.trim()) {
+        messageDiv.style.display = 'block';
+        setTimeout(function() {
+          messageDiv.style.display = 'none';
+        }, 3000); // El popup desaparece después de 3 segundos
+      }
+    };
+  </script>
+
+{% endblock %}

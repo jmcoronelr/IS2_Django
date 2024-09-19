@@ -20,11 +20,9 @@ from . import views
 from django.contrib import admin
 from django.urls import path, include
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('content/', include('content.urls')),
-    path('roles/', include('roles.urls')),
     path('plantillas/', include('Plantillas.urls')),
     path('roles/', include('roles.urls')),
     path('', views.home, name="home"),

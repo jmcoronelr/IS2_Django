@@ -107,9 +107,6 @@ class RecuperarUsuario(SuccessMessageMixin, PasswordResetView):
 
 @login_required
 def profile(request):
-    """
-    Falta añadir comentarios[]][][][][]
-    """
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=request.user)
         profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
@@ -117,8 +114,11 @@ def profile(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, 'Tu perfil ha sido actualizado!')
-            return redirect(to='users_profile')
+
+            messages.success(request, 'Tu perfil ha sido actualizado!', extra_tags='profile')
+            return redirect('usuarios:users_profile')
+        else:
+            print("Formularios inválidos")
     else:
         user_form = UpdateUserForm(instance=request.user)
         profile_form = UpdateProfileForm(instance=request.user.profile)

@@ -166,4 +166,3 @@ def eliminar_rol(request, rol_id):
         return redirect('lista_roles')
     
     return render(request, 'roles/confirmar_eliminar.html', {'rol': rol})
-
