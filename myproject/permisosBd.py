@@ -33,6 +33,9 @@ permisos = [
     {'nombre': 'Generar reportes: Usuarios con mayor numero creaciones', 'descripcion': 'Permite generar un reporte sobre los usuarios que han creado más contenidos en el sistema.'},
     {'nombre': 'Generar reportes: Usuarios con mayor numero ediciones', 'descripcion': 'Permite generar un reporte sobre los usuarios que han editado más contenidos en el sistema.'},
     {'nombre': 'Generar reportes: Usuarios con mayor numero publicaciones', 'descripcion': 'Permite generar un reporte sobre los usuarios que han publicado más contenidos en el sistema.'},
+    {'nombre': 'Plantillas: Crear', 'descripcion': 'Permite crear nuevas plantillas en el sistema.'},
+    {'nombre': 'Plantillas: Editar', 'descripcion': 'Permite modificar las plantillas existentes en el sistema.'},
+    {'nombre': 'Plantillas: Eliminar', 'descripcion': 'Permite eliminar plantillas del sistema.'},
     {'nombre': 'Plantillas: Listar', 'descripcion': 'Permite listar las plantillas disponibles en el sistema.'},
     {'nombre': 'Roles: Asignar', 'descripcion': 'Permite asignar roles a los usuarios del sistema.'},
     {'nombre': 'Roles: Crear', 'descripcion': 'Permite crear nuevos roles.'},
@@ -42,6 +45,7 @@ permisos = [
     {'nombre': 'Usuarios: Listar', 'descripcion': 'Permite visualizar la lista de usuarios registrados en el sistema.'},
     {'nombre': 'Sitio: Configurar Atributos', 'descripcion': 'Permite configurar atributos generales del sitio, como el nombre, el logo y la descripción.'}
 ]
+
 
 
 # Inserta los permisos en la base de datos
