@@ -88,15 +88,18 @@
 <body>
 
 {% if user.is_authenticated %}
+{% load tiene_permiso %}
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <ul class="navbar-nav navbar-nav-left">
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'content_list' %}active{% endif %}" href="{% url 'content_list' %}">Contenido</a>
             </li>
+            {% if request.user|tiene_permiso:"Categorias: Listar" %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'categoria_list' %}active{% endif %}" href="{% url 'categoria_list' %}">Categorias</a>
             </li>
+            {% endif %}
         </ul>
 
         <!-- Logo en lugar de "CMS" -->
@@ -105,14 +108,18 @@
         </a>
 
         <ul class="navbar-nav navbar-nav-right">
-            {% load tiene_permiso %}
-            {% if request.user|tiene_permiso:"administrar_sitio" %}
+            
+            {% if request.user|tiene_permiso:"Plantillas: Listar" %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'plantilla_list' %}active{% endif %}" href="{% url 'plantilla_list' %}">Plantillas</a>
             </li>
+            {% endif %}
+            {% if request.user|tiene_permiso:"Roles: Listar" %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'lista_roles' %}active{% endif %}" href="{% url 'lista_roles' %}">Roles</a>
             </li>
+            {% endif %}
+            {% if request.user|tiene_permiso:"Usuarios: Listar" %}
             <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'lista_usuarios' %}active{% endif %}" href="{% url 'lista_usuarios' %}">Usuarios</a>
             </li>
