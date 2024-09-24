@@ -90,8 +90,10 @@
         <div class="header">
             <h1 class="mb-4">Lista de Plantillas</h1>
             <div class="search-create-container">
+                {% load tiene_permiso %}
+                {% if request.user|tiene_permiso:"Plantillas: Crear" %}
                 <a href="{% url 'plantilla_create' %}" class="btn btn-secondary">Crear Nueva Plantilla</a>
-                
+                {% endif %}
                 <!-- Bloque de búsqueda -->
                 <form method="get" action="{% url 'plantilla_list' %}" class="search-form">
                     <input type="text" name="q" class="form-control" placeholder="Buscar plantilla por descripción..." value="{{ request.GET.q }}" required>
@@ -114,9 +116,13 @@
                     <td>{{ plantilla.descripcion }}</td>
                     <td>{{ plantilla.estado|yesno:"Activo,Inactivo" }}</td>
                     <td class="actions">
+                        {% if request.user|tiene_permiso:"Plantillas: Editar" %}
                         <a href="{% url 'plantilla_edit' plantilla.pk %}" class="btn btn-primary btn-sm">Editar</a>
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"Plantillas: Eliminar" %}
                         <!-- Botón para abrir el modal de eliminar -->
                         <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ plantilla.pk }}">Eliminar</button>
+                        {% endif %}
                     </td>
                 </tr>
             
