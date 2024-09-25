@@ -31,7 +31,10 @@
       <a href="javascript:history.back()" class="btn btn-outline-secondary">← Volver atrás</a>
       <div>
         <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
+        {% load tiene_permiso %}
+        {% if request.user|tiene_permiso:"Roles: Asignar" %}
         <a href="{% url 'asignar_rol' usuario_id=usuario.id %}" class="btn btn-secondary">Asignar Rol</a>
+        {% endif %}
       </div>
     </div>
   </div>

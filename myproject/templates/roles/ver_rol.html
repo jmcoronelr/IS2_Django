@@ -41,7 +41,10 @@
         </div>
 
         <div class="d-flex justify-content-end mt-4">
+            {% load tiene_permiso %}
+            {% if request.user|tiene_permiso:"Roles: Asignar Permisos" %}
             <a href="{% url 'asignar_permisos' rol.id %}" class="btn btn-primary mr-3">Asignar Permisos</a>
+            {% endif %}
             <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
         </div>
     </div>

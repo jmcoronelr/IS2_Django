@@ -89,8 +89,10 @@
         <div class="header">
             <h1 class="mb-4">Lista de Roles</h1>
             <div class="search-create-container">
+                {% load tiene_permiso %}
+                {% if request.user|tiene_permiso:"Roles: Crear" %}
                 <a href="{% url 'crear_rol' %}" class="btn btn-secondary">Crear Nuevo Rol</a>
-                
+                {% endif %}
                 <!-- Bloque de búsqueda -->
                 <form method="get" action="{% url 'lista_roles' %}" class="search-form">
                     <input type="text" name="q" class="form-control" placeholder="Buscar Rol..." value="{{ request.GET.q }}" required>
@@ -106,7 +108,9 @@
                         <strong>{{ rol.nombre }}</strong> - {{ rol.descripcion }}
                     </a>
                     <!-- Ícono de eliminación -->
+                    {% if request.user|tiene_permiso:"Roles: Eliminar" %}
                     <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-rol-id="{{ rol.id }}">
+                    {% endif %}
                 </li>
             {% empty %}
                 <li class="list-group-item">No hay roles disponibles.</li>
