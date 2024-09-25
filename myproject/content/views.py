@@ -8,11 +8,34 @@ from django.http import JsonResponse
 import json
 from .models import Content, ContentBlock
 from Categorias.models import Categorias
-from django.views.decorators.csrf import csrf_exempt
+from roles.models import RolEnCategoria, Rol
+from historial.models import Historial
 
 def content_list(request):
-    contents = Content.objects.all().order_by('created_at')
+    # Obtener permisos necesarios
+    permisos_requeridos = [
+        'Contenido: Editar propio',
+        'Contenido: Inactivar',
+        'Contenido: Publicar',
+        'Contenido: Eliminar',
+        'Contenido: Ver historial',
+        'Contenido: Crear'
+    ]
     
+    # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
+    roles_con_permisos = Rol.objects.filter(
+        permisos__nombre__in=permisos_requeridos
+    ).values_list('id', flat=True)
+
+    # Filtrar las categorías donde el usuario tiene estos roles
+    categorias_permitidas = RolEnCategoria.objects.filter(
+        usuario_id=request.user.id,
+        rol_id__in=roles_con_permisos
+    ).values_list('categoria_id', flat=True)
+
+    # Filtrar los contenidos que pertenecen a esas categorías
+    contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+
     # Búsqueda por título
     query = request.GET.get('q')
     if query:
@@ -35,41 +58,46 @@ def content_list(request):
     # Filtrar por categoría
     categoria = request.GET.get('categoria')
     if categoria:
-        contents = contents.filter(category__id=categoria)
+        contents = contents.filter(categoria__id=categoria)
 
     # Paginación
-    paginator = Paginator(contents, 8)  # Muestra 10 contenidos por página
+    paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página
     page_number = request.GET.get('page')
     contents = paginator.get_page(page_number)
 
     return render(request, 'content/content_list.html', {'contents': contents})
 
-from historial.models import Historial  # Importa el modelo Historial
 
 def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
-        accion = 'editado'  # Acción para historial
+        accion = 'editado'
     else:
         content = None
-        accion = 'creado'  # Acción para historial
+        accion = 'creado'
 
     plantillas = Plantilla.objects.all()
-    categorias = Categorias.objects.filter(estado=True)  # Solo las categorías activas
+
+    # Filtro de categorías con permiso "Crear Contenido"
+    categorias = Categorias.objects.filter(
+        id__in=RolEnCategoria.objects.filter(
+            usuario_id=request.user.id,
+            rol_id__in=Rol.objects.filter(permisos__nombre='Contenido: Crear')  # Filtra roles con el permiso
+        ).values('categoria_id'),
+        estado=True
+    )
 
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
             content = form.save(commit=False)
-            
-            # Asignar plantilla seleccionada
+
             plantilla_id = request.POST.get('plantilla')
             if plantilla_id:
                 content.plantilla = Plantilla.objects.get(id=plantilla_id)
             else:
                 content.plantilla = None
 
-            # Asignar categoría seleccionada
             categoria_id = request.POST.get('categoria')
             if categoria_id:
                 content.categoria = Categorias.objects.get(id=categoria_id)
@@ -84,7 +112,6 @@ def content_create_edit(request, pk=None):
             for block in block_data:
                 bloque_id = block.get('id')
 
-                # Si no hay bloque_id, creamos un nuevo bloque
                 if bloque_id:
                     content_block = ContentBlock.objects.get(id=bloque_id)
                 else:
@@ -93,7 +120,6 @@ def content_create_edit(request, pk=None):
                 content_block.block_type = block.get('type')
                 content_block.content_text = block.get('content') if block.get('type') == 'texto' else None
 
-                # Manejo de archivos multimedia
                 multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
                 if multimedia_file:
                     content_block.multimedia = multimedia_file
@@ -106,15 +132,13 @@ def content_create_edit(request, pk=None):
 
                 block_ids.append(content_block.id)
 
-            # Eliminar los bloques que no están en block_ids
             ContentBlock.objects.filter(content=content).exclude(id__in=block_ids).delete()
 
-            # Registrar el cambio en el historial
             Historial.objects.create(
                 content=content,
-                user=request.user,  # Usuario que realizó el cambio
+                user=request.user,
                 cambio=f"El contenido '{content.title}' fue {accion}.",
-                version=Historial.objects.filter(content=content).count() + 1  # Versión secuencial
+                version=Historial.objects.filter(content=content).count() + 1
             )
 
             return redirect('content_list')
@@ -128,11 +152,13 @@ def content_create_edit(request, pk=None):
     return render(request, 'content/content_form.html', {
         'form': form,
         'plantillas': plantillas,
-        'categorias': categorias,  # Enviar las categorías al template
+        'categorias': categorias,  # Enviar las categorías filtradas
         'selected_plantilla': selected_plantilla,
-        'selected_categoria': selected_categoria,  # Enviar la categoría seleccionada
+        'selected_categoria': selected_categoria,
         'blocks': blocks,
     })
+
+
 
 
 
