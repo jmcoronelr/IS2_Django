@@ -38,6 +38,7 @@ permisos = [
     {'nombre': 'Plantillas: Eliminar', 'descripcion': 'Permite eliminar plantillas del sistema.'},
     {'nombre': 'Plantillas: Listar', 'descripcion': 'Permite listar las plantillas disponibles en el sistema.'},
     {'nombre': 'Roles: Asignar', 'descripcion': 'Permite asignar roles a los usuarios del sistema.'},
+    {'nombre': 'Roles: Asignar Permisos', 'descripcion': 'Permite asignar permisos a los roles del sistema.'},
     {'nombre': 'Roles: Crear', 'descripcion': 'Permite crear nuevos roles.'},
     {'nombre': 'Roles: Editar', 'descripcion': 'Permite modificar los permisos y detalles de roles existentes en el sistema.'},
     {'nombre': 'Roles: Eliminar', 'descripcion': 'Permite eliminar roles que no estén asignados a ningún usuario en el sistema.'},
