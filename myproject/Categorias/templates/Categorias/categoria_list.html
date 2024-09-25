@@ -82,8 +82,10 @@
         <div class="header">
             <h1 class="mb-4">Lista de Categorías</h1>
             <div class="search-create-container">
+                {% load tiene_permiso %}
+                {% if request.user|tiene_permiso:"Categorias: Crear" %}
                 <a href="{% url 'categoria_create' %}" class="btn btn-secondary">Crear nueva categoría</a>
-                
+                {% endif %}
                 <!-- Bloque de búsqueda -->
                 <form method="get" action="{% url 'categoria_list' %}" class="search-form">
                     <input type="text" name="q" class="form-control" placeholder="Buscar Categoría..." required>
@@ -111,9 +113,13 @@
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ categoria.descripcionCorta }} - {{ categoria.descripcionLarga }} ({{ categoria.estado|yesno:"Activo,Inactivo" }})</span>
                 <div class="actions">
+                    {% if request.user|tiene_permiso:"Categorias: Modificar" %}
                     <a href="{% url 'categoria_edit' categoria.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                    {% endif %}
+                    {% if request.user|tiene_permiso:"Categorias: Eliminar" %}
                     <!-- Activar modal con el id correcto -->
                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-categoria-id="{{ categoria.pk }}" data-categoria-nombre="{{ categoria.descripcionCorta }}">Eliminar</button>
+                    {% endif %}
                 </div>
             </li>
             {% empty %}
