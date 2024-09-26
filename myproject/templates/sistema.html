@@ -7,27 +7,25 @@ Blinq
 {% block content %}
 {% load tiene_permiso %}
 <style>
+  /* Ajustes de la barra lateral */
   .sidebar {
-    width: 80px;
-    height: 400px;
-    background: rgba(255, 255, 255, 0.124); /* Fondo gris translúcido */
+    width: 70px;
+    height: 350px;
+    background: rgba(255, 255, 255, 0.124);
     border-radius: 50px;
     position: fixed;
     top: 50%;
-    transform: translateY(-50%) translateX(-100px);
+    transform: translateY(-50%) translateX(-90px);
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    padding: 20px 0;
+    padding: 15px 0;
     transition: transform 0.6s ease-out;
-    backdrop-filter: blur(10px); /* Efecto de desenfoque */
-    -webkit-backdrop-filter: blur(10px); /* Compatibilidad Safari */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    border: 1px solid rgba(255, 255, 255, 0.3); /* Bordes blancos suaves */
-}
-
-
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
 
   .icon-item {
     display: flex;
@@ -36,16 +34,16 @@ Blinq
   }
 
   .icon-item p {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-weight: normal;
     color: #000;
-    margin-top: 10px;
+    margin-top: 5px;
     text-align: center;
   }
 
   .create-icon, .flujos-icon, .reportes-icon {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -55,8 +53,8 @@ Blinq
   }
 
   .create-icon img, .flujos-icon img, .reportes-icon img {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
   }
 
   .create-icon:hover, .flujos-icon:hover, .reportes-icon:hover {
@@ -68,41 +66,118 @@ Blinq
     transform: translateY(-50%) translateX(0);
   }
 
-  /* Estilo para el feed de contenido */
+  /* Ajustes para centrar y compactar la barra de búsqueda y los filtros */
+  .search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    max-width: 1000px;
+    margin: 30px auto;
+  }
+
+  .search-form {
+    display: flex;
+    gap: 5px;
+    background-color: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 20px;
+    align-items: center;
+  }
+
+  .search-form input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.9rem;
+    color: #555;
+    width: 180px;
+  }
+
+  .search-form button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .category-filter {
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 5px 15px;
+  }
+
+  .category-filter select {
+    padding: 3px;
+    font-size: 0.85rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    color: #333;
+  }
+
+  .alphabetical-filter {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+  }
+
+  .alphabetical-filter a {
+    padding: 3px;
+    font-size: 0.9rem;
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s, background-color 0.3s;
+  }
+
+  .alphabetical-filter a:hover {
+    font-weight: bold;
+  }
+
+  .alphabetical-filter .active {
+    background-color: #3F72AF;
+    color: white;
+    border-radius: 5px;
+    padding: 3px 7px;
+  }
+
+  /* Ajustes de la cuadrícula de contenido */
   .content-feed {
-    margin-left: 100px;
-    padding: 20px;
-    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 15px;
+    max-width: 1000px;
   }
 
   .content-feed h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   .content-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
   }
 
   .content-item {
     background-color: #e0e0e0;
-    border-radius: 20px;
-    padding: 20px;
+    border-radius: 15px;
+    padding: 15px;
     display: flex;
     align-items: center;
-    width: 300px;
-    height: 200px;
+    width: 250px;
+    height: 170px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     flex-direction: column;
   }
 
   .content-image {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     background-color: white;
     border-radius: 15px;
     display: flex;
@@ -120,35 +195,57 @@ Blinq
 
   .content-category {
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 
   .content-details {
-    text-align: left;
+    text-align: center;
     width: 100%;
   }
 
   .content-details h3 {
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin-bottom: 5px;
   }
 
   .description {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #333;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
 
   .content-details a {
     color: #007bff;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     position: absolute;
-    bottom: 10px;
+    bottom: 5px;
   }
 
   .content-details a:hover {
     text-decoration: underline;
+  }
+
+  .order-icons {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+  }
+
+  .order-icon {
+    font-size: 1.2rem;
+    color: black;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .order-icon.active {
+    color: #00bfff;
+  }
+
+  .order-icon:hover {
+    color: #00bfff;
+    cursor: pointer;
   }
 </style>
 
@@ -157,7 +254,7 @@ Blinq
   <div class="icon-item">
     <a href="{% url 'content_create' %}?next={{ request.path }}" class="create-icon">
       <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Crear Icon" />
-  </a>
+    </a>
     <p>Crear</p>
   </div>
 
@@ -186,29 +283,108 @@ Blinq
 </script>
 {% endif %}
 
-<div class="content-feed">
-  <h2>Últimos Contenidos</h2>
-  <div class="content-grid">
-    {% for contenido in contenidos %}
-    <div class="content-item">
-      <div class="content-category">{{ contenido.category }}</div>
-      <div class="content-image">
-        {% if contenido.image %}
-        <img src="{{ contenido.image.url }}" alt="Imagen de {{ contenido.title }}">
-        {% else %}
-        <span>Sin imagen</span>
-        {% endif %}
-      </div>
-      <div class="content-details">
-        <h3>{{ contenido.title }}</h3>
-        <div class="description">{{ contenido.description }}</div>
-        <a href="{% if contenido.pk %}{% url 'content_detail' contenido.pk %}?next={{ request.path }}{% endif %}">Ver más</a>
-      </div>
-    </div>
-    {% empty %}
-    <p>No hay contenidos disponibles.</p>
+<div class="search-filter-container">
+  <form method="get" action="" class="search-form">
+    <input type="text" name="q" id="search-input" placeholder="Buscar por clave" autocomplete="off">
+    <button type="submit">
+      <img src="https://cdn-icons-png.flaticon.com/512/49/49116.png" alt="Buscar Icono" width="20">
+    </button>
+  </form>
+
+  <div class="category-filter">
+    <form method="get" action="">
+      <select name="categoria" onchange="this.form.submit()">
+        <option value="all" {% if request.GET.categoria == 'all' %}selected{% endif %}>Todas las categorías</option>
+        {% for categoria in categorias %}
+        <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+          {{ categoria.descripcionLarga }} <!-- Cambiado a descripcionLarga para coincidir -->
+        </option>
+        {% endfor %}
+      </select>
+    </form>
+</div>
+
+
+  <div class="alphabetical-filter">
+    <a href="?letra=all" class="{% if letra_seleccionada == 'all' %}active{% endif %}">Todos</a>
+    {% for letra in "ABCDEFGHIJKLMNOPQRSTUVWXYZÑ" %}
+    <a href="?letra={{ letra }}" class="{% if letra_seleccionada == letra %}active{% endif %}">{{ letra }}</a>
     {% endfor %}
   </div>
+
+  <div class="order-icons">
+    <a href="?order=asc" class="order-icon asc{% if request.GET.order == 'asc' %} active{% endif %}">
+      <span>&#9650;</span>
+    </a>
+    <a href="?order=desc" class="order-icon desc{% if request.GET.order == 'desc' %} active{% endif %}">
+      <span>&#9660;</span>
+    </a>
+  </div>
 </div>
+
+<div class="content-feed">
+  <h2>Últimos Contenidos</h2>
+    <div id="content-grid" class="content-grid">
+      {% for contenido in contenidos %}
+      <div class="content-item">
+        <!--<div class="content-category">{{ contenido.category }}</div>-->
+        <div class="content-image">
+          {% if contenido.image %}
+          <img src="{{ contenido.image.url }}" alt="Imagen de {{ contenido.title }}">
+          {% else %}
+          <span>Sin imagen</span>
+          {% endif %}
+        </div>
+        <div class="content-details">
+          <h3>{{ contenido.title }}</h3>
+          <div class="description">{{ contenido.description }}</div>
+          <a href="{% if contenido.pk %}{% url 'content_detail' contenido.pk %}?next={{ request.path }}{% endif %}">Ver más</a>
+        </div>
+      </div>
+      {% empty %}
+      <p>No hay contenidos disponibles.</p>
+      {% endfor %}
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');  // El ID del input de búsqueda
+        
+        searchInput.addEventListener('keyup', function () {
+            const query = searchInput.value;
+    
+            // Si la búsqueda está vacía, no hacer la solicitud
+            if (query.length === 0) {
+                fetch(`?q=`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('content-grid').innerHTML = data.html;  // Actualizar el contenido
+                })
+                .catch(error => console.error('Error:', error));
+                return;
+            }
+    
+            // Enviar la solicitud AJAX para la búsqueda en tiempo real
+            fetch(`?q=${query}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('content-grid').innerHTML = data.html;  // Actualizar el contenido
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    </script>
+    
+        
+
+</div>
+
 
 {% endblock %}

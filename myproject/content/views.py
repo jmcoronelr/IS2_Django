@@ -12,7 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 def content_list(request):
     contents = Content.objects.all().order_by('created_at')
-    
+    categorias = Categorias.objects.all()  # Traer todas las categorías
+
     # Búsqueda por título
     query = request.GET.get('q')
     if query:
@@ -35,14 +36,18 @@ def content_list(request):
     # Filtrar por categoría
     categoria = request.GET.get('categoria')
     if categoria:
-        contents = contents.filter(category__id=categoria)
+        contents = contents.filter(categoria__id=categoria)
 
     # Paginación
-    paginator = Paginator(contents, 8)  # Muestra 10 contenidos por página
+    paginator = Paginator(contents, 8)
     page_number = request.GET.get('page')
     contents = paginator.get_page(page_number)
 
-    return render(request, 'content/content_list.html', {'contents': contents})
+    # Pasar las categorías al contexto
+    return render(request, 'content/content_list.html', {
+        'contents': contents,
+        'categorias': categorias,  # Asegúrate de pasar las categorías al template
+    })
 
 from historial.models import Historial  # Importa el modelo Historial
 
