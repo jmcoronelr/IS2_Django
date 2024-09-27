@@ -8,6 +8,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
+from content.models import Content
 
 from .forms import RegistroUsuarioForm, UpdateUserForm, UpdateProfileForm
 
@@ -104,6 +105,15 @@ class RecuperarUsuario(SuccessMessageMixin, PasswordResetView):
                       "asegurate de que ingresaste el correo con el que te registraste y mira la carpeta de spam."
     success_url = reverse_lazy('home')
 
+
+def home(request):
+    """
+    Vista para la página principal que muestra solo los contenidos en estado 'publicado'.
+    """
+    # Filtra los contenidos que están en estado 'published'
+    contenidos = Content.objects.filter(status='published').order_by('created_at')
+    
+    return render(request, 'home.html', {'contenidos': contenidos})
 
 @login_required
 def profile(request):
