@@ -120,7 +120,8 @@
   <div class="interaction-buttons">
     <button class="btn btn-primary">👍 Me gusta</button>
     <button class="btn btn-danger">👎 No me gusta</button>
-    <button class="btn btn-success">💬 Comentar</button>
+    <a href="{% url 'agregar_comentario' content.pk%}" class="btn btn-success">💬 Comentar</a>
+
   </div>
 </div>
 {% endblock %}

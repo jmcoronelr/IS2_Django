@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Content
-from .forms import ContentForm
+from .models import Content, Comentario
+from .forms import ContentForm, ComentarioForm
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
 from django.http import JsonResponse
@@ -199,3 +199,19 @@ def get_plantilla_blocks(request, plantilla_id):
     } for bloque in plantilla.bloques.all()]  # Asegúrate de usar 'bloques' si tienes related_name
 
     return JsonResponse({'blocks': blocks})
+
+def agregar_comentario(request, pk):
+    contenido = get_object_or_404(Content, pk=pk)
+    
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.autor = request.user
+            comentario.contenido = contenido
+            comentario.save()
+            return redirect('content_detail', pk=contenido.pk)
+    else:
+        form = ComentarioForm()
+
+    return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})

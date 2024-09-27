@@ -1,6 +1,7 @@
 from django.db import models
 from Plantillas.models import Plantilla  # Importa el modelo de Plantilla
 from Categorias.models import Categorias
+from django.conf import settings
 class Content(models.Model):
     STATUS_CHOICES = [
         ('draft', 'Borrador'),
@@ -39,3 +40,13 @@ class ContentBlock(models.Model):
 
     def __str__(self):
         return f"{self.block_type} - {self.content.title}"
+
+class Comentario(models.Model):
+    contenido = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='comentarios')
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    texto = models.TextField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+    actualizado_en = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'Comentario de {self.autor} en {self.contenido}'
