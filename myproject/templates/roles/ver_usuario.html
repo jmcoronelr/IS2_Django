@@ -6,36 +6,80 @@
       background-color: #3F72AF;
       border-color: rgba(0, 0, 0, 0.7);      /* Color del borde */
       border-radius: 10px;                   /* Bordes redondeados */
-
   }
   .btn-primary:hover {
       background-color: #2a415d; /* Color de fondo cuando se hace hover */
       border-color: rgba(0, 0, 0, 0.85);     /* Color del borde cuando se hace hover */
   }
-  </style>
-  
-  <div class="container mt-4">
-    <h2 class="mb-4">Roles del Usuario: {{ usuario.nombre }} {{ usuario.apellido }}</h2>
+  .btn-danger {
+      background-color: #d9534f; /* Color del botón eliminar */
+      border-color: rgba(0, 0, 0, 0.7);
+  }
+  .btn-danger:hover {
+      background-color: #c9302c;
+      border-color: rgba(0, 0, 0, 0.85);
+  }
+  /* Ajusta el espacio entre el texto y el botón */
+  .list-group-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+  .list-group-item strong {
+      margin-right: 10px;
+  }
+</style>
 
-    <ul class="list-group mb-4">
-      {% for rol_en_categoria in roles_en_categoria %}
-        <li class="list-group-item">
-          Rol: <strong>{{ rol_en_categoria.rol.nombre }}</strong> en la categoría: {{ rol_en_categoria.categoria.descripcionCorta }}
-        </li>
-      {% empty %}
-        <li class="list-group-item">El usuario no tiene roles asignados.</li>
-      {% endfor %}
-    </ul>
+<div class="container mt-4">
+  <h2 class="mb-4">Roles del Usuario: {{ usuario.nombre }} {{ usuario.apellido }}</h2>
 
-    <div class="d-flex justify-content-between">
-      <a href="javascript:history.back()" class="btn btn-outline-secondary">← Volver atrás</a>
-      <div>
-        <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
-        {% load tiene_permiso %}
-        {% if request.user|tiene_permiso:"Roles: Asignar" %}
-        <a href="{% url 'asignar_rol' usuario_id=usuario.id %}" class="btn btn-secondary">Asignar Rol</a>
-        {% endif %}
+  <ul class="list-group mb-4">
+    {% for rol_en_categoria in roles_en_categoria %}
+      <li class="list-group-item">
+        <div>Rol: <strong>{{ rol_en_categoria.rol.nombre }}</strong> en la categoría: {{ rol_en_categoria.categoria.descripcionCorta }}</div>
+        <!-- Botón de eliminar -->
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ rol_en_categoria.id }}">
+          Eliminar
+        </button>
+      </li>
+
+      <!-- Modal de confirmación -->
+      <div class="modal fade" id="deleteModal{{ rol_en_categoria.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ rol_en_categoria.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel{{ rol_en_categoria.id }}">Confirmar Eliminación</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              ¿Estás seguro de que quieres eliminar el rol <strong>{{ rol_en_categoria.rol.nombre }}</strong> del usuario {{ usuario.nombre }} {{ usuario.apellido }}?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <!-- Actualizamos la URL para que apunte a la nueva vista 'eliminar_rol_en_categoria' -->
+              <form method="post" action="{% url 'eliminar_rol_en_categoria' rol_en_categoria.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
+    {% empty %}
+      <li class="list-group-item">El usuario no tiene roles asignados.</li>
+    {% endfor %}
+  </ul>
+
+  <div class="d-flex justify-content-between">
+    <a href="javascript:history.back()" class="btn btn-outline-secondary">← Volver atrás</a>
+    <div>
+      <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
+      {% load tiene_permiso %}
+      {% if request.user|tiene_permiso:"Roles: Asignar" %}
+      <a href="{% url 'asignar_rol' usuario_id=usuario.id %}" class="btn btn-secondary">Asignar Rol</a>
+      {% endif %}
     </div>
   </div>
+</div>
+
 {% endblock %}

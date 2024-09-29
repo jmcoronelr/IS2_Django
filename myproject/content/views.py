@@ -55,10 +55,13 @@ def content_list(request):
     if estado:
         contents = contents.filter(status=estado)
 
-    # Filtrar por categoría
+    # Filtrar por categoría (solo las permitidas)
     categoria = request.GET.get('categoria')
-    if categoria:
+    if categoria and categoria in categorias_permitidas:
         contents = contents.filter(categoria__id=categoria)
+
+    # Obtener solo las categorías permitidas para el usuario
+    categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Paginación
     paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página
@@ -68,8 +71,9 @@ def content_list(request):
     # Pasar las categorías al contexto
     return render(request, 'content/content_list.html', {
         'contents': contents,
-        'categorias': categorias,  # Asegúrate de pasar las categorías al template
+        'categorias': categorias,  # Solo categorías permitidas
     })
+
 
 
 def content_create_edit(request, pk=None):

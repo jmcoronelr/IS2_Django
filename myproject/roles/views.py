@@ -168,3 +168,16 @@ def eliminar_rol(request, rol_id):
         return redirect('lista_roles')
     
     return render(request, 'roles/confirmar_eliminar.html', {'rol': rol})
+@login_required
+def eliminar_rol_en_categoria(request, rol_en_categoria_id):
+    """
+    Eliminar un rol específico asignado a un usuario en una categoría.
+    """
+    rol_en_categoria = get_object_or_404(RolEnCategoria, id=rol_en_categoria_id)
+
+    if request.method == 'POST':
+        rol_en_categoria.delete()
+        messages.success(request, f'El rol {rol_en_categoria.rol.nombre} en la categoría {rol_en_categoria.categoria.descripcionCorta} ha sido eliminado correctamente.')
+        return redirect('ver_usuario', usuario_id=rol_en_categoria.usuario.id)
+    
+    return render(request, 'roles/confirmar_eliminar.html', {'rol_en_categoria': rol_en_categoria})
