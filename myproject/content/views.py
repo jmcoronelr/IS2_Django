@@ -65,7 +65,11 @@ def content_list(request):
     page_number = request.GET.get('page')
     contents = paginator.get_page(page_number)
 
-    return render(request, 'content/content_list.html', {'contents': contents})
+    # Pasar las categorías al contexto
+    return render(request, 'content/content_list.html', {
+        'contents': contents,
+        'categorias': categorias,  # Asegúrate de pasar las categorías al template
+    })
 
 
 def content_create_edit(request, pk=None):

@@ -29,9 +29,9 @@
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <div class="d-flex justify-content-between mt-4">
+                        <div class="d-flex justify-content-left mt-4">
+                            <a href="{{ previous_url }}" class="btn btn-secondary" style="margin-right: 9px;">Atrás</a>
                             <button type="submit" class="btn btn-primary">Asignar Permisos</button>
-                            <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
                         </div>
                     </form>
                 </div>

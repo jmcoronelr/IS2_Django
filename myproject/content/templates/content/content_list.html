@@ -201,9 +201,13 @@
                     </select>
                     <select name="categoria">
                         <option value="">Filtrar por categoría</option>
-                        <option value="1">Categoría 1</option>
-                        <option value="2">Categoría 2</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                                {{ categoria.descripcionLarga }}
+                            </option>
+                        {% endfor %}
                     </select>
+                    
                     <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
                 </div>
             </form>
