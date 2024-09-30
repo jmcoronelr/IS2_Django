@@ -50,10 +50,12 @@ class UpdateUserForm(forms.ModelForm):
   """
   
   username = forms.CharField(max_length=100,
-                               required=True,
+                               required=False,
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
-  email = forms.EmailField(required=True,
+  email = forms.EmailField(required=False,
                              widget=forms.TextInput(attrs={'class': 'form-control'}))
+  nombre = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
+  apellido = forms.CharField(max_length=100, required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
 
   class Meta:
     model = Usuario

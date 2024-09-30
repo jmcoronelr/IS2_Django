@@ -1,0 +1,17 @@
+<!-- agregar_comentario.html -->
+<h2>Agregar un comentario a "{{ contenido.title }}"</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Comentar</button>
+</form>
+
+<h3>Comentarios</h3>
+<ul>
+    {% for comentario in contenido.comentarios.all %}
+        <li><strong>{{ comentario.autor }}</strong>: {{ comentario.texto }} <small>{{ comentario.creado_en }}</small></li>
+    {% empty %}
+        <li>No hay comentarios aún.</li>
+    {% endfor %}
+</ul>

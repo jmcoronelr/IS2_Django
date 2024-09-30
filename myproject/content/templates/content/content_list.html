@@ -171,7 +171,7 @@
             <h1 class="mb-4">Lista de Contenidos</h1>
             <div class="search-create-container">
                 {% load tiene_permiso %}
-                {% if request.user|tiene_permiso:"crear_contenido" %}
+                {% if request.user|tiene_permiso:"Contenido: Crear" %}
                 <a href="{% url 'content_create' %}" class="btn btn-secondary">Crear Nuevo Contenido</a>
                 {% endif %}
                 
@@ -201,9 +201,13 @@
                     </select>
                     <select name="categoria">
                         <option value="">Filtrar por categoría</option>
-                        <option value="1">Categoría 1</option>
-                        <option value="2">Categoría 2</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                                {{ categoria.descripcionLarga }}
+                            </option>
+                        {% endfor %}
                     </select>
+                    
                     <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
                 </div>
             </form>
@@ -214,12 +218,16 @@
             <div class="col-md-4 col-lg-3">
                 <div class="content-card">
                     <div class="content-title">
+                        {% if request.user|tiene_permiso:"Contenido: Ver historial"%}
                         <a href="{% url 'historial_content' content.pk %}">
                             <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
                                  alt="Historia" class="history-icon" width="20" height="20">
-                        </a>                      
+                        </a>
+                        {% endif %}                      
                         {{ content.title }}
+                        {% if request.user|tiene_permiso:"Contenido: Eliminar"%}
                         <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
+                        {% endif %}   
                     </div>
                     <div class="content-info">
                         <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
@@ -227,10 +235,10 @@
                     </div>
                     <div class="content-actions">
                         <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                        {% if request.user|tiene_permiso:"editar" %}
+                        {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                         {% endif %}
-                        {% if request.user|tiene_permiso:"publicar_contenido" and content.status != 'published' %}
+                        {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
                         <a href="" class="btn btn-primary btn-sm">Publicar</a>
                         {% endif %}
                     </div>

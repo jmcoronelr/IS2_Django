@@ -5,6 +5,20 @@
 {% endblock %}
 
 {% block content %}
+
+<style>
+    .btn-primary {
+        background-color: #3F72AF;
+        border-color: rgba(0, 0, 0, 0.7);      /* Color del borde */
+        border-radius: 10px;                   /* Bordes redondeados */
+
+    }
+    .btn-primary:hover {
+        background-color: #2a415d; /* Color de fondo cuando se hace hover */
+        border-color: rgba(0, 0, 0, 0.85);     /* Color del borde cuando se hace hover */
+    }
+</style>
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -15,9 +29,9 @@
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
-                        <div class="d-flex justify-content-between mt-4">
+                        <div class="d-flex justify-content-left mt-4">
+                            <a href="{{ previous_url }}" class="btn btn-secondary" style="margin-right: 9px;">Atrás</a>
                             <button type="submit" class="btn btn-primary">Asignar Permisos</button>
-                            <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Volver a la Lista de Roles</a>
                         </div>
                     </form>
                 </div>

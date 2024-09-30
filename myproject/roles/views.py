@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Usuario, Rol, RolEnCategoria, Categorias, Permiso
 from .forms import AsignarRolForm, CrearRolForm, AsignarPermisoForm
+from django.urls import reverse
 
 @login_required
 def asignar_rol(request, usuario_id):
@@ -100,17 +101,17 @@ def crear_rol(request):
 def asignar_permisos(request, rol_id):
     """
     Asigna permisos a un rol específico.
-
-    :param request: La solicitud HTTP.
-    :param rol_id: El ID del rol al que se le asignarán permisos.
-    :return: Renderiza la plantilla con el formulario de asignación de permisos.
     """
     rol = get_object_or_404(Rol, id=rol_id)
+    
+    # Obtener la URL anterior (referencia)
+    previous_url = request.META.get('HTTP_REFERER', reverse('lista_roles'))  # Si no hay HTTP_REFERER, redirige a lista_roles por defecto.
+    
     if request.method == 'POST':
         form = AsignarPermisoForm(request.POST, instance=rol)
         if form.is_valid():
             permisos = form.cleaned_data['permisos']
-            rol.permisos.set(permisos) 
+            rol.permisos.set(permisos)
             rol.save()
             messages.success(request, f'Se han asignado permisos al rol {rol.nombre}.')
             return redirect('ver_rol', rol_id=rol.id)
@@ -119,7 +120,8 @@ def asignar_permisos(request, rol_id):
 
     return render(request, 'roles/asignar_permisos.html', {
         'rol': rol,
-        'form': form
+        'form': form,
+        'previous_url': previous_url,  # Pasar la URL anterior al template
     })
 
 @login_required
@@ -166,4 +168,16 @@ def eliminar_rol(request, rol_id):
         return redirect('lista_roles')
     
     return render(request, 'roles/confirmar_eliminar.html', {'rol': rol})
+@login_required
+def eliminar_rol_en_categoria(request, rol_en_categoria_id):
+    """
+    Eliminar un rol específico asignado a un usuario en una categoría.
+    """
+    rol_en_categoria = get_object_or_404(RolEnCategoria, id=rol_en_categoria_id)
 
+    if request.method == 'POST':
+        rol_en_categoria.delete()
+        messages.success(request, f'El rol {rol_en_categoria.rol.nombre} en la categoría {rol_en_categoria.categoria.descripcionCorta} ha sido eliminado correctamente.')
+        return redirect('ver_usuario', usuario_id=rol_en_categoria.usuario.id)
+    
+    return render(request, 'roles/confirmar_eliminar.html', {'rol_en_categoria': rol_en_categoria})
