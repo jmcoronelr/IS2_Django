@@ -6,9 +6,15 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 def home(request):
+    # Filtra solo los contenidos que estén en estado 'published'
+    contenidos = Content.objects.filter(status='published').order_by('created_at')
+
+    # Si el usuario está autenticado, redirigir a la página del sistema
     if request.user.is_authenticated:
         return redirect('sistema')
-    return render(request, 'home.html')
+
+    # Pasar los contenidos publicados al template 'home.html'
+    return render(request, 'home.html', {'contenidos': contenidos})
 
 from django.shortcuts import render, redirect
 from content.models import Content

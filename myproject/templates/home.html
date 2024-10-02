@@ -225,6 +225,37 @@
         </button>
       </div>
 
+      <!-- Contenido principal: Lista de Contenidos Publicados -->
+    <div class="container mt-4">
+      <h2>Publicaciones</h2>
+      <div class="row">
+          {% for contenido in contenidos %}
+          <div class="col-md-4 mb-3">
+              <div class="card shadow-sm h-100">
+                  <!-- Imagen del contenido -->
+                  <div class="content-image">
+                      {% if contenido.image %}
+                      <img src="{{ contenido.image.url }}" class="card-img-top" alt="Imagen de {{ contenido.title }}">
+                      {% else %}
+                      <img src="https://via.placeholder.com/150" class="card-img-top" alt="Sin imagen">
+                      {% endif %}
+                  </div>
+                  <div class="card-body">
+                      <!-- Categoría y Título -->
+                      <div class="content-category text-muted small mb-2">{{ contenido.category }}</div>
+                      <h5 class="card-title">{{ contenido.title }}</h5>
+                      <!-- Descripción -->
+                      <p class="card-text">{{ contenido.description|truncatechars:100 }}</p>
+                  </div>
+              </div>
+          </div>
+          {% empty %}
+          <p>No hay contenidos disponibles.</p>
+          {% endfor %}
+      </div>
+  </div>
+  
+
       <!-- Categorías como botones -->
       <div class="category-box">
         <h2>Categorías</h2>
@@ -303,5 +334,7 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+
   </body>
 </html>
