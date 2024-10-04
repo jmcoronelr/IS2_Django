@@ -324,27 +324,27 @@ Blinq
 
 <div class="content-feed">
   <h2>Últimos Contenidos</h2>
-    <div id="content-grid" class="content-grid">
-      {% for contenido in contenidos %}
-      <div class="content-item">
-        <!--<div class="content-category">{{ contenido.category }}</div>-->
-        <div class="content-image">
-          {% if contenido.image %}
-          <img src="{{ contenido.image.url }}" alt="Imagen de {{ contenido.title }}">
-          {% else %}
+  <div id="content-grid" class="content-grid">
+    {% for contenido_data in contenidos %}
+    <div class="content-item">
+      <div class="content-image">
+        {% if contenido_data.imagen %}
+          <img src="{{ contenido_data.imagen }}" alt="Imagen de {{ contenido_data.contenido.title }}" style="max-width: 100%; max-height: 100%;">
+        {% else %}
           <span>Sin imagen</span>
-          {% endif %}
-        </div>
-        <div class="content-details">
-          <h3>{{ contenido.title }}</h3>
-          <div class="description">{{ contenido.description }}</div>
-          <a href="{% if contenido.pk %}{% url 'content_detail' contenido.pk %}?next={{ request.path }}{% endif %}">Ver más</a>
-        </div>
+        {% endif %}
       </div>
-      {% empty %}
-      <p>No hay contenidos disponibles.</p>
-      {% endfor %}
+      <div class="content-details">
+        <h3>{{ contenido_data.contenido.title }}</h3>
+        <div class="description">{{ contenido_data.contenido.description }}</div>
+        <a href="{% url 'content_detail' contenido_data.contenido.pk %}?next={{ request.path }}">Ver más</a>
+      </div>
+    </div>
+    {% empty %}
+    <p>No hay contenidos disponibles.</p>
+    {% endfor %}
   </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('search-input');  // El ID del input de búsqueda

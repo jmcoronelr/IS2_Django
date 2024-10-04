@@ -183,12 +183,25 @@ def content_delete(request, pk):
 def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
     
-    # Obtén la URL anterior o utiliza una URL predeterminada (por ejemplo, '/content') si no existe 'next'
+    # Obtén la URL anterior o una predeterminada
     next_url = request.GET.get('next', '/content')
     
+    # Manejar comentarios
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.autor = request.user
+            comentario.contenido = content
+            comentario.save()
+            return redirect('content_detail', pk=content.pk)  # Recargar la misma página
+    else:
+        form = ComentarioForm()
+
     return render(request, 'content/content_detail.html', {
         'content': content,
-        'next_url': next_url  # Pasar el valor de next a la plantilla
+        'next_url': next_url,
+        'form': form  # Pasar el formulario al contexto
     })
 
 def get_plantilla_blocks(request, plantilla_id):

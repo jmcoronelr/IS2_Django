@@ -7,14 +7,25 @@ from django.http import JsonResponse
 
 def home(request):
     # Filtra solo los contenidos que estén en estado 'published'
-    contenidos = Content.objects.filter(status='published').order_by('created_at')
+    contenidos_publicados = Content.objects.filter(status='published').order_by('created_at')
 
     # Si el usuario está autenticado, redirigir a la página del sistema
     if request.user.is_authenticated:
         return redirect('sistema')
 
-    # Pasar los contenidos publicados al template 'home.html'
-    return render(request, 'home.html', {'contenidos': contenidos})
+    # Agregar lógica para extraer las imágenes multimedia de los bloques
+    contenidos_con_imagenes = []
+    for contenido in contenidos_publicados:
+        bloques_multimedia = contenido.blocks.filter(block_type='multimedia', multimedia__isnull=False)
+        # Seleccionar la primera imagen si hay alguna
+        imagen = bloques_multimedia.first().multimedia.url if bloques_multimedia.exists() else None
+        contenidos_con_imagenes.append({
+            'contenido': contenido,
+            'imagen': imagen,
+        })
+
+    # Pasar los contenidos publicados con imágenes al template 'home.html'
+    return render(request, 'home.html', {'contenidos': contenidos_con_imagenes})
 
 from django.shortcuts import render, redirect
 from content.models import Content
@@ -55,28 +66,19 @@ def sistema(request):
     # Obtener todas las categorías
     categorias = Categorias.objects.all()
 
-    # Verificar si la solicitud es AJAX
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        # Devolver el HTML completo que estaba en la plantilla parcial, pero como una cadena dentro del JSON
-        html = ''
-        for contenido in contenidos_publicados:
-            html += f'''
-                <div class="content-item">
-                   <!-- <div class="content-category">{contenido.categoria.descripcionLarga}</div> -->
-                    <div class="content-image">
-                        <span>Sin imagen</span>
-                    </div>
-                    <div class="content-details">
-                        <h3>{contenido.title}</h3>
-                        <div class="description">{contenido.description}</div>
-                        <a href="#">Ver más</a>
-                    </div>
-                </div>
-            '''
-        return JsonResponse({'html': html})
+    # Agregar lógica para extraer las imágenes multimedia de los bloques
+    contenidos_con_imagenes = []
+    for contenido in contenidos_publicados:
+        bloques_multimedia = contenido.blocks.filter(block_type='multimedia', multimedia__isnull=False)
+        # Seleccionar la primera imagen si hay alguna
+        imagen = bloques_multimedia.first().multimedia.url if bloques_multimedia.exists() and bloques_multimedia.first().multimedia else None
+        contenidos_con_imagenes.append({
+            'contenido': contenido,
+            'imagen': imagen,
+        })
 
     return render(request, 'sistema.html', {
-        'contenidos': contenidos_publicados,
+        'contenidos': contenidos_con_imagenes,
         'letra_seleccionada': letra,
         'categorias': categorias,
     })
