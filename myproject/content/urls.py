@@ -10,4 +10,6 @@ urlpatterns = [
     path('detail/<int:pk>/', views.content_detail, name='content_detail'),  # Detalle de contenido
     path('<int:plantilla_id>/get_blocks/', views.get_plantilla_blocks, name='get_plantilla_blocks'),  # Obtener bloques de plantilla
     path('detail/<int:pk>/comentario/', views.agregar_comentario, name='agregar_comentario'),
+    path('review/', views.review_list, name='review_list'),  # Listar contenidos en Revision
+    path('review/detail/<int:pk>/', views.review_detail, name='review_detail'),  # Revison del contenido
 ]

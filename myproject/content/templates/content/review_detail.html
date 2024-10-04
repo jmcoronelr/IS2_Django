@@ -1,0 +1,154 @@
+{% extends 'base.html' %} {% block Titulo %} {{ content.title }} {% endblock %}
+{% block content %}
+  <style>
+    .container-custom {
+      padding: 20px;
+      border-radius: 20px 20px 0 0; /* Redondea solo las esquinas superiores */
+      background-color: #f1f2f6;
+    }
+
+    .content-area {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 100%;
+      height: 500px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      position: relative;
+      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    }
+
+    .draggable {
+      position: absolute;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+    }
+
+    .draggable img,
+    .draggable video,
+    .draggable audio {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .block-info {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* Estilo para los detalles en una línea */
+    .content-details {
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .content-details p {
+      margin: 0;
+      padding-right: 10px;
+    }
+
+    /* Botones de interacción */
+    .interaction-buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .interaction-buttons button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 1.1rem;
+    }
+
+    .content-area {
+      overflow-y: scroll;
+      max-height: 600px;
+    }
+  </style>
+
+  <div class="container mt-5 container-custom">
+    <!-- Botón de volver a la lista arriba -->
+    <div class="text-end">
+        <a href="{{ next_url }}" class="btn btn-secondary">← Volver a la lista</a>
+    </div>
+
+    <!-- Título del contenido -->
+    <h1>{{ content.title }}</h1>
+    <p>{{ content.description }}</p>
+
+    <!-- Detalles en una sola línea -->
+    <div class="content-details">
+        <p><strong>Categoría:</strong> {{ content.categoria.descripcionLarga }}</p>
+        <p><strong>Creado en:</strong> {{ content.created_at }}</p>
+        <p><strong>Última actualización:</strong> {{ content.updated_at }}</p>
+    </div>
+
+    <!-- Área de contenido con bloques -->
+    <div class="content-area">
+        {% for bloque in content.blocks.all %}
+        <div
+            class="draggable"
+            style="top: {{ bloque.top }}; left: {{ bloque.left }}; width: {{ bloque.width }}; height: {{ bloque.height }};"
+        >
+            {% if bloque.block_type == 'texto' %}
+            <p>{{ bloque.content_text }}</p>
+            {% elif bloque.block_type == 'multimedia' %} {% if bloque.multimedia %}
+            <div class="block-info">
+                <img src="{{ bloque.multimedia.url }}" alt="Imagen multimedia" />
+            </div>
+            {% else %}
+            <p>No hay archivo multimedia cargado</p>
+            {% endif %} {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Botones de interacción al final -->
+    <div class="interaction-buttons">
+        {% load tiene_permiso %} 
+        {% if request.user|tiene_permiso:"Contenido: Publicar" %} 
+        {% if request.user|tiene_permiso:"Contenido: Inactivar" %}
+        <form method="POST" action="{% url 'review_detail' pk=content.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" name="status" value="publicar">Publicar</button>
+        </form>
+
+        <!-- Botón para abrir el modal de rechazo -->
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#RejectModal">
+            Rechazar
+        </button>
+        {% endif %} 
+        {% endif %}
+    </div>
+
+    <!-- Modal de confirmación para Rechazar -->
+    <div class="modal fade" id="RejectModal" tabindex="-1" aria-labelledby="RejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="RejectModalLabel">Confirmar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Qué quieres hacer con el contenido rechazado?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" action="{% url 'review_detail' pk=content.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="rechazar" class="btn btn-danger">Rechazar</button>
+                        <button type="submit" name="status" value="borrador" class="btn btn-primary">Mandar a borrador</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}
