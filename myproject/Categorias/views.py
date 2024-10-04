@@ -51,15 +51,22 @@ def categoria_edit(request, pk):
 
     return render(request, 'Categorias/categoria_edit.html', {'form': form})
 
+from roles.models import RolEnCategoria  # Importar RolEnCategoria para verificar roles
 
 def categoria_delete(request, pk):
     categoria = get_object_or_404(Categorias, pk=pk)
+    roles_asociados = RolEnCategoria.objects.filter(categoria=categoria).exists()
 
     if categoria.content_set.exists():  # Verifica si hay contenidos asociados
         # Añadimos el mensaje de error con la tag 'category_message'
         messages.error(request, "No puedes eliminar esta categoría porque tiene contenidos asociados.", extra_tags='category_message')
         return redirect('categoria_list')
     
+    if roles_asociados:
+        # Añadir un mensaje de error si hay roles asociados
+        messages.error(request, "No puedes eliminar esta categoría porque tiene roles asociados.", extra_tags='category_message')
+        return redirect('categoria_list')
+
     if request.method == 'POST':
         categoria.delete()
         # Añadimos el mensaje de éxito con la tag 'category_message'
