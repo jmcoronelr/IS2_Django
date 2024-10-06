@@ -205,3 +205,7 @@ EMAIL_HOST_PASSWORD = 'rzge rdnm yatc dayt'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # O 'DENY' si prefieres no permitir iframes
