@@ -4,6 +4,7 @@ from Categorias.models import Categorias
 from functools import wraps
 from django.http import HttpResponseForbidden
 from django import template
+from django.core.exceptions import ValidationError
 
 class Permiso(models.Model):
     nombre = models.CharField(max_length=100)
@@ -19,6 +20,13 @@ class Rol(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def delete(self, *args, **kwargs):
+        # Verifica si el rol está asignado a algún usuario
+        if RolEnCategoria.objects.filter(rol=self).exists():
+            # Lanza una excepción si el rol está en uso
+            raise ValidationError('No se puede eliminar el rol porque está asignado a un usuario.')
+        super().delete(*args, **kwargs)
     
 class RolEnCategoria(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
