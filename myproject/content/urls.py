@@ -10,4 +10,5 @@ urlpatterns = [
     path('detail/<int:pk>/', views.content_detail, name='content_detail'),  # Detalle de contenido
     path('<int:plantilla_id>/get_blocks/', views.get_plantilla_blocks, name='get_plantilla_blocks'),  # Obtener bloques de plantilla
     path('detail/<int:pk>/comentario/', views.agregar_comentario, name='agregar_comentario'),
+    path('switch-state/<int:pk>/', views.cambiar_estado_contenido, name='switch_state'),
 ]

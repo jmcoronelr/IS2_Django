@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Content, Comentario
+from .models import Content
 from .forms import ContentForm, ComentarioForm
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
@@ -10,7 +10,7 @@ from .models import Content, ContentBlock
 from Categorias.models import Categorias
 from roles.models import RolEnCategoria, Rol
 from historial.models import Historial
-
+from django.contrib import messages
 def content_list(request):
     # Obtener permisos necesarios
     permisos_requeridos = [
@@ -236,3 +236,14 @@ def agregar_comentario(request, pk):
         form = ComentarioForm()
 
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
+
+def cambiar_estado_contenido(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    if content.status == 'published':
+        content.status = 'inactive'
+    else:
+        content.status = 'published'
+    
+    content.save()
+    messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
+    return redirect('content_list')
