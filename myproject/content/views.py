@@ -93,14 +93,19 @@ def content_create_edit(request, pk=None):
 
     plantillas = Plantilla.objects.all()
 
-    # Filtro de categorías con permiso "Crear Contenido"
-    categorias = Categorias.objects.filter(
-        id__in=RolEnCategoria.objects.filter(
-            usuario_id=request.user.id,
-            rol_id__in=Rol.objects.filter(permisos__nombre='Contenido: Crear')  # Filtra roles con el permiso
-        ).values('categoria_id'),
-        estado=True
-    )
+    # Verificar si el usuario es superusuario
+    if request.user.is_superuser:
+        # Si es superusuario, mostrar todas las categorías activas
+        categorias = Categorias.objects.filter(estado=True)
+    else:
+        # Filtro de categorías con permiso "Crear Contenido" para usuarios no superusuarios
+        categorias = Categorias.objects.filter(
+            id__in=RolEnCategoria.objects.filter(
+                usuario_id=request.user.id,
+                rol_id__in=Rol.objects.filter(permisos__nombre='Contenido: Crear')  # Filtra roles con el permiso
+            ).values('categoria_id'),
+            estado=True
+        )
 
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
@@ -167,11 +172,12 @@ def content_create_edit(request, pk=None):
     return render(request, 'content/content_form.html', {
         'form': form,
         'plantillas': plantillas,
-        'categorias': categorias,  # Enviar las categorías filtradas
+        'categorias': categorias,  # Enviar las categorías filtradas o todas si es superusuario
         'selected_plantilla': selected_plantilla,
         'selected_categoria': selected_categoria,
         'blocks': blocks,
     })
+
 
 
 
