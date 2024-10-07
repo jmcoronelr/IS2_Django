@@ -12,29 +12,38 @@ from roles.models import RolEnCategoria, Rol
 from historial.models import Historial
 from django.contrib import messages
 def content_list(request):
-    # Obtener permisos necesarios
-    permisos_requeridos = [
-        'Contenido: Editar propio',
-        'Contenido: Inactivar',
-        'Contenido: Publicar',
-        'Contenido: Eliminar',
-        'Contenido: Ver historial',
-        'Contenido: Crear'
-    ]
-    
-    # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
-    roles_con_permisos = Rol.objects.filter(
-        permisos__nombre__in=permisos_requeridos
-    ).values_list('id', flat=True)
+    # Verificar si el usuario es superusuario
+    if request.user.is_superuser:
+        # Si es superusuario, obtener todos los contenidos sin filtrar por roles ni categorías
+        contents = Content.objects.all().order_by('created_at')
+        categorias = Categorias.objects.all()  # Mostrar todas las categorías
+    else:
+        # Obtener permisos necesarios
+        permisos_requeridos = [
+            'Contenido: Editar propio',
+            'Contenido: Inactivar',
+            'Contenido: Publicar',
+            'Contenido: Eliminar',
+            'Contenido: Ver historial',
+            'Contenido: Crear'
+        ]
+        
+        # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
+        roles_con_permisos = Rol.objects.filter(
+            permisos__nombre__in=permisos_requeridos
+        ).values_list('id', flat=True)
 
-    # Filtrar las categorías donde el usuario tiene estos roles
-    categorias_permitidas = RolEnCategoria.objects.filter(
-        usuario_id=request.user.id,
-        rol_id__in=roles_con_permisos
-    ).values_list('categoria_id', flat=True)
+        # Filtrar las categorías donde el usuario tiene estos roles
+        categorias_permitidas = RolEnCategoria.objects.filter(
+            usuario_id=request.user.id,
+            rol_id__in=roles_con_permisos
+        ).values_list('categoria_id', flat=True)
 
-    # Filtrar los contenidos que pertenecen a esas categorías
-    contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+        # Filtrar los contenidos que pertenecen a esas categorías
+        contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+
+        # Obtener solo las categorías permitidas para el usuario
+        categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Búsqueda por título
     query = request.GET.get('q')
@@ -55,13 +64,10 @@ def content_list(request):
     if estado:
         contents = contents.filter(status=estado)
 
-    # Filtrar por categoría (solo las permitidas)
+    # Filtrar por categoría (solo las permitidas para usuarios no superusuarios)
     categoria = request.GET.get('categoria')
-    if categoria and categoria in categorias_permitidas:
+    if not request.user.is_superuser and categoria and categoria in categorias_permitidas:
         contents = contents.filter(categoria__id=categoria)
-
-    # Obtener solo las categorías permitidas para el usuario
-    categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Paginación
     paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página
@@ -71,8 +77,9 @@ def content_list(request):
     # Pasar las categorías al contexto
     return render(request, 'content/content_list.html', {
         'contents': contents,
-        'categorias': categorias,  # Solo categorías permitidas
+        'categorias': categorias,  # Solo categorías permitidas para usuarios no superusuarios
     })
+
 
 
 
