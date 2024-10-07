@@ -248,31 +248,34 @@ Blinq
     cursor: pointer;
   }
 </style>
-
-{% if request.user|tiene_permiso:"administrar_sitio" %}
+{% if request.user|tiene_permiso:"Contenido: Crear" or request.user|tiene_permiso:"Contenido: Rechazar" or request.user|tiene_permiso:"Contenido: Aceptar" or request.user|tiene_permiso:"Contenido: Mandar a revisión" or request.user|tiene_permiso:"Contenido: Mandar a borrador" or request.user|tiene_permiso:"Contenido: Publicar" or request.user|tiene_permiso:"Generar reportes: Cantidad articulos publicados" or request.user|tiene_permiso:"Generar reportes: Cantidad articulos redactados y tiempo promedio de revision" or request.user|tiene_permiso:"Generar reportes: Cantidad de likes por cada articulo"%}
 <div class="sidebar" id="sidebar">
+  {% if request.user|tiene_permiso:"Contenido: Crear" %}
   <div class="icon-item">
     <a href="{% url 'content_create' %}?next={{ request.path }}" class="create-icon">
       <img src="https://cdn-icons-png.flaticon.com/512/271/271228.png" alt="Crear Icon" />
     </a>
     <p>Crear</p>
   </div>
-
+  {% endif %}
+  {% if request.user|tiene_permiso:"Contenido: Rechazar" or request.user|tiene_permiso:"Contenido: Aceptar" or request.user|tiene_permiso:"Contenido: Mandar a revisión" or request.user|tiene_permiso:"Contenido: Mandar a borrador" or request.user|tiene_permiso:"Contenido: Publicar" %}
   <div class="icon-item">
     <a href="{% url 'flujos_home' %}" class="flujos-icon">
       <img src="https://cdn-icons-png.freepik.com/512/481/481268.png" alt="Flujos Icon" />
     </a>
     <p>Flujos</p>
   </div>
-
+  {% endif %}
+  {% if request.user|tiene_permiso:"Generar reportes: Cantidad articulos publicados" or request.user|tiene_permiso:"Generar reportes: Cantidad articulos redactados y tiempo promedio de revision" or request.user|tiene_permiso:"Generar reportes: Cantidad de likes por cada articulo" %}
   <div class="icon-item">
     <a href="{% url 'reportes_home' %}" class="reportes-icon">
       <img src="https://cdn-icons-png.flaticon.com/512/3093/3093748.png" alt="Reportes Icon" />
     </a>
     <p>Reportes</p>
   </div>
+  {% endif %}
 </div>
-
+{% endif %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
@@ -281,7 +284,6 @@ Blinq
     }, 100);
   });
 </script>
-{% endif %}
 
 <div class="search-filter-container">
   <form method="get" action="" class="search-form">
