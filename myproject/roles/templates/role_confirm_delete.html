@@ -9,17 +9,29 @@
 </head>
 <body>
     <div class="container mt-5">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-dismissible fade show {{ message.tags }}" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="card">
             <div class="card-header bg-danger text-white">
                 <h4 class="mb-0">Eliminar Rol</h4>
             </div>
             <div class="card-body">
-                <h5 class="card-title">¿Estás seguro de que deseas eliminar el rol "{{ role.name }}"?</h5>
+                <h5 class="card-title">¿Estás seguro de que deseas eliminar el rol "{{ rol.nombre }}"?</h5>
                 <form method="post">
                     {% csrf_token %}
                     <div class="form-group">
                         <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
-                        <a href="{% url 'role_list' %}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{% url 'lista_roles' %}" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </form>
             </div>
