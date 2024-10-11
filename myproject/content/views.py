@@ -87,6 +87,7 @@ def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
+        content.status = 'review'
     else:
         content = None
         accion = 'creado'
