@@ -260,3 +260,36 @@ def cambiar_estado_contenido(request, pk):
     content.save()
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
+from django.views.decorators.csrf import csrf_exempt
+
+
+@csrf_exempt
+def like_content(request, content_id):
+    content = get_object_or_404(Content, id=content_id)
+    if request.method == 'POST':
+        content.likes += 1
+        content.save()
+        return JsonResponse({'likes': content.likes})
+
+@csrf_exempt
+def dislike_content(request, content_id):
+    content = get_object_or_404(Content, id=content_id)
+    if request.method == 'POST':
+        content.dislikes += 1
+        content.save()
+        return JsonResponse({'dislikes': content.dislikes})
+@csrf_exempt
+def unlike_content(request, content_id):
+    content = get_object_or_404(Content, id=content_id)
+    if request.method == 'POST':
+        content.likes -= 1
+        content.save()
+        return JsonResponse({'likes': content.likes})
+
+@csrf_exempt
+def undislike_content(request, content_id):
+    content = get_object_or_404(Content, id=content_id)
+    if request.method == 'POST':
+        content.dislikes -= 1
+        content.save()
+        return JsonResponse({'dislikes': content.dislikes})

@@ -111,6 +111,17 @@
   .comment-section form button {
     margin: 10px 0;
   }
+  /* Estilos para los botones cuando están activos */
+  .active-like {
+    background-color: #007bff !important; /* Azul para like activo */
+    color: white;
+  }
+
+  .active-dislike {
+    background-color: #dc3545 !important; /* Rojo para dislike activo */
+    color: white;
+  }
+
 </style>
 
 <div class="container mt-5 container-custom">
@@ -153,20 +164,20 @@
 
   <div class="interaction-buttons">
     <!-- Botón de Me gusta -->
-    <button class="btn" style="background-color: #ffffff; border-radius: 10px;">
+    <button id="like-btn" class="btn" style="background-color: #ffffff; border-radius: 10px;">
       <img src="https://cdn4.iconfinder.com/data/icons/basic-flat-ui-extra-set-200-item/76/ui_ux_minimalist_button_thumbs_up_like_favorite-512.png"
-          alt="Me gusta" style="width: 30px; height: 30px;">
+           alt="Me gusta" style="width: 30px; height: 30px;">
     </button>
-  
-  <!-- Botón de No me gusta -->
-  <button class="btn" style="background-color: #5b5a5a; border-radius: 10px; margin-left: 10px;">
-    <img src="https://cdn4.iconfinder.com/data/icons/basic-flat-ui-extra-set-200-item/76/ui_ux_minimalist_button_thumbs_up_like_favorite-512.png"
-        alt="No me gusta" style="width: 30px; height: 30px; transform: rotate(180deg); filter: invert(100%);">
-  </button>
+    <span id="like-count">{{ content.likes }}</span>
 
-  
+    <!-- Botón de No me gusta -->
+    <button id="dislike-btn" class="btn" style="background-color: #5b5a5a; border-radius: 10px; margin-left: 10px;">
+      <img src="https://cdn4.iconfinder.com/data/icons/basic-flat-ui-extra-set-200-item/76/ui_ux_minimalist_button_thumbs_up_like_favorite-512.png"
+           alt="No me gusta" style="width: 30px; height: 30px; transform: rotate(180deg); filter: invert(100%);">
+    </button>
+    <span id="dislike-count">{{ content.dislikes }}</span>
   </div>
-  
+
   <!-- Sección de comentarios -->
   <div class="comment-section">
     <h3>Comentarios</h3>
@@ -189,4 +200,204 @@
     </form>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log("JavaScript cargado");
+
+    // Variables para saber si el usuario ya ha dado like o dislike
+    let liked = false;
+    let disliked = false;
+
+    // Seleccionamos los botones
+    const likeBtn = document.getElementById('like-btn');
+    const dislikeBtn = document.getElementById('dislike-btn');
+
+    // Event Listener para el botón de Like
+    likeBtn.addEventListener('click', function() {
+      if (!liked && !disliked) {
+        // Si no ha dado like ni dislike, incrementa el like
+        fetch("{% url 'like_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de likes
+          let likeCount = document.getElementById('like-count');
+          likeCount.innerText = data.likes;
+          liked = true;
+          disliked = false;
+
+          // Cambiar el estilo de los botones
+          likeBtn.classList.add('active-like');
+          dislikeBtn.classList.remove('active-dislike');
+        })
+        .catch(error => {
+          console.log('Error al enviar el like:', error);
+        });
+      } else if (liked) {
+        // Si ya ha dado like, lo deshace
+        fetch("{% url 'unlike_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de likes
+          let likeCount = document.getElementById('like-count');
+          likeCount.innerText = data.likes;
+          liked = false;
+
+          // Remover el estilo activo
+          likeBtn.classList.remove('active-like');
+        })
+        .catch(error => {
+          console.log('Error al enviar el unlike:', error);
+        });
+      } else if (disliked) {
+        // Si ha dado dislike y ahora da like, deshacer el dislike y hacer like
+        fetch("{% url 'undislike_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de dislikes
+          let dislikeCount = document.getElementById('dislike-count');
+          dislikeCount.innerText = data.dislikes;
+
+          // Luego incrementar el like
+          return fetch("{% url 'like_content' content.id %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          });
+        })
+        .then(response => response.json())
+        .then(data => {
+          let likeCount = document.getElementById('like-count');
+          likeCount.innerText = data.likes;
+          liked = true;
+          disliked = false;
+
+          // Cambiar los estilos
+          likeBtn.classList.add('active-like');
+          dislikeBtn.classList.remove('active-dislike');
+        })
+        .catch(error => {
+          console.log('Error al procesar el cambio de like y dislike:', error);
+        });
+      }
+    });
+
+    // Event Listener para el botón de Dislike
+    dislikeBtn.addEventListener('click', function() {
+      if (!liked && !disliked) {
+        // Si no ha dado like ni dislike, incrementa el dislike
+        fetch("{% url 'dislike_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de dislikes
+          let dislikeCount = document.getElementById('dislike-count');
+          dislikeCount.innerText = data.dislikes;
+          disliked = true;
+          liked = false;
+
+          // Cambiar el estilo de los botones
+          dislikeBtn.classList.add('active-dislike');
+          likeBtn.classList.remove('active-like');
+        })
+        .catch(error => {
+          console.log('Error al enviar el dislike:', error);
+        });
+      } else if (disliked) {
+        // Si ya ha dado dislike, lo deshace
+        fetch("{% url 'undislike_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de dislikes
+          let dislikeCount = document.getElementById('dislike-count');
+          dislikeCount.innerText = data.dislikes;
+          disliked = false;
+
+          // Remover el estilo activo
+          dislikeBtn.classList.remove('active-dislike');
+        })
+        .catch(error => {
+          console.log('Error al enviar el undislike:', error);
+        });
+      } else if (liked) {
+        // Si ha dado like y ahora da dislike, deshacer el like y hacer dislike
+        fetch("{% url 'unlike_content' content.id %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar el contador de likes
+          let likeCount = document.getElementById('like-count');
+          likeCount.innerText = data.likes;
+
+          // Luego incrementar el dislike
+          return fetch("{% url 'dislike_content' content.id %}", {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          });
+        })
+        .then(response => response.json())
+        .then(data => {
+          let dislikeCount = document.getElementById('dislike-count');
+          dislikeCount.innerText = data.dislikes;
+          disliked = true;
+          liked = false;
+
+          // Cambiar los estilos
+          dislikeBtn.classList.add('active-dislike');
+          likeBtn.classList.remove('active-like');
+        })
+        .catch(error => {
+          console.log('Error al procesar el cambio de dislike y like:', error);
+        });
+      }
+    });
+  });
+</script>
 {% endblock %}
