@@ -156,6 +156,40 @@
         margin-top: 20px;
         color: #555;
       }
+
+      /* Ajustes para las tarjetas */
+      .card {
+        height: auto;
+        min-height: 300px; /* Altura mínima */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .card-img-top {
+        height: 150px; /* Altura fija para las imágenes */
+        width: 100%; /* Asegura que la imagen se ajuste al ancho del contenedor */
+        object-fit: cover; /* Asegura que las imágenes llenen el contenedor sin distorsionarse */
+        border-radius: 10px;
+      }
+
+      .card-body {
+        flex-grow: 1;
+      }
+
+      .content-image {
+        height: 150px; /* Mantiene la altura del contenedor constante */
+        overflow: hidden; /* Evita que el contenido se desborde */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .content-image img {
+        height: 100%;
+        width: auto;
+        object-fit: cover;
+      }
     </style>
   </head>
   <body>
@@ -224,6 +258,37 @@
           <span class="visually-hidden">Siguiente</span>
         </button>
       </div>
+
+      <!-- Contenido principal: Lista de Contenidos Publicados -->
+      <div class="container mt-4">
+        <h2>Publicaciones</h2>
+        <div class="row">
+            {% for contenido_data in contenidos %}
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <!-- Imagen del contenido -->
+                    <div class="content-image">
+                        {% if contenido_data.imagen %}
+                        <img src="{{ contenido_data.imagen }}" class="card-img-top" alt="Imagen de {{ contenido_data.contenido.title }}">
+                        {% else %}
+                        <img src="https://via.placeholder.com/150" class="card-img-top" alt="Sin imagen">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <!-- Categoría y Título -->
+                        <div class="content-category text-muted small mb-2">{{ contenido_data.contenido.category }}</div>
+                        <h5 class="card-title">{{ contenido_data.contenido.title }}</h5>
+                        <!-- Descripción -->
+                        <p class="card-text">{{ contenido_data.contenido.description|truncatechars:100 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>No hay contenidos disponibles.</p>
+            {% endfor %}
+        </div>
+      </div>
+        
 
       <!-- Categorías como botones -->
       <div class="category-box">
@@ -303,5 +368,7 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+
+
   </body>
 </html>

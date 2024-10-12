@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Content, Comentario
+from .models import Content
 from .forms import ContentForm, ComentarioForm
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
@@ -10,31 +10,44 @@ from .models import Content, ContentBlock
 from Categorias.models import Categorias
 from roles.models import RolEnCategoria, Rol
 from historial.models import Historial
+from django.contrib import messages
+from content.models import UserInteraction
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 def content_list(request):
-    # Obtener permisos necesarios
-    permisos_requeridos = [
-        'Contenido: Editar propio',
-        'Contenido: Inactivar',
-        'Contenido: Publicar',
-        'Contenido: Eliminar',
-        'Contenido: Ver historial',
-        'Contenido: Crear'
-    ]
-    
-    # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
-    roles_con_permisos = Rol.objects.filter(
-        permisos__nombre__in=permisos_requeridos
-    ).values_list('id', flat=True)
+    # Verificar si el usuario es superusuario
+    if request.user.is_superuser:
+        # Si es superusuario, obtener todos los contenidos sin filtrar por roles ni categorías
+        contents = Content.objects.all().order_by('created_at')
+        categorias = Categorias.objects.all()  # Mostrar todas las categorías
+    else:
+        # Obtener permisos necesarios
+        permisos_requeridos = [
+            'Contenido: Editar propio',
+            'Contenido: Inactivar',
+            'Contenido: Publicar',
+            'Contenido: Eliminar',
+            'Contenido: Ver historial',
+            'Contenido: Crear'
+        ]
+        
+        # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
+        roles_con_permisos = Rol.objects.filter(
+            permisos__nombre__in=permisos_requeridos
+        ).values_list('id', flat=True)
 
-    # Filtrar las categorías donde el usuario tiene estos roles
-    categorias_permitidas = RolEnCategoria.objects.filter(
-        usuario_id=request.user.id,
-        rol_id__in=roles_con_permisos
-    ).values_list('categoria_id', flat=True)
+        # Filtrar las categorías donde el usuario tiene estos roles
+        categorias_permitidas = RolEnCategoria.objects.filter(
+            usuario_id=request.user.id,
+            rol_id__in=roles_con_permisos
+        ).values_list('categoria_id', flat=True)
 
-    # Filtrar los contenidos que pertenecen a esas categorías
-    contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+        # Filtrar los contenidos que pertenecen a esas categorías
+        contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+
+        # Obtener solo las categorías permitidas para el usuario
+        categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Búsqueda por título
     query = request.GET.get('q')
@@ -55,13 +68,10 @@ def content_list(request):
     if estado:
         contents = contents.filter(status=estado)
 
-    # Filtrar por categoría (solo las permitidas)
+    # Filtrar por categoría (solo las permitidas para usuarios no superusuarios)
     categoria = request.GET.get('categoria')
-    if categoria and categoria in categorias_permitidas:
+    if not request.user.is_superuser and categoria and categoria in categorias_permitidas:
         contents = contents.filter(categoria__id=categoria)
-
-    # Obtener solo las categorías permitidas para el usuario
-    categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Paginación
     paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página
@@ -71,8 +81,9 @@ def content_list(request):
     # Pasar las categorías al contexto
     return render(request, 'content/content_list.html', {
         'contents': contents,
-        'categorias': categorias,  # Solo categorías permitidas
+        'categorias': categorias,  # Solo categorías permitidas para usuarios no superusuarios
     })
+
 
 
 
@@ -80,7 +91,11 @@ def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
+<<<<<<< HEAD
         es_nuevo = False  # Ya existe, por lo tanto, es una edición
+=======
+        content.status = 'review'
+>>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76
     else:
         content = None
         accion = 'creado'
@@ -88,14 +103,19 @@ def content_create_edit(request, pk=None):
 
     plantillas = Plantilla.objects.all()
 
-    # Filtro de categorías con permiso "Crear Contenido"
-    categorias = Categorias.objects.filter(
-        id__in=RolEnCategoria.objects.filter(
-            usuario_id=request.user.id,
-            rol_id__in=Rol.objects.filter(permisos__nombre='Contenido: Crear')  # Filtra roles con el permiso
-        ).values('categoria_id'),
-        estado=True
-    )
+    # Verificar si el usuario es superusuario
+    if request.user.is_superuser:
+        # Si es superusuario, mostrar todas las categorías activas
+        categorias = Categorias.objects.filter(estado=True)
+    else:
+        # Filtro de categorías con permiso "Crear Contenido" para usuarios no superusuarios
+        categorias = Categorias.objects.filter(
+            id__in=RolEnCategoria.objects.filter(
+                usuario_id=request.user.id,
+                rol_id__in=Rol.objects.filter(permisos__nombre='Contenido: Crear')  # Filtra roles con el permiso
+            ).values('categoria_id'),
+            estado=True
+        )
 
     if request.method == 'POST':
         form = ContentForm(request.POST, instance=content)
@@ -173,7 +193,7 @@ def content_create_edit(request, pk=None):
     return render(request, 'content/content_form.html', {
         'form': form,
         'plantillas': plantillas,
-        'categorias': categorias,  # Enviar las categorías filtradas
+        'categorias': categorias,  # Enviar las categorías filtradas o todas si es superusuario
         'selected_plantilla': selected_plantilla,
         'selected_categoria': selected_categoria,
         'blocks': blocks,
@@ -198,13 +218,40 @@ def content_delete(request, pk):
 def content_detail(request, pk):
     content = get_object_or_404(Content, pk=pk)
     
-    # Obtén la URL anterior o utiliza una URL predeterminada (por ejemplo, '/content') si no existe 'next'
+    # Obtén la URL anterior o una predeterminada
     next_url = request.GET.get('next', '/content')
     
+    # Verificar si el usuario ha interactuado con el contenido
+    user_interaction = None
+    liked = False
+    disliked = False
+    if request.user.is_authenticated:
+        user_interaction = UserInteraction.objects.filter(user=request.user, content=content).first()
+        if user_interaction:
+            liked = user_interaction.liked
+            disliked = user_interaction.disliked
+
+    # Manejar comentarios
+    if request.method == 'POST':
+        form = ComentarioForm(request.POST)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.autor = request.user
+            comentario.contenido = content
+            comentario.save()
+            return redirect('content_detail', pk=content.pk)  # Recargar la misma página
+    else:
+        form = ComentarioForm()
+
     return render(request, 'content/content_detail.html', {
         'content': content,
-        'next_url': next_url  # Pasar el valor de next a la plantilla
+        'next_url': next_url,
+        'form': form,
+        'user_interaction': user_interaction,
+        'liked': liked,  # Enviar si el usuario ya dio "like"
+        'disliked': disliked,  # Enviar si el usuario ya dio "dislike"
     })
+
 
 def get_plantilla_blocks(request, plantilla_id):
     plantilla = get_object_or_404(Plantilla, id=plantilla_id)
@@ -239,6 +286,7 @@ def agregar_comentario(request, pk):
 
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
 
+<<<<<<< HEAD
 
 
 def review_list(request):
@@ -330,3 +378,60 @@ def review_detail(request, pk):
         'content': content,
         'next_url': next_url  # Pasar el valor de next a la plantilla
     })
+=======
+def cambiar_estado_contenido(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    if content.status == 'published':
+        content.status = 'inactive'
+    else:
+        content.status = 'published'
+    
+    content.save()
+    messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
+    return redirect('content_list')
+@require_POST
+@login_required
+def like_content(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    interaction, created = UserInteraction.objects.get_or_create(user=request.user, content=content)
+
+    if interaction.liked:
+        interaction.liked = False
+        content.likes -= 1
+    else:
+        interaction.liked = True
+        content.likes += 1
+
+        # Si el usuario había dado dislike antes, se lo quitamos
+        if interaction.disliked:
+            interaction.disliked = False
+            content.dislikes -= 1
+
+    interaction.save()
+    content.save()
+
+    return JsonResponse({'likes': content.likes, 'dislikes': content.dislikes})
+
+@require_POST
+@login_required
+def dislike_content(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    interaction, created = UserInteraction.objects.get_or_create(user=request.user, content=content)
+
+    if interaction.disliked:
+        interaction.disliked = False
+        content.dislikes -= 1
+    else:
+        interaction.disliked = True
+        content.dislikes += 1
+
+        # Si el usuario había dado like antes, se lo quitamos
+        if interaction.liked:
+            interaction.liked = False
+            content.likes -= 1
+
+    interaction.save()
+    content.save()
+
+    return JsonResponse({'likes': content.likes, 'dislikes': content.dislikes})
+>>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76
