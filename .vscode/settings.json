@@ -1,4 +1,6 @@
 {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "notebook.defaultFormatter": "esbenp.prettier-vscode"
+    "notebook.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.colorDecoratorsLimit": 5000,
+    "editor.defaultColorDecorators": true
 }

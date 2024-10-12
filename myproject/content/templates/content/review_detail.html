@@ -111,7 +111,7 @@
     </div>
 
     <!-- Botones de interacción al final -->
-    <div class="interaction-buttons">
+    <div class="interaction-buttons d-flex align-items-center justify-content-start">
         {% load tiene_permiso %} 
         {% if request.user|tiene_permiso:"Contenido: Publicar" %} 
         {% if request.user|tiene_permiso:"Contenido: Inactivar" %}

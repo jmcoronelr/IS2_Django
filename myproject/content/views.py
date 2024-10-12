@@ -80,9 +80,11 @@ def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
+        es_nuevo = False  # Ya existe, por lo tanto, es una edición
     else:
         content = None
         accion = 'creado'
+        es_nuevo = True  # No existe, por lo tanto, es creación
 
     plantillas = Plantilla.objects.all()
 
@@ -111,6 +113,17 @@ def content_create_edit(request, pk=None):
                 content.categoria = Categorias.objects.get(id=categoria_id)
             else:
                 content.categoria = None
+
+            # Cambiar el estado del contenido basado en el botón presionado
+            estado = request.POST.get('status')
+            if estado == 'review':
+                content.estado = 'review'     # Cambia el estado a 'Revision'
+            elif estado == 'published':
+                content.estado = 'published'    # Cambia el estado a "Publicado"
+            elif estado == 'draft':
+                content.estado = 'draft'        # Cambia el estado a 'Borrador'
+            elif estado == 'inactive':
+                content.status = 'inactive'     # Cambia el estado a 'Inactivo'
 
             content.save()
 
@@ -164,7 +177,9 @@ def content_create_edit(request, pk=None):
         'selected_plantilla': selected_plantilla,
         'selected_categoria': selected_categoria,
         'blocks': blocks,
+        'es_nuevo': es_nuevo  # Indicador de si es creación o edición
     })
+
 
 
 

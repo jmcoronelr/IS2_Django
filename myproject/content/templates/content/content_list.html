@@ -75,6 +75,48 @@
                 text-align: center;
             }
 
+            .dropdown {
+                display: inline-block;
+                position: relative;
+                top: 0%; 
+                left: 0;
+                z-index: 1000;
+            }
+            .dropdown-menu{
+                display: none;
+                position: absolute;
+                background-color: #f8f9fa;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 10px;
+                z-index: 99999;
+                top: 500;
+                left: 500;
+            }
+            .dropdown:hover .dropdown-menu {
+                display: inline-grid !important;
+            }
+            dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f1f1f1;
+                min-width: 160px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 99;
+            }
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+            .dropdown-item {
+                background-color: #f8f9fa;
+                color: black;
+                padding: 16px;
+                font-size: 16px;
+                border: none;
+            }
+            .dropdown-item:hover {
+                background-color: #e8e9ea;
+            }
+
             .delete-icon {
                 position: absolute;
                 top: 0;
@@ -238,9 +280,30 @@
                         {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                         {% endif %}
-                        {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
-                        <a href="" class="btn btn-primary btn-sm">Publicar</a>
-                        {% endif %}
+                        <div class="dropdown" data-bs-auto-close="false">
+                            {% if request.user|tiene_permiso:"Contenido: Publicar" or request.user|tiene_permiso:"Contenido: Inactivar"%} 
+                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
+                                Más...
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {% if content.status != 'review' %}
+                                <li>
+                                    <button class="dropdown-item" type="submit" name="status" value="review">Revisión</button>
+                                </li>
+                                {% endif %}
+                                {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %} 
+                                <li>
+                                    <button class="dropdown-item" type="submit" name="status" value="published">Publicar</button>
+                                </li>
+                                {% endif %}
+                                {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
+                                <li>
+                                    <button class="dropdown-item" type="submit" name="status" value="inactive">Inactivo</button>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

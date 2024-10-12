@@ -64,6 +64,49 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .dropdown {
+            display: inline-block;
+            position: relative;
+            top: 0%; 
+            left: 0;
+            z-index: 1000;
+        }
+        .dropdown-menu{
+            display: none;
+            position: absolute;
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            z-index: 99999;
+            top: 500;
+            left: 500;
+        }
+        .dropdown:hover .dropdown-menu {
+            display: inline-grid !important;
+        }
+        dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 99;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .dropdown-item {
+            background-color: #f8f9fa;
+            color: black;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+        }
+        .dropdown-item:hover {
+            background-color: #e8e9ea;
+        }
+
+
         .resize-handle {
             width: 10px;
             height: 10px;
@@ -174,6 +217,10 @@
             border-radius: 10px;
         }
 
+        .action-buttons button {
+            margin-right: 5px;
+        }
+
         /* Estilo para la sección de detalles multimedia */
         .multimedia-details {
             font-size: 0.8rem;
@@ -193,6 +240,7 @@
         <!-- Iniciar formulario -->
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            {% load tiene_permiso %} 
             <!-- Encabezado con los campos en una sola fila -->
             <div class="form-inline-container">
                 <div class="form-group">
@@ -212,10 +260,6 @@
                             </option>
                         {% endfor %}
                     </select>
-                </div>
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    {{ form.status }}
                 </div>
             </div>
 
@@ -267,10 +311,30 @@
                         
             <!-- Botones de pie: Atrás, Guardar y Seleccionar Plantilla -->
             <div class="footer-buttons">
-                <div class="action-buttons">
+                <div class="action-buttons d-flex align-items-center justify-content-start">
                     <!-- Reemplazar el enlace fijo con history.back() -->
                     <button type="button" class="btn btn-secondary" onclick="history.back()">← Volver atrás</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary" name="status" value="draft">Guardar</button>
+                    <button type="submit" class="btn btn-primary" name="status" value="review">Revisión</button>
+                    <div class="dropdown" data-bs-auto-close="false">
+                        {% if request.user|tiene_permiso:"Contenido: Publicar" or request.user|tiene_permiso:"Contenido: Inactivar"%} 
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
+                            Más...
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            {% if request.user|tiene_permiso:"Contenido: Publicar" %} 
+                            <li>
+                                <button class="dropdown-item" type="submit" name="status" value="published">Publicar</button>
+                            </li>
+                            {% endif %}
+                            {% if request.user|tiene_permiso:"Contenido: Inactivar" %}
+                            <li>
+                                <button class="dropdown-item" type="submit" name="status" value="inactive">Inactivo</button>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <!-- Sección para seleccionar Plantilla -->
