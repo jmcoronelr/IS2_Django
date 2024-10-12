@@ -18,7 +18,8 @@ class Content(models.Model):
     plantilla = models.ForeignKey(Plantilla, on_delete=models.SET_NULL, null=True, blank=True)  # Relación con Plantilla
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    likes = models.PositiveIntegerField(default=0)
+    dislikes = models.PositiveIntegerField(default=0)
     def __str__(self):
         return self.title
 
@@ -50,3 +51,12 @@ class Comentario(models.Model):
 
     def __str__(self):
         return f'Comentario de {self.autor} en {self.contenido}'
+
+class UserInteraction(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='interactions')
+    liked = models.BooleanField(default=False)
+    disliked = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.user} - {self.content.title} - {"Liked" if self.liked else "Disliked" if self.disliked else "None"}'

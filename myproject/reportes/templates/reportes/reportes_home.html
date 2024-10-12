@@ -7,8 +7,8 @@ Reportes
 {% block content %}
 {% load tiene_permiso %}
 <style>
-  /* Sidebar con glassmorphism y estilo estático */
-  .sidebar {
+
+.sidebar {
     width: 70px;
     height: 350px;
     background: rgba(255, 255, 255, 0.124); /* Fondo gris translúcido */
@@ -68,52 +68,71 @@ Reportes
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Agregar sombra */
   }
 
-  /* Estilos de la página de reportes */
   .reportes-container {
-    margin-left: 100px; /* Ajuste para que no se solape con el sidebar */
+    margin-left: 100px;
     padding: 20px;
   }
 
   .reportes-header {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 20px;
-    gap: 10px; /* Espacio entre los elementos */
+    align-items: center;
   }
 
-  .reportes-header input, .reportes-header button, .reportes-header select {
-    padding: 8px;
+  .reportes-header label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
     margin-right: 5px;
-    border-radius: 8px;
+  }
+
+  .reportes-header select, 
+  .reportes-header input, 
+  .reportes-header button {
+    padding: 8px;
+    border-radius: 6px;
     border: 1px solid #ccc;
+    background-color: #fff;
+    font-size: 14px;
+    width: 180px;
   }
 
-  .reportes-header input[type="date"] {
-    width: 120px; /* Opcional: Reduce el tamaño de los inputs de fecha */
+  .reportes-header button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
   }
 
-  .chart-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    text-align: center;
+  .reportes-header button:hover {
+    background-color: #0056b3;
   }
 
-  .report-list {
-    background-color: white;
-    padding: 20px;
-    border-radius: 15px;
+  .hidden {
+    display: none;
   }
 
-  .report-list h3 {
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-    font-weight: bold;
+  .report-result {
+    margin-top: 20px;
   }
 
-  .report-list p {
-    margin: 10px 0;
+  .report-result table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .report-result th, .report-result td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .report-result th {
+    background-color: #f2f2f2;
   }
 </style>
 
@@ -148,31 +167,122 @@ Reportes
 <div class="reportes-container">
   <!-- Encabezado de filtros -->
   <div class="reportes-header">
-    <select>
-      <option value="">Tipo</option>
-      <option value="categoria">Categoría</option>
+    <!-- Tipo de Reporte -->
+    <label for="report-type">Tipo de Reporte:</label>
+    <select id="report-type" class="form-control">
+      <option value="" disabled selected>Seleccione tipo de reporte</option>
+      <optgroup label="Reportes de Categorías">
+        <option value="most_visited">Categorías más visitadas</option>
+        <option value="most_shared">Categorías más compartidas</option>
+      </optgroup>
+      <optgroup label="Reportes de Usuarios">
+        <option value="top_contributors">Usuarios con más contribuciones</option>
+      </optgroup>
+      <optgroup label="Reportes de Publicaciones">
+        <option value="approved_posts">Publicaciones aprobadas</option>
+        <option value="most_commented">Publicaciones con más comentarios</option>
+        <option value="most_likes">Publicaciones con más likes</option> <!-- Opción corregida -->
+      </optgroup>
     </select>
-    <select>
-      <option value="">Subtipo</option>
-      <option value="categoria">Categoría</option>
+
+    <!-- Intervalo de Tiempo -->
+    <label for="time-interval">Intervalo de Tiempo:</label>
+    <select id="time-interval" class="form-control">
+      <option value="" disabled selected>Seleccione intervalo de tiempo</option>
+      <option value="year">Año</option>
+      <option value="month">Mes</option>
+      <option value="week">Semanas</option>
+      <option value="custom">Personalizado</option>
     </select>
-    <input type="date" name="start" />
-    <input type="date" name="end" />
-    <button>Exportar</button>
+
+    <!-- Campos para rango de fechas personalizado -->
+    <label for="start-date" class="hidden date-label">Desde:</label>
+    <input type="date" id="start-date" class="form-control hidden">
+
+    <label for="end-date" class="hidden date-label">Hasta:</label>
+    <input type="date" id="end-date" class="form-control hidden">
+
+    <!-- Botón de Generar -->
+    <button id="generate-report" class="btn btn-primary">Generar Reporte</button>
   </div>
 
-  <!-- Cuerpo con gráfico y lista de reportes -->
-  <div class="chart-container">
-    <h2>Gráfico de barras</h2>
-    <p>Visualización del gráfico aquí</p>
-  </div>
-
-  <div class="report-list">
-    <h3>Lista de reporte</h3>
-    <p>Datos</p>
-    <p>Datos</p>
-    <p>Datos</p>
+  <!-- Resultado del reporte (Oculto inicialmente) -->
+  <div class="report-result hidden" id="report-result">
+    <h3>Reporte Generado:</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Título de la Publicación</th>
+          <th>Likes</th>
+        </tr>
+      </thead>
+      <tbody id="report-body">
+        <!-- Aquí se mostrarán los resultados -->
+      </tbody>
+    </table>
   </div>
 </div>
+
+<script>
+  // Mostrar campos de fecha solo cuando se selecciona "Personalizado"
+  document.getElementById('time-interval').addEventListener('change', function() {
+    const startDate = document.getElementById('start-date');
+    const endDate = document.getElementById('end-date');
+    const startDateLabel = document.querySelector('label[for="start-date"]');
+    const endDateLabel = document.querySelector('label[for="end-date"]');
+
+    if (this.value === 'custom') {
+      startDate.classList.remove('hidden');
+      endDate.classList.remove('hidden');
+      startDateLabel.classList.remove('hidden');
+      endDateLabel.classList.remove('hidden');
+    } else {
+      startDate.classList.add('hidden');
+      endDate.classList.add('hidden');
+      startDateLabel.classList.add('hidden');
+      endDateLabel.classList.add('hidden');
+    }
+  });
+
+  // Event Listener para el botón de generar reporte
+  document.getElementById('generate-report').addEventListener('click', function() {
+    const reportType = document.getElementById('report-type').value;
+
+    if (reportType === 'most_likes') {
+      // Hacer solicitud al servidor para obtener los datos reales
+      fetch("{% url 'reporte_likes_json' %}")
+        .then(response => response.json())
+        .then(data => {
+          const reportResult = document.getElementById('report-result');
+          const reportBody = document.getElementById('report-body');
+
+          // Limpiar el cuerpo de la tabla
+          reportBody.innerHTML = "";
+
+          // Rellenar la tabla con los datos reales del backend
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            const titleCell = document.createElement('td');
+            const likesCell = document.createElement('td');
+
+            titleCell.textContent = item.title;
+            likesCell.textContent = item.likes;
+
+            row.appendChild(titleCell);
+            row.appendChild(likesCell);
+            reportBody.appendChild(row);
+          });
+
+          // Mostrar la sección de resultados
+          reportResult.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.log('Error al obtener el reporte:', error);
+        });
+    } else {
+      alert("Selecciona 'Publicaciones con más likes' para generar este reporte.");
+    }
+  });
+</script>
 
 {% endblock %}
