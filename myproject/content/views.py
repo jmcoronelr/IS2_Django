@@ -11,6 +11,10 @@ from Categorias.models import Categorias
 from roles.models import RolEnCategoria, Rol
 from historial.models import Historial
 from django.contrib import messages
+from content.models import UserInteraction
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+
 def content_list(request):
     # Verificar si el usuario es superusuario
     if request.user.is_superuser:
@@ -199,6 +203,16 @@ def content_detail(request, pk):
     # Obtén la URL anterior o una predeterminada
     next_url = request.GET.get('next', '/content')
     
+    # Verificar si el usuario ha interactuado con el contenido
+    user_interaction = None
+    liked = False
+    disliked = False
+    if request.user.is_authenticated:
+        user_interaction = UserInteraction.objects.filter(user=request.user, content=content).first()
+        if user_interaction:
+            liked = user_interaction.liked
+            disliked = user_interaction.disliked
+
     # Manejar comentarios
     if request.method == 'POST':
         form = ComentarioForm(request.POST)
@@ -214,8 +228,12 @@ def content_detail(request, pk):
     return render(request, 'content/content_detail.html', {
         'content': content,
         'next_url': next_url,
-        'form': form  # Pasar el formulario al contexto
+        'form': form,
+        'user_interaction': user_interaction,
+        'liked': liked,  # Enviar si el usuario ya dio "like"
+        'disliked': disliked,  # Enviar si el usuario ya dio "dislike"
     })
+
 
 def get_plantilla_blocks(request, plantilla_id):
     plantilla = get_object_or_404(Plantilla, id=plantilla_id)
@@ -260,36 +278,48 @@ def cambiar_estado_contenido(request, pk):
     content.save()
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
-from django.views.decorators.csrf import csrf_exempt
+@require_POST
+@login_required
+def like_content(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    interaction, created = UserInteraction.objects.get_or_create(user=request.user, content=content)
 
-
-@csrf_exempt
-def like_content(request, content_id):
-    content = get_object_or_404(Content, id=content_id)
-    if request.method == 'POST':
-        content.likes += 1
-        content.save()
-        return JsonResponse({'likes': content.likes})
-
-@csrf_exempt
-def dislike_content(request, content_id):
-    content = get_object_or_404(Content, id=content_id)
-    if request.method == 'POST':
-        content.dislikes += 1
-        content.save()
-        return JsonResponse({'dislikes': content.dislikes})
-@csrf_exempt
-def unlike_content(request, content_id):
-    content = get_object_or_404(Content, id=content_id)
-    if request.method == 'POST':
+    if interaction.liked:
+        interaction.liked = False
         content.likes -= 1
-        content.save()
-        return JsonResponse({'likes': content.likes})
+    else:
+        interaction.liked = True
+        content.likes += 1
 
-@csrf_exempt
-def undislike_content(request, content_id):
-    content = get_object_or_404(Content, id=content_id)
-    if request.method == 'POST':
+        # Si el usuario había dado dislike antes, se lo quitamos
+        if interaction.disliked:
+            interaction.disliked = False
+            content.dislikes -= 1
+
+    interaction.save()
+    content.save()
+
+    return JsonResponse({'likes': content.likes, 'dislikes': content.dislikes})
+
+@require_POST
+@login_required
+def dislike_content(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    interaction, created = UserInteraction.objects.get_or_create(user=request.user, content=content)
+
+    if interaction.disliked:
+        interaction.disliked = False
         content.dislikes -= 1
-        content.save()
-        return JsonResponse({'dislikes': content.dislikes})
+    else:
+        interaction.disliked = True
+        content.dislikes += 1
+
+        # Si el usuario había dado like antes, se lo quitamos
+        if interaction.liked:
+            interaction.liked = False
+            content.likes -= 1
+
+    interaction.save()
+    content.save()
+
+    return JsonResponse({'likes': content.likes, 'dislikes': content.dislikes})
