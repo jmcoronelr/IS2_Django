@@ -280,39 +280,12 @@
                         {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                         {% endif %}
-<<<<<<< HEAD
-                        <div class="dropdown" data-bs-auto-close="false">
-                            {% if request.user|tiene_permiso:"Contenido: Publicar" or request.user|tiene_permiso:"Contenido: Inactivar"%} 
-                            <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
-                                Más...
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                {% if content.status != 'review' %}
-                                <li>
-                                    <button class="dropdown-item" type="submit" name="status" value="review">Revisión</button>
-                                </li>
-                                {% endif %}
-                                {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %} 
-                                <li>
-                                    <button class="dropdown-item" type="submit" name="status" value="published">Publicar</button>
-                                </li>
-                                {% endif %}
-                                {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
-                                <li>
-                                    <button class="dropdown-item" type="submit" name="status" value="inactive">Inactivo</button>
-                                </li>
-                                {% endif %}
-                            </ul>
-                            {% endif %}
-                        </div>
-=======
                         {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
                         <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
                         {% endif %}
                         {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
                         <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
                         {% endif %}
->>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76
                     </div>
                 </div>
             </div>

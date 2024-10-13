@@ -91,11 +91,8 @@ def content_create_edit(request, pk=None):
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
-<<<<<<< HEAD
         es_nuevo = False  # Ya existe, por lo tanto, es una edición
-=======
         content.status = 'review'
->>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76
     else:
         content = None
         accion = 'creado'
@@ -286,9 +283,6 @@ def agregar_comentario(request, pk):
 
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
 
-<<<<<<< HEAD
-
-
 def review_list(request):
     # Obtener permisos necesarios
     permisos_requeridos = [
@@ -378,7 +372,8 @@ def review_detail(request, pk):
         'content': content,
         'next_url': next_url  # Pasar el valor de next a la plantilla
     })
-=======
+
+
 def cambiar_estado_contenido(request, pk):
     content = get_object_or_404(Content, pk=pk)
     if content.status == 'published':
@@ -434,4 +429,3 @@ def dislike_content(request, pk):
     content.save()
 
     return JsonResponse({'likes': content.likes, 'dislikes': content.dislikes})
->>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76

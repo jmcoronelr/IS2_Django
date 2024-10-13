@@ -261,15 +261,12 @@
                         {% endfor %}
                     </select>
                 </div>
-<<<<<<< HEAD
-=======
                 <div class="form-group">
                     <label for="status">Status</label>
                     <input type="text" class="form-control" value="{{ form.status.value }}" readonly>
                     <input type="hidden" name="status" value="{{ form.status.value }}">
                 </div>
                 
->>>>>>> 5775807282a074020ca28364b31b67d55bc2fd76
             </div>
 
             <!-- Botones para añadir bloques -->
@@ -324,26 +321,10 @@
                     <!-- Reemplazar el enlace fijo con history.back() -->
                     <button type="button" class="btn btn-secondary" onclick="history.back()">← Volver atrás</button>
                     <button type="submit" class="btn btn-primary" name="status" value="draft">Guardar</button>
-                    <button type="submit" class="btn btn-primary" name="status" value="review">Revisión</button>
-                    <div class="dropdown" data-bs-auto-close="false">
-                        {% if request.user|tiene_permiso:"Contenido: Publicar" or request.user|tiene_permiso:"Contenido: Inactivar"%} 
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
-                            Más...
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            {% if request.user|tiene_permiso:"Contenido: Publicar" %} 
-                            <li>
-                                <button class="dropdown-item" type="submit" name="status" value="published">Publicar</button>
-                            </li>
-                            {% endif %}
-                            {% if request.user|tiene_permiso:"Contenido: Inactivar" %}
-                            <li>
-                                <button class="dropdown-item" type="submit" name="status" value="inactive">Inactivo</button>
-                            </li>
-                            {% endif %}
-                        </ul>
-                        {% endif %}
-                    </div>
+                    <button type="submit" class="btn btn-primary" name="status" value="review">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5219/5219497.png" alt="Revisión Icono" style="width: 20px; height: 20px; margin-right: 5px;">
+                        Revisión
+                    </button>
                 </div>
 
                 <!-- Sección para seleccionar Plantilla -->
