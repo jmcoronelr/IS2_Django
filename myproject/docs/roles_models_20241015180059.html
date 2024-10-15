@@ -1,0 +1,28 @@
+
+                    <html>
+                    <head>
+                        <title>roles.models Documentation</title>
+                        <link rel='stylesheet' href='style.css'>
+                    </head>
+                    <body>
+                        <nav><a href='index.html'>Back to Index</a></nav>
+                        <h1>roles.models</h1><h2>Funciones</h2><ul><h3>permiso_requerido</h3><p><strong>Parámetros:</strong> (permiso_nombre, categoria_id=None)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p></ul><h2>Clases</h2><h2>Categorias</h2><p>Categorias(id, descripcionCorta, descripcionLarga, estado)</p><h3>Atributos:</h3><ul><li>descripcionCorta</li><li>descripcionLarga</li><li>estado</li><li>id</li><li>objects</li><li>content_set</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul></ul><h2>HttpResponseForbidden</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>status_code</li></ul><h3>Métodos:</h3><ul></ul><h2>Permiso</h2><p>Permiso(id, nombre, descripcion)</p><h3>Atributos:</h3><ul><li>nombre</li><li>descripcion</li><li>id</li><li>objects</li><li>rol_set</li></ul><h3>Métodos:</h3><ul></ul><h2>Rol</h2><p>Rol(id, nombre, descripcion)</p><h3>Atributos:</h3><ul><li>nombre</li><li>descripcion</li><li>permisos</li><li>id</li><li>objects</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul><li>delete(self, *args, **kwargs): No hay docstring disponible</li></ul><h2>RolEnCategoria</h2><p>RolEnCategoria(id, usuario, categoria, rol)</p><h3>Atributos:</h3><ul><li>usuario_id</li><li>usuario</li><li>categoria_id</li><li>categoria</li><li>rol_id</li><li>rol</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>Usuario</h2><p>
+    Modelo personalizado de usuario que extiende AbstractBaseUser y PermissionsMixin.
+    Define los campos básicos para los usuarios, incluyendo nombre de usuario, email,
+    nombre, apellido y estados de actividad.
+
+    Atributos:
+    - id: Identificador único del usuario.
+    - username: Nombre de usuario único.
+    - email: Correo electrónico único.
+    - nombre: Nombre del usuario.
+    - apellido: Apellido del usuario.
+    - is_active: Estado de actividad del usuario.
+    - is_staff: Indica si el usuario tiene permisos administrativos.
+
+    Métodos:
+    - __str__: Retorna una representación en cadena del usuario (su correo electrónico).
+    </p><h3>Atributos:</h3><ul><li>USERNAME_FIELD</li><li>REQUIRED_FIELDS</li><li>id</li><li>username</li><li>email</li><li>apellido</li><li>nombre</li><li>is_active</li><li>is_staff</li><li>objects</li><li>password</li><li>last_login</li><li>is_superuser</li><li>groups</li><li>user_permissions</li><li>logentry_set</li><li>comentario_set</li><li>userinteraction_set</li><li>profile</li><li>rolencategoria_set</li><li>historial_set</li><li>emailaddress_set</li><li>socialaccount_set</li></ul><h3>Métodos:</h3><ul></ul><h2>ValidationError</h2><p>An error while validating data.</p><h3>Atributos:</h3><ul><li>message_dict</li><li>messages</li></ul><h3>Métodos:</h3><ul><li>update_error_dict(self, error_dict): No hay docstring disponible</li></ul>
+                    </body>
+                    </html>
+                    

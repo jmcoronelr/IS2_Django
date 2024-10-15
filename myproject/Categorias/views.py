@@ -5,7 +5,7 @@ from django.contrib import messages
 
 def categoria_create(request):
     """
-    Vista para crear una nueva categoría.
+    Crear una nueva categoría.
     """
     if request.method == 'POST':
         form = Form_Categorias(request.POST)
@@ -22,7 +22,7 @@ def categoria_create(request):
 
 def categoria_list(request):
     """
-    Vista para listar todas las categorías o buscar una categoría específica.
+    Listar todas las categorías o busca una categoría específica.
     """
     query = request.GET.get('q')
     if query:
@@ -35,7 +35,7 @@ def categoria_list(request):
 
 def categoria_edit(request, pk):
     """
-    Vista para editar una categoría existente.
+    Editar una categoría existente.
     """
     categoria = get_object_or_404(Categorias, pk=pk)
 
@@ -54,6 +54,9 @@ def categoria_edit(request, pk):
 from roles.models import RolEnCategoria  # Importar RolEnCategoria para verificar roles
 
 def categoria_delete(request, pk):
+    """
+    Elimina una categoría existente.
+    """
     categoria = get_object_or_404(Categorias, pk=pk)
     roles_asociados = RolEnCategoria.objects.filter(categoria=categoria).exists()
 
