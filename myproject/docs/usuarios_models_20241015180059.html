@@ -1,0 +1,96 @@
+
+                    <html>
+                    <head>
+                        <title>usuarios.models Documentation</title>
+                        <link rel='stylesheet' href='style.css'>
+                    </head>
+                    <body>
+                        <nav><a href='index.html'>Back to Index</a></nav>
+                        <h1>usuarios.models</h1><p>No se encontraron funciones.</p><h2>Clases</h2><h2>AbstractBaseUser</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>is_active</li><li>REQUIRED_FIELDS</li><li>is_anonymous</li><li>is_authenticated</li><li>get_email_field_name</li><li>normalize_username</li><li>password</li><li>last_login</li></ul><h3>Métodos:</h3><ul><li>save(self, *args, **kwargs): No hay docstring disponible</li><li>get_username(self): Return the username for this User.</li><li>clean(self): No hay docstring disponible</li><li>natural_key(self): No hay docstring disponible</li><li>set_password(self, raw_password): No hay docstring disponible</li><li>check_password(self, raw_password): 
+        Return a boolean of whether the raw_password was correct. Handles
+        hashing formats behind the scenes.
+        </li><li>acheck_password(self, raw_password): See check_password().</li><li>set_unusable_password(self): No hay docstring disponible</li><li>has_usable_password(self): 
+        Return False if set_unusable_password() has been called for this user.
+        </li><li>get_session_auth_hash(self): 
+        Return an HMAC of the password field.
+        </li><li>get_session_auth_fallback_hash(self): No hay docstring disponible</li><li>_get_session_auth_hash(self, secret=None): No hay docstring disponible</li></ul><h2>BaseUserManager</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>normalize_email</li></ul><h3>Métodos:</h3><ul><li>get_by_natural_key(self, username): No hay docstring disponible</li></ul><h2>PermissionsMixin</h2><p>
+    Add the fields and methods necessary to support the Group and Permission
+    models using the ModelBackend.
+    </p><h3>Atributos:</h3><ul><li>is_superuser</li><li>groups</li><li>user_permissions</li></ul><h3>Métodos:</h3><ul><li>get_user_permissions(self, obj=None): 
+        Return a list of permission strings that this user has directly.
+        Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
+        </li><li>get_group_permissions(self, obj=None): 
+        Return a list of permission strings that this user has through their
+        groups. Query all available auth backends. If an object is passed in,
+        return only permissions matching this object.
+        </li><li>get_all_permissions(self, obj=None): No hay docstring disponible</li><li>has_perm(self, perm, obj=None): 
+        Return True if the user has the specified permission. Query all
+        available auth backends, but return immediately if any backend returns
+        True. Thus, a user who has permission from a single auth backend is
+        assumed to have permission in general. If an object is provided, check
+        permissions for that object.
+        </li><li>has_perms(self, perm_list, obj=None): 
+        Return True if the user has each of the specified permissions. If
+        object is passed, check if the user has all required perms for it.
+        </li><li>has_module_perms(self, app_label): 
+        Return True if the user has any permissions in the given app label.
+        Use similar logic as has_perm(), above.
+        </li></ul><h2>Profile</h2><p>
+    Falta añadir comentarios[]][][][][]
+    </p><h3>Atributos:</h3><ul><li>user_id</li><li>user</li><li>avatar</li><li>bio</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul><li>save(self, *args, **kwargs): No hay docstring disponible</li></ul><h2>Usuario</h2><p>
+    Modelo personalizado de usuario que extiende AbstractBaseUser y PermissionsMixin.
+    Define los campos básicos para los usuarios, incluyendo nombre de usuario, email,
+    nombre, apellido y estados de actividad.
+
+    Atributos:
+    - id: Identificador único del usuario.
+    - username: Nombre de usuario único.
+    - email: Correo electrónico único.
+    - nombre: Nombre del usuario.
+    - apellido: Apellido del usuario.
+    - is_active: Estado de actividad del usuario.
+    - is_staff: Indica si el usuario tiene permisos administrativos.
+
+    Métodos:
+    - __str__: Retorna una representación en cadena del usuario (su correo electrónico).
+    </p><h3>Atributos:</h3><ul><li>USERNAME_FIELD</li><li>REQUIRED_FIELDS</li><li>id</li><li>username</li><li>email</li><li>apellido</li><li>nombre</li><li>is_active</li><li>is_staff</li><li>objects</li><li>password</li><li>last_login</li><li>is_superuser</li><li>groups</li><li>user_permissions</li><li>logentry_set</li><li>comentario_set</li><li>userinteraction_set</li><li>profile</li><li>rolencategoria_set</li><li>historial_set</li><li>emailaddress_set</li><li>socialaccount_set</li></ul><h3>Métodos:</h3><ul></ul><h2>UsuarioManager</h2><p>
+    Clase que define el administrador personalizado para el modelo Usuario.
+    Hereda de BaseUserManager y es responsable de crear tanto usuarios
+    normales como superusuarios.
+
+    Métodos:
+    - create_user: Crea y guarda un usuario con los campos proporcionados.
+    - create_superuser: Crea y guarda un superusuario con privilegios administrativos.
+    </p><h3>Atributos:</h3><ul></ul><h3>Métodos:</h3><ul><li>create_user(self, username, email, password=None, **extra_fields): 
+        Crea y guarda un usuario con el nombre de usuario, correo electrónico y contraseña.
+
+        Parámetros:
+        - username (str): Nombre de usuario único.
+        - email (str): Correo electrónico único.
+        - password (str, opcional): Contraseña del usuario. Se encripta automáticamente.
+        - extra_fields (dict): Campos adicionales opcionales para el usuario.
+
+        Retorna:
+        - user (Usuario): El objeto usuario creado.
+
+        Lanza:
+        - ValueError: Si no se proporciona un correo electrónico.
+        </li><li>create_superuser(self, username, email, password=None, **extra_fields): 
+        Crea y guarda un superusuario con privilegios administrativos.
+
+        Parámetros:
+        - username (str): Nombre de usuario único.
+        - email (str): Correo electrónico único.
+        - password (str, opcional): Contraseña del superusuario.
+        - extra_fields (dict): Campos adicionales opcionales, como `is_staff` y `is_superuser`.
+
+        Retorna:
+        - superuser (Usuario): El objeto superusuario creado.
+
+        Lanza:
+        - ValueError: Si los valores de `is_staff` o `is_superuser` no son `True`.
+        </li></ul>
+                    </body>
+                    </html>
+                    
