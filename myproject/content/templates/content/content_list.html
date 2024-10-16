@@ -239,11 +239,11 @@
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                         {% endif %}
                         {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
-                        <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
+                        <a href="{% url 'switch_state' content.pk 'published' %}" class="btn btn-primary btn-sm">Publicar</a>
                         {% endif %}
                         {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
-                        <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
-                        {% endif %}
+                        <a href="{% url 'switch_state' content.pk 'inactive' %}" class="btn btn-primary btn-sm">Inactivar</a>
+                        {% endif %}                        
                     </div>
                 </div>
             </div>

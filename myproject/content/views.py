@@ -14,7 +14,7 @@ from django.contrib import messages
 from content.models import UserInteraction
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
-
+from django.utils import timezone
 def content_list(request):
     """
     Muestra una lista de contenidos, con la opción de filtrarlos por permisos, estado, categoría, fecha y título.
@@ -73,11 +73,16 @@ def content_create_edit(request, pk=None):
     Si se proporciona una clave primaria (pk), se edita el contenido existente; de lo contrario, se crea uno nuevo.
     Solo los superusuarios pueden ver todas las categorías; los demás usuarios ven categorías según sus roles.
     Maneja la carga de bloques de contenido dinámicos y actualiza el historial de cambios del contenido.
+
+    Cuando se aprieta el boton editar entra a revision y ahi se guarda para el tema de los reportes
     """
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
         content.status = 'review'
+        # Verificar si revision_started_at está vacío y el contenido pasa a revisión
+        if content.revision_started_at is None:
+            content.revision_started_at = timezone.now()        
     else:
         content = None
         accion = 'creado'
@@ -263,19 +268,25 @@ def agregar_comentario(request, pk):
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
 
 
-def cambiar_estado_contenido(request, pk):
-    """
-    Cambia el estado de un contenido entre 'published' e 'inactive'.
-    
-    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
-    """
+
+def cambiar_estado_contenido(request, pk, nuevo_estado):
     content = get_object_or_404(Content, pk=pk)
-    if content.status == 'published':
-        content.status = 'inactive'
-    else:
-        content.status = 'published'
-    
+
+    # Verificar si el nuevo estado es "review" para registrar la fecha de inicio de la revisión
+    if nuevo_estado == 'review':
+        # Si el contenido vuelve a revisión, solo establecer la fecha de inicio si es None
+        if content.revision_started_at is None:
+            content.revision_started_at = timezone.now()
+        # Limpiar la fecha de fin de la revisión cuando entra en revisión
+        content.revision_ended_at = None
+    elif content.status == 'review' and nuevo_estado in ['published', 'rejected']:
+        # Si el contenido estaba en "review" y cambia a "published" o "rejected", registrar el fin de la revisión
+        content.revision_ended_at = timezone.now()
+
+    # Cambiar el estado del contenido
+    content.status = nuevo_estado
     content.save()
+
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
 
