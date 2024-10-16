@@ -80,9 +80,7 @@
             </ul>
     {% endif %}
 
-  <div class="d-flex justify-content-between">
-    <a href="javascript:history.back()" class="btn btn-outline-secondary">← Volver atrás</a>
-    <div>
+
       <a href="{% url 'lista_roles' %}" class="btn btn-primary">Ver Roles</a>
       {% load tiene_permiso %}
       {% if request.user|tiene_permiso:"Roles: Asignar" %}
