@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from content.models import Content
 import json
 from django.utils import timezone
+from django.core.mail import send_mail
+
 def flujos_home(request):
     # Obtenemos los contenidos por estado
     borradores = Content.objects.filter(status='draft')
@@ -44,6 +46,14 @@ def update_content_status(request):
         # Cambiar el estado del contenido
         content.status = new_status
         content.save()
+        # Enviar correo al autor notificando el cambio de estado
+        send_mail(
+            subject=f'Actualización de estado para "{content.title}"',
+            message=f'Hola {content.autor.username},\n\nTu contenido "{content.title}" ha cambiado de estado a "{content.status}".',
+            from_email='tu_correo@gmail.com',
+            recipient_list=[content.autor.email],
+            fail_silently=False,
+        )
 
         return JsonResponse({'status': 'ok'})
 

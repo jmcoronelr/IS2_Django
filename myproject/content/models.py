@@ -17,6 +17,7 @@ class Content(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     categoria = models.ForeignKey(Categorias, on_delete=models.CASCADE)
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     plantilla = models.ForeignKey(Plantilla, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
