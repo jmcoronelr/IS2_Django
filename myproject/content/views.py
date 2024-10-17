@@ -66,21 +66,21 @@ def content_list(request):
     })
 
 
+from django.core.mail import send_mail
+
 def content_create_edit(request, pk=None):
     """
     Crea o edita un contenido.
-
-    Si se proporciona una clave primaria (pk), se edita el contenido existente; de lo contrario, se crea uno nuevo.
-    Solo los superusuarios pueden ver todas las categorías; los demás usuarios ven categorías según sus roles.
-    Maneja la carga de bloques de contenido dinámicos y actualiza el historial de cambios del contenido.
     """
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
+        old_status = content.status  # Guarda el estado anterior
         content.status = 'review'
     else:
         content = None
         accion = 'creado'
+        old_status = None  # No hay estado anterior si es nuevo
 
     plantillas = Plantilla.objects.all()
 
@@ -100,6 +100,10 @@ def content_create_edit(request, pk=None):
         if form.is_valid():
             content = form.save(commit=False)
 
+            # Asigna el autor solo si es un contenido nuevo
+            if not pk:
+                content.autor = request.user
+
             plantilla_id = request.POST.get('plantilla')
             if plantilla_id:
                 content.plantilla = Plantilla.objects.get(id=plantilla_id)
@@ -112,7 +116,19 @@ def content_create_edit(request, pk=None):
             else:
                 content.categoria = None
 
+            new_status = content.status  # Guarda el nuevo estado
+
             content.save()
+
+            # Enviar correo solo si el estado ha cambiado
+            if old_status and old_status != new_status:
+                send_mail(
+                    subject=f'Actualización de estado para "{content.title}"',
+                    message=f'Hola {content.autor.username},\n\nTu contenido "{content.title}" ha cambiado su estado de "{old_status}" a "{new_status}".',
+                    from_email='tu_correo@gmail.com',
+                    recipient_list=[content.autor.email],
+                    fail_silently=False,
+                )
 
             block_data = json.loads(request.POST.get('block_data', '[]'))
             block_ids = []
@@ -164,6 +180,7 @@ def content_create_edit(request, pk=None):
         'selected_categoria': selected_categoria,
         'blocks': blocks,
     })
+
 
 
 def content_delete(request, pk):
@@ -263,11 +280,10 @@ def agregar_comentario(request, pk):
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
 
 
+
 def cambiar_estado_contenido(request, pk):
     """
     Cambia el estado de un contenido entre 'published' e 'inactive'.
-    
-    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
     """
     content = get_object_or_404(Content, pk=pk)
     if content.status == 'published':
@@ -276,8 +292,19 @@ def cambiar_estado_contenido(request, pk):
         content.status = 'published'
     
     content.save()
+
+    # Enviar correo al autor notificando el cambio de estado
+    send_mail(
+        subject=f'Actualización de estado para "{content.title}"',
+        message=f'Hola {content.autor.username},\n\nTu contenido "{content.title}" ha cambiado de estado a "{content.status}".',
+        from_email='tu_correo@gmail.com',
+        recipient_list=[content.autor.email],
+        fail_silently=False,
+    )
+
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
+
 
 
 @require_POST
