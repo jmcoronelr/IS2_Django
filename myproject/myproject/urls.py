@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from . import views
 from django.contrib import admin
 from django.urls import path, include
+from sitio.views import toggle_maintenance, maintenance_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,7 +32,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('categorias/', include('Categorias.urls')),
     path('flujos/', include('flujos.urls')),
-    path('reportes/', include('reportes.urls')), 
+    path('reportes/', include('reportes.urls')),
+    path('toggle_maintenance/', toggle_maintenance, name='toggle_maintenance'),
+    path('maintenance/', maintenance_view, name='maintenance'),
     path('historial/', include('historial.urls')), 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
