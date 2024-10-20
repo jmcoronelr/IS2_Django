@@ -26,7 +26,6 @@ permisos = [
     {'nombre': 'Contenido: Eliminar', 'descripcion': 'Permite eliminar contenidos del sitio web.'},
     {'nombre': 'Contenido: Ver historial', 'descripcion': 'Permite visualizar el historial de modificaciones realizadas sobre los contenidos.'},
     {'nombre': 'Contenido: Rechazar', 'descripcion': 'Permite rechazar contenidos que no cumplen con los requisitos.'},
-    {'nombre': 'Contenido: Aceptar', 'descripcion': 'Permite aceptar contenidos que han sido revisados.'},
     {'nombre': 'Contenido: Mandar a revisión', 'descripcion': 'Permite enviar contenidos para revisión antes de su publicación.'},
     {'nombre': 'Contenido: Mandar a borrador', 'descripcion': 'Permite marcar contenidos como borradores para su edición posterior.'},
     

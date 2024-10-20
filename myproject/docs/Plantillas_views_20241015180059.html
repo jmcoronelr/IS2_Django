@@ -1,0 +1,66 @@
+
+                    <html>
+                    <head>
+                        <title>Plantillas.views Documentation</title>
+                        <link rel='stylesheet' href='style.css'>
+                    </head>
+                    <body>
+                        <nav><a href='index.html'>Back to Index</a></nav>
+                        <h1>Plantillas.views</h1><h2>Funciones</h2><ul><h3>get_plantilla_blocks</h3><p><strong>Parámetros:</strong> (request, plantilla_id)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_create</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_delete</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Vista para eliminar una plantilla existente.
+
+    Maneja la solicitud GET para mostrar una página de confirmación de eliminación y 
+    la solicitud POST para procesar la eliminación de la instancia de Plantilla.
+    
+    Args:
+        request: El objeto HttpRequest que contiene los datos de la solicitud.
+        pk (int): Clave primaria de la plantilla a eliminar.
+    
+    Returns:
+        HttpResponse: Redirige a la lista de plantillas tras la eliminación exitosa o 
+        renderiza la página de confirmación de eliminación si la solicitud es GET.
+    </p><h3>plantilla_edit</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_list</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    Vista para listar todas las plantillas
+    </p></ul><h2>Clases</h2><h2>Bloque</h2><p>Bloque(id, plantilla, tipo, contenido, multimedia, posicion_top, posicion_left, width, height)</p><h3>Atributos:</h3><ul><li>plantilla_id</li><li>plantilla</li><li>tipo</li><li>contenido</li><li>multimedia</li><li>posicion_top</li><li>posicion_left</li><li>width</li><li>height</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>JsonResponse</h2><p>
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before ECMAScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be a json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
+    </p><h3>Atributos:</h3><ul></ul><h3>Métodos:</h3><ul></ul><h2>Paginator</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>ELLIPSIS</li><li>default_error_messages</li><li>count</li><li>num_pages</li><li>page_range</li></ul><h3>Métodos:</h3><ul><li>validate_number(self, number): Validate the given 1-based page number.</li><li>get_page(self, number): 
+        Return a valid page, even if the page argument isn't a number or isn't
+        in range.
+        </li><li>page(self, number): Return a Page object for the given 1-based page number.</li><li>_get_page(self, *args, **kwargs): 
+        Return an instance of a single page.
+
+        This hook can be used by subclasses to use an alternative to the
+        standard :cls:`Page` object.
+        </li><li>_check_object_list_is_ordered(self): 
+        Warn if self.object_list is unordered (typically a QuerySet).
+        </li><li>get_elided_page_range(self, number=1, on_each_side=3, on_ends=2): 
+        Return a 1-based range of pages with some values elided.
+
+        If the page range is larger than a given size, the whole range is not
+        provided and a compact form is returned instead, e.g. for a paginator
+        with 50 pages, if page 43 were the current page, the output, with the
+        default arguments, would be:
+
+            1, 2, …, 40, 41, 42, 43, 44, 45, 46, …, 49, 50.
+        </li></ul><h2>Plantilla</h2><p>Plantilla(id, descripcion, estado)</p><h3>Atributos:</h3><ul><li>descripcion</li><li>estado</li><li>id</li><li>objects</li><li>bloques</li><li>content_set</li></ul><h3>Métodos:</h3><ul></ul><h2>PlantillaForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>Q</h2><p>
+    Encapsulate filters as objects that can then be combined logically (using
+    `&` and `|`).
+    </p><h3>Atributos:</h3><ul><li>AND</li><li>OR</li><li>XOR</li><li>default</li><li>conditional</li><li>identity</li><li>referenced_base_fields</li></ul><h3>Métodos:</h3><ul><li>_combine(self, other, conn): No hay docstring disponible</li><li>resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False): No hay docstring disponible</li><li>flatten(self): 
+        Recursively yield this Q object and all subexpressions, in depth-first
+        order.
+        </li><li>check(self, against, using='default'): 
+        Do a database query to check if the expressions of the Q instance
+        matches against the expressions.
+        </li><li>deconstruct(self): No hay docstring disponible</li></ul>
+                    </body>
+                    </html>
+                    

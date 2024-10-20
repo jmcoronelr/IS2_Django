@@ -4,6 +4,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from content.models import Content
 import json
+from django.utils import timezone
+from django.core.mail import send_mail
 
 def flujos_home(request):
     # Obtenemos los contenidos por estado
@@ -29,8 +31,30 @@ def update_content_status(request):
 
         # Actualizamos el estado del contenido
         content = Content.objects.get(id=content_id)
+
+        # Verificar si el nuevo estado es "review" para registrar la fecha de inicio de la revisión
+        if new_status == 'review':
+            # Si el contenido vuelve a revisión, solo establecer la fecha de inicio si es None
+            if content.revision_started_at is None:
+                content.revision_started_at = timezone.now()
+            # Limpiar la fecha de fin de la revisión cuando entra en revisión
+            content.revision_ended_at = None
+        elif content.status == 'review' and new_status in ['published', 'rejected']:
+            # Si el contenido estaba en "review" y cambia a "published" o "rejected", registrar el fin de la revisión
+            content.revision_ended_at = timezone.now()
+
+        # Cambiar el estado del contenido
         content.status = new_status
         content.save()
+        # Enviar correo al autor notificando el cambio de estado
+        send_mail(
+            subject=f'Actualización de estado para "{content.title}"',
+            message=f'Hola {content.autor.username},\n\nTu contenido "{content.title}" ha cambiado de estado a "{content.status}".',
+            from_email='tu_correo@gmail.com',
+            recipient_list=[content.autor.email],
+            fail_silently=False,
+        )
 
         return JsonResponse({'status': 'ok'})
+
     return JsonResponse({'status': 'error'}, status=400)

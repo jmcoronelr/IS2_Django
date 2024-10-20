@@ -1,0 +1,84 @@
+
+                    <html>
+                    <head>
+                        <title>content.views Documentation</title>
+                        <link rel='stylesheet' href='style.css'>
+                    </head>
+                    <body>
+                        <nav><a href='index.html'>Back to Index</a></nav>
+                        <h1>content.views</h1><h2>Funciones</h2><ul><h3>agregar_comentario</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Agrega un comentario a un contenido específico.
+    
+    Verifica si el formulario de comentario es válido y lo guarda en la base de datos.
+    </p><h3>cambiar_estado_contenido</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Cambia el estado de un contenido entre 'published' e 'inactive'.
+    
+    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
+    </p><h3>content_create_edit</h3><p><strong>Parámetros:</strong> (request, pk=None)</p><p><strong>Retorno:</strong> None</p><p>
+    Crea o edita un contenido.
+
+    Si se proporciona una clave primaria (pk), se edita el contenido existente; de lo contrario, se crea uno nuevo.
+    Solo los superusuarios pueden ver todas las categorías; los demás usuarios ven categorías según sus roles.
+    Maneja la carga de bloques de contenido dinámicos y actualiza el historial de cambios del contenido.
+    </p><h3>content_delete</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Elimina un contenido seleccionado.
+    
+    Permite eliminar un contenido confirmando la acción con el usuario.
+    </p><h3>content_detail</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Muestra los detalles de un contenido específico, incluidas las interacciones del usuario.
+    
+    También permite agregar comentarios al contenido y verificar si el usuario ha dado like o dislike.
+    </p><h3>content_list</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    Muestra una lista de contenidos, con la opción de filtrarlos por permisos, estado, categoría, fecha y título.
+    
+    Si el usuario es superusuario, se muestran todos los contenidos. Los usuarios regulares solo ven los contenidos 
+    que corresponden a las categorías en las que tienen roles con permisos específicos.
+    También se incluye la opción de paginar los resultados.
+    </p><h3>dislike_content</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Maneja la lógica de 'dislike' en un contenido.
+    
+    Si el usuario ya ha dado 'dislike', lo elimina; si no, lo agrega.
+    Si el usuario había dado 'like', también se elimina.
+    </p><h3>get_plantilla_blocks</h3><p><strong>Parámetros:</strong> (request, plantilla_id)</p><p><strong>Retorno:</strong> None</p><p>
+    Obtiene los bloques asociados a una plantilla específica.
+    
+    Devuelve un JSON con los detalles de los bloques, como tipo, texto, posición y tamaño.
+    </p><h3>like_content</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+    Maneja la lógica de 'like' en un contenido.
+    
+    Si el usuario ya ha dado 'like', lo elimina; si no, lo agrega. 
+    Si el usuario había dado 'dislike', también se elimina.
+    </p></ul><h2>Clases</h2><h2>Categorias</h2><p>Categorias(id, descripcionCorta, descripcionLarga, estado)</p><h3>Atributos:</h3><ul><li>descripcionCorta</li><li>descripcionLarga</li><li>estado</li><li>id</li><li>objects</li><li>content_set</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul></ul><h2>ComentarioForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>Content</h2><p>Content(id, title, description, categoria, status, plantilla, created_at, updated_at, likes, dislikes)</p><h3>Atributos:</h3><ul><li>STATUS_CHOICES</li><li>title</li><li>description</li><li>categoria_id</li><li>categoria</li><li>status</li><li>get_status_display</li><li>plantilla_id</li><li>plantilla</li><li>created_at</li><li>get_next_by_created_at</li><li>get_previous_by_created_at</li><li>updated_at</li><li>get_next_by_updated_at</li><li>get_previous_by_updated_at</li><li>likes</li><li>dislikes</li><li>id</li><li>objects</li><li>blocks</li><li>comentarios</li><li>interactions</li><li>historial_set</li></ul><h3>Métodos:</h3><ul></ul><h2>ContentBlock</h2><p>ContentBlock(id, content, block_type, content_text, multimedia, top, left, width, height)</p><h3>Atributos:</h3><ul><li>BLOCK_TYPE_CHOICES</li><li>content_id</li><li>content</li><li>block_type</li><li>get_block_type_display</li><li>content_text</li><li>multimedia</li><li>top</li><li>left</li><li>width</li><li>height</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>ContentForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>Historial</h2><p>Historial(id, version, content, user, timestamp, cambio)</p><h3>Atributos:</h3><ul><li>version</li><li>content_id</li><li>content</li><li>user_id</li><li>user</li><li>timestamp</li><li>get_next_by_timestamp</li><li>get_previous_by_timestamp</li><li>cambio</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>JsonResponse</h2><p>
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before ECMAScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be a json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    :param json_dumps_params: A dictionary of kwargs passed to json.dumps().
+    </p><h3>Atributos:</h3><ul></ul><h3>Métodos:</h3><ul></ul><h2>Paginator</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>ELLIPSIS</li><li>default_error_messages</li><li>count</li><li>num_pages</li><li>page_range</li></ul><h3>Métodos:</h3><ul><li>validate_number(self, number): Validate the given 1-based page number.</li><li>get_page(self, number): 
+        Return a valid page, even if the page argument isn't a number or isn't
+        in range.
+        </li><li>page(self, number): Return a Page object for the given 1-based page number.</li><li>_get_page(self, *args, **kwargs): 
+        Return an instance of a single page.
+
+        This hook can be used by subclasses to use an alternative to the
+        standard :cls:`Page` object.
+        </li><li>_check_object_list_is_ordered(self): 
+        Warn if self.object_list is unordered (typically a QuerySet).
+        </li><li>get_elided_page_range(self, number=1, on_each_side=3, on_ends=2): 
+        Return a 1-based range of pages with some values elided.
+
+        If the page range is larger than a given size, the whole range is not
+        provided and a compact form is returned instead, e.g. for a paginator
+        with 50 pages, if page 43 were the current page, the output, with the
+        default arguments, would be:
+
+            1, 2, …, 40, 41, 42, 43, 44, 45, 46, …, 49, 50.
+        </li></ul><h2>Plantilla</h2><p>Plantilla(id, descripcion, estado)</p><h3>Atributos:</h3><ul><li>descripcion</li><li>estado</li><li>id</li><li>objects</li><li>bloques</li><li>content_set</li></ul><h3>Métodos:</h3><ul></ul><h2>Rol</h2><p>Rol(id, nombre, descripcion)</p><h3>Atributos:</h3><ul><li>nombre</li><li>descripcion</li><li>permisos</li><li>id</li><li>objects</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul><li>delete(self, *args, **kwargs): No hay docstring disponible</li></ul><h2>RolEnCategoria</h2><p>RolEnCategoria(id, usuario, categoria, rol)</p><h3>Atributos:</h3><ul><li>usuario_id</li><li>usuario</li><li>categoria_id</li><li>categoria</li><li>rol_id</li><li>rol</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>UserInteraction</h2><p>UserInteraction(id, user, content, liked, disliked)</p><h3>Atributos:</h3><ul><li>user_id</li><li>user</li><li>content_id</li><li>content</li><li>liked</li><li>disliked</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul>
+                    </body>
+                    </html>
+                    
