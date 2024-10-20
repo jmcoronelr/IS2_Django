@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'reportes',
     'Plantillas',
     'historial',
+    'sitio',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -98,7 +99,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'sitio.maintenance_middleware.MaintenanceMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
