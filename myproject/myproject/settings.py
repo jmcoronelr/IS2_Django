@@ -60,6 +60,7 @@ SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'usuarios.authentication.EmailOrUsernameModelBackend',  # El backend personalizado que permite email o username
 )
 
 # URL para redirigir después de iniciar sesión
