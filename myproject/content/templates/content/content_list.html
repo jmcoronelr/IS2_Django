@@ -235,15 +235,34 @@
                     </div>
                     <div class="content-actions">
                         <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                        {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
+                        {% if request.user|tiene_permiso:"Contenido: Editar propio" and content.status != 'review' and content.status != 'published' and content.status != 'rejected'%}
                         <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                         {% endif %}
-                        {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
+                        {% if request.user|tiene_permiso:"Contenido: Publicar"%}
+                        {% if content.status == 'review'%}
+                        <a href="{% url 'switch_state' content.pk 'published' %}" class="btn btn-secondary btn-sm">Publicar</a>
+                        {% endif %}
+                        {% if content.status == 'inactive'%}
                         <a href="{% url 'switch_state' content.pk 'published' %}" class="btn btn-primary btn-sm">Publicar</a>
                         {% endif %}
-                        {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
-                        <a href="{% url 'switch_state' content.pk 'inactive' %}" class="btn btn-primary btn-sm">Inactivar</a>
-                        {% endif %}                        
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status == 'published'%}
+                        <a href="{% url 'switch_state' content.pk 'inactive' %}" class="btn btn-secondary btn-sm">Inactivar</a>
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"Contenido: Rechazar" and content.status == 'review'%}
+                        <a href="{% url 'switch_state' content.pk 'rejected' %}" class="btn btn-primary btn-sm">Rechazar</a>
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"Contenido: Mandar a revisión" %}
+                        {% if content.status == 'draft'%}
+                        <a href="{% url 'switch_state' content.pk 'review' %}" class="btn btn-primary btn-sm">Revisar</a>
+                        {% endif %}
+                        {% if content.status == 'rejected'%}
+                        <a href="{% url 'switch_state' content.pk 'review' %}" class="btn btn-secondary btn-sm">Revisar</a>
+                        {% endif %}
+                        {% endif %}
+                        {% if request.user|tiene_permiso:"Contenido: Mandar a borrador" and content.status == 'rejected'%}
+                        <a href="{% url 'switch_state' content.pk 'review' %}" class="btn btn-primary btn-sm">Volver a Borrador</a>
+                        {% endif %}                           
                     </div>
                 </div>
             </div>
