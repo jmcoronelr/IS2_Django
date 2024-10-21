@@ -323,6 +323,40 @@ Reportes
         .catch(error => {
           console.log('Error al obtener el reporte:', error);
         });
+    } else if (reportType === 'approved_posts') {
+    // Lógica para el reporte de "Publicaciones Aprobadas"
+    fetch("{% url 'reporte_publicados_json' %}")
+      .then(response => response.json())
+      .then(data => {
+        // Configurar los encabezados de la tabla
+        tableHeaders.innerHTML = `
+          <th>Título de la Publicación</th>
+          <th>Fecha de Publicación</th>
+        `;
+
+        // Limpiar el cuerpo de la tabla
+        reportBody.innerHTML = "";
+
+        // Rellenar la tabla con los datos reales del backend
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          const titleCell = document.createElement('td');
+          const dateCell = document.createElement('td');
+
+          titleCell.textContent = item.title;
+          dateCell.textContent = item.published_started_at || 'Sin fecha';
+
+          row.appendChild(titleCell);
+          row.appendChild(dateCell);
+          reportBody.appendChild(row);
+        });
+
+        // Mostrar la sección de resultados
+        reportResult.classList.remove('hidden');
+      })
+      .catch(error => {
+        console.log('Error al obtener el reporte:', error);
+      });
     } else {
       alert("Selecciona un tipo de reporte válido para generar.");
     }

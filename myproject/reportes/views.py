@@ -65,3 +65,17 @@ def reporte_revision_json(request):
         })
 
     return JsonResponse(data, safe=False)
+
+def reporte_titulos_publicados_json(request):
+    # Obtener solo los contenidos con estado 'publicado'
+    contenidos = Content.objects.filter(status='published')
+    data = []
+
+    # Construir la respuesta en formato JSON con los títulos y fechas de publicación
+    for contenido in contenidos:
+        data.append({
+            'title': contenido.title,
+            'published_started_at': contenido.published_started_at.strftime('%Y-%m-%d') if contenido.published_started_at else None
+        })
+    
+    return JsonResponse(data, safe=False)
