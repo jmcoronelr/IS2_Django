@@ -301,7 +301,10 @@ def cambiar_estado_contenido(request, pk, nuevo_estado):
             content.revision_started_at = timezone.now()
         # Limpiar la fecha de fin de la revisión cuando entra en revisión
         content.revision_ended_at = None
-    elif content.status == 'review' and nuevo_estado in ['published', 'rejected']:
+    elif (content.status == 'review' or content.status == 'inactive') and nuevo_estado == 'published':
+        content.revision_ended_at = timezone.now()
+        content.published_started_at = timezone.now()
+    elif content.status == 'review' and nuevo_estado == 'rejected':
         # Si el contenido estaba en "review" y cambia a "published" o "rejected", registrar el fin de la revisión
         content.revision_ended_at = timezone.now()
 
