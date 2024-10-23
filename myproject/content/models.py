@@ -11,6 +11,7 @@ class Content(models.Model):
         ('inactive', 'Inactivo'),
     ]
     
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField()
     categoria = models.ForeignKey(Categorias, on_delete=models.CASCADE)

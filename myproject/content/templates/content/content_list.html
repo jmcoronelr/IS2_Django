@@ -208,77 +208,172 @@
                         {% endfor %}
                     </select>
                     
+                    <input type="hidden" name="tab" value="{{ tab }}">
+
                     <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
                 </div>
             </form>
         </div>
 
-        <div class="row g-4">
-            {% for content in contents %}
-            <div class="col-md-4 col-lg-3">
-                <div class="content-card">
-                    <div class="content-title">
-                        {% if request.user|tiene_permiso:"Contenido: Ver historial"%}
-                        <a href="{% url 'historial_content' content.pk %}">
-                            <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
-                                 alt="Historia" class="history-icon" width="20" height="20">
-                        </a>
-                        {% endif %}                      
-                        {{ content.title }}
-                        {% if request.user|tiene_permiso:"Contenido: Eliminar"%}
-                        <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
-                        {% endif %}   
-                    </div>
-                    <div class="content-info">
-                        <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
-                        <p>Estado: {{ content.get_status_display }}</p>
-                    </div>
-                    <div class="content-actions">
-                        <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                        {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
-                        <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
-                        {% endif %}
-                        {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
-                        <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
-                        {% endif %}
-                        {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
-                        <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-                
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center mt-5">
-                {% if contents.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1">Primera</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ contents.previous_page_number }}">Anterior</a>
-                </li>
-                {% endif %}
+        <!-- Tabs for separating author content and other content -->
+        <ul class="nav nav-tabs" id="contentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if request.GET.tab == 'mine' %}active{% endif %}" 
+                    id="my-content-tab" data-bs-toggle="tab" href="#my-content" role="tab" 
+                    aria-controls="my-content" aria-selected="true"
+                    onclick="window.location.href = '?tab=mine';">
+                    Mis Contenidos
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link {% if request.GET.tab == 'all' %}active{% endif %}" 
+                    id="all-content-tab" data-bs-toggle="tab" href="#all-content" role="tab" 
+                    aria-controls="all-content" aria-selected="false"
+                    onclick="window.location.href = '?tab=all';">
+                    Otros Contenidos
+                </a>
+            </li>
+        </ul>
 
-                {% for num in contents.paginator.page_range %}
-                    {% if contents.number == num %}
-                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
-                    {% elif num > contents.number|add:'-3' and num < contents.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+
+        <div class="tab-content" id="contentTabsContent">
+            <!-- Tab for the contents of the current user -->
+            <div class="tab-pane fade {% if request.GET.tab == 'mine' %}show active{% endif %}" id="my-content" role="tabpanel" aria-labelledby="my-content-tab">
+                <div class="row g-4">
+                    {% if contents %}
+                        {% for content in contents %}
+                        <div class="col-md-4 col-lg-3">
+                            <div class="content-card">
+                                <div class="content-title">
+                                    {% if request.user|tiene_permiso:"Contenido: Ver historial"%}
+                                    <a href="{% url 'historial_content' content.pk %}">
+                                        <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
+                                            alt="Historia" class="history-icon" width="20" height="20">
+                                    </a>
+                                    {% endif %}                      
+                                    {{ content.title }}
+                                    {% if request.user|tiene_permiso:"Contenido: Eliminar"%}
+                                    <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
+                                    {% endif %}   
+                                </div>
+                                <div class="content-info">
+                                    <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
+                                    <p>Estado: {{ content.get_status_display }}</p>
+                                </div>
+                                <div class="content-actions">
+                                    <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
+                                    {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
+                                    <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
+                                    {% endif %}
+                                    {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
+                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
+                                    {% endif %}
+                                    {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
+                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                No hay contenidos disponibles en esta pestaña.
+                            </div>
+                        </div>
                     {% endif %}
-                {% endfor %}
+                </div>
 
-                {% if contents.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ contents.next_page_number }}">Siguiente</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ contents.paginator.num_pages }}">Última</a>
-                </li>
-                {% endif %}
-            </ul>
-        </nav>
+                <!-- Paginación para mis contenidos -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-5">
+                        {% if contents.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_user={{ contents.previous_page_number|default:'' }}#author-tab">Anterior</a>
+                        </li>
+                        {% endif %}
+                        {% for num in contents.paginator.page_range %}
+                            <li class="page-item {% if contents.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page_user={{ num|default:'' }}#author-tab">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if contents.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_user={{ contents.next_page_number|default:'' }}#author-tab">Siguiente</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Tab for the contents of other users -->
+            <div class="tab-pane fade {% if request.GET.tab == 'all' %}show active{% endif %}" id="all-content" role="tabpanel" aria-labelledby="all-content-tab">
+                <div class="row g-4">
+                    {% if contents %}
+                        {% for content in contents %}
+                        <div class="col-md-4 col-lg-3">
+                            <div class="content-card">
+                                <div class="content-title">
+                                    {% if request.user|tiene_permiso:"Contenido: Ver historial"%}
+                                    <a href="{% url 'historial_content' content.pk %}">
+                                        <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
+                                            alt="Historia" class="history-icon" width="20" height="20">
+                                    </a>
+                                    {% endif %}                      
+                                    {{ content.title }}
+                                    {% if request.user|tiene_permiso:"Contenido: Eliminar"%}
+                                    <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
+                                    {% endif %}   
+                                </div>
+                                <div class="content-info">
+                                    <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
+                                    <p>Estado: {{ content.get_status_display }}</p>
+                                </div>
+                                <div class="content-actions">
+                                    <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
+                                    {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
+                                    <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
+                                    {% endif %}
+                                    {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
+                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
+                                    {% endif %}
+                                    {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
+                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                No hay contenidos disponibles en esta pestaña.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Paginación para otros contenidos -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mt-5">
+                        {% if contents.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_other={{ contents.previous_page_number|default:'' }}#others-tab">Anterior</a>
+                        </li>
+                        {% endif %}
+                        {% for num in contents.paginator.page_range %}
+                            <li class="page-item {% if contents.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page_other={{ num|default:'' }}#others-tab">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if contents.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_other={{ contents.next_page_number|default:'' }}#others-tab">Siguiente</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
 
         <!-- Modal de confirmación -->
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -294,7 +389,7 @@
                     <div class="modal-footer">
                         <form id="deleteForm" method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="page" value="{{ request.GET.page }}">
+                            <input type="hidden" name="page" value="{{ request.GET.page|default_if_none:1 }}">
                             <button type="submit" class="btn btn-primary">Eliminar</button>
                         </form>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -303,16 +398,37 @@
             </div>
         </div>
 
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             var deleteModal = document.getElementById('deleteModal');
+
+            if (deleteModal) {
             deleteModal.addEventListener('show.bs.modal', function (event) {
+                console.log("Modal activado");  // Verifica si el evento se dispara
+
                 var button = event.relatedTarget;
+
+                if (button) {
                 var contentId = button.getAttribute('data-bs-content-id');
-                var deleteForm = document.getElementById('deleteForm');
+                console.log("Content ID obtenido:", contentId);  // Depurar el contentId
+
+                // Verificar el valor de la página actual (por defecto usar 1 si no existe o es null)
                 var currentPage = "{{ request.GET.page|default:1 }}"; 
+                if (!currentPage) {
+                    currentPage = 1;
+                }
+
+                var deleteForm = document.getElementById('deleteForm');
                 deleteForm.action = '/content/delete/' + contentId + '/?page=' + currentPage;
+                console.log("Delete form action:", deleteForm.action);
+                } else {
+            console.log("No se encontró el botón que activó el modal.");
+                }
             });
+            } else {
+    console.log("No se encontró el modal con ID 'deleteModal'.");
+}
         </script>
     </div>
 {% endblock %}

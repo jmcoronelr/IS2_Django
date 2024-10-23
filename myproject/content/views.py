@@ -49,10 +49,20 @@ def content_list(request):
         # Obtener solo las categorías permitidas para el usuario
         categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
+    # Obtener el valor de la pestaña activa (default 'mine')
+    tab = request.GET.get('tab', 'mine')
+
+    # Filtrar por autor
+    if tab == 'mine':
+        contents= contents.filter(author=request.user)
+    else:
+        contents = contents.exclude(author=request.user)
+
     # Búsqueda por título
     query = request.GET.get('q')
     if query:
         contents = contents.filter(title__icontains=query)
+
 
     # Filtrar por fecha
     fecha = request.GET.get('fecha')
@@ -82,6 +92,7 @@ def content_list(request):
     return render(request, 'content/content_list.html', {
         'contents': contents,
         'categorias': categorias,  # Solo categorías permitidas para usuarios no superusuarios
+        'tab': tab,  # Pasar la pestaña activa al contexto
     })
 
 
@@ -116,6 +127,7 @@ def content_create_edit(request, pk=None):
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
             content = form.save(commit=False)
+            content.author = request.user
 
             plantilla_id = request.POST.get('plantilla')
             if plantilla_id:
