@@ -79,3 +79,21 @@ def reporte_titulos_publicados_json(request):
         })
     
     return JsonResponse(data, safe=False)
+
+
+def reporte_inactivos_json(request):
+    """
+    Genera un reporte de artículos inactivos con su título y fecha de inactivación.
+    """
+    contenidos = Content.objects.filter(status='inactive').annotate(
+        fecha_inactivacion=F('inactivated_at')
+    ).order_by('-fecha_inactivacion')
+
+    data = []
+    for contenido in contenidos:
+        data.append({
+            'title': contenido.title,
+            'fecha_inactivacion': contenido.inactivated_at.strftime('%Y-%m-%d') if contenido.inactivated_at else None,
+        })
+
+    return JsonResponse(data, safe=False)

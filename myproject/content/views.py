@@ -307,6 +307,9 @@ def cambiar_estado_contenido(request, pk, nuevo_estado):
     elif content.status == 'review' and nuevo_estado == 'rejected':
         # Si el contenido estaba en "review" y cambia a "published" o "rejected", registrar el fin de la revisión
         content.revision_ended_at = timezone.now()
+    elif nuevo_estado == 'inactive':
+        # Registrar la fecha de inactivación si el nuevo estado es "inactivo"
+        content.inactivated_at = timezone.now()
 
     # Cambiar el estado del contenido
     content.status = nuevo_estado
