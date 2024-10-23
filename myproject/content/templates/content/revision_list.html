@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% block Titulo%} 
+  Revisión
+{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <style>
+            html {
+                scroll-behavior: smooth;
+            }
+            
+            /* Paleta de colores personalizada */
+            .btn-primary {
+                background-color: #3F72AF;
+                border-color: #3F72AF;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #365f91;
+                border-color: #365f91;
+            }
+
+            .btn-secondary {
+                background-color: #F5F5F5;
+                border-color: #D9D9D9;
+                color: #333;
+            }
+
+            .btn-secondary:hover {
+                background-color: #E0E0E0;
+                border-color: #BFBFBF;
+            }
+
+            .btn-danger {
+                background-color: #D32F2F;
+                border-color: #D32F2F;
+            }
+
+            .btn-danger:hover {
+                background-color: #B71C1C;
+                border-color: #B71C1C;
+            }
+
+            /* Paginación personalizada */
+            .pagination .page-link {
+                color: #333;
+                background-color: #F5F5F5;
+                border-color: #D9D9D9;
+            }
+
+            .pagination .page-item.active .page-link {
+                background-color: #3F72AF;
+                border-color: #3F72AF;
+                color: white;
+            }
+
+            .content-card {
+                border: 1px solid #e0e0e0;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 10px;
+                text-align: center;
+                background-color: #f8f9fa;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .content-title {
+                font-weight: bold;
+                font-size: 1em;
+                margin-bottom: 5px;
+                position: relative;
+                text-align: center;
+            }
+
+            .delete-icon {
+                position: absolute;
+                top: 0;
+                right: 0;
+                cursor: pointer;
+                margin: 10px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .delete-icon:hover {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            .delete-icon:hover img {
+                filter: brightness(0) saturate(100%) invert(41%) sepia(60%) saturate(746%) hue-rotate(150deg) brightness(95%) contrast(102%);
+            }
+
+            .content-info {
+                font-size: 0.85em;
+                color: #6c757d;
+                margin-bottom: 10px;
+            }
+
+            .content-actions {
+                margin-top: 5px;
+                display: flex;
+                justify-content: center;
+                gap: 5px;
+            }
+
+            .filter-container {
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .filters {
+                display: flex;
+                gap: 10px;
+            }
+
+            .filter-container select, .filter-container input {
+                padding: 5px;
+                font-size: 0.9em;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: calc(1.375rem + 1.5vw);
+                margin-bottom: 0;
+            }
+
+            .search-create-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 10px;
+            }
+
+            .search-form input {
+                width: 250px;
+            }
+
+            .history-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                cursor: pointer;
+                margin: 10px;
+                transition: transform 0.3s ease, opacity 0.3s ease;
+            }
+
+            .history-icon:hover {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+        </style>
+
+        <div class="header">
+            <h1 class="mb-4">Contenidos en Revisión</h1>
+            <div class="search-create-container">
+                <form method="get" action="{% url 'review_list' %}" class="search-form">
+                    <input type="text" name="q" class="form-control" placeholder="Buscar Contenido..." value="{{ request.GET.q }}" required>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <form method="get" action="{% url 'review_list' %}">
+                <div class="filters">
+                    <select name="fecha">
+                        <option value="">Filtrar por fecha</option>
+                        <option value="today">Hoy</option>
+                        <option value="week">Esta semana</option>
+                        <option value="month">Este mes</option>
+                    </select>
+                    <select name="estado">
+                        <option value="">Filtrar por estado</option>
+                        <option value="review">En Revisión</option>
+                        <option value="rejected">Rechazado</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                    <select name="categoria">
+                        <option value="">Filtrar por categoría</option>
+                        {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if request.GET.categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                                {{ categoria.descripcionLarga }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <button type="submit" class="btn btn-secondary btn-sm">Filtrar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for content in contents %}
+            <div class="col-md-4 col-lg-3">
+                <div class="content-card">
+                    <div class="content-title">
+                        {{ content.title }} 
+                    </div>
+                    <div class="content-info">
+                        <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
+                        <p>Estado: {{ content.get_status_display }}</p>
+                    </div>
+                    <div class="content-actions">
+                        <a href="{% url 'review_detail' content.pk %}" class="btn btn-primary btn-sm">Revisar</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+                
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center mt-5">
+                {% if contents.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">Primera</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.previous_page_number }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% for num in contents.paginator.page_range %}
+                    {% if contents.number == num %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num > contents.number|add:'-3' and num < contents.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if contents.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.next_page_number }}">Siguiente</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ contents.paginator.num_pages }}">Última</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+    </div>
+{% endblock %}

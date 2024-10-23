@@ -95,6 +95,7 @@ def content_create_edit(request, pk=None):
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
         old_status = content.status  # Guarda el estado anterior
+        es_nuevo = False  # Ya existe, por lo tanto, es una edición
         content.status = 'review'
         # Verificar si revision_started_at está vacío y el contenido pasa a revisión
         if content.revision_started_at is None:
@@ -103,6 +104,7 @@ def content_create_edit(request, pk=None):
         content = None
         accion = 'creado'
         old_status = None  # No hay estado anterior si es nuevo
+        es_nuevo = True  # No existe, por lo tanto, es creación
 
     plantillas = Plantilla.objects.all()
 
@@ -140,6 +142,16 @@ def content_create_edit(request, pk=None):
                 content.categoria = None
 
             new_status = content.status  # Guarda el nuevo estado
+            # Cambiar el estado del contenido basado en el botón presionado
+            estado = request.POST.get('status')
+            if estado == 'review':
+                content.estado = 'review'     # Cambia el estado a 'Revision'
+            elif estado == 'published':
+                content.estado = 'published'    # Cambia el estado a "Publicado"
+            elif estado == 'draft':
+                content.estado = 'draft'        # Cambia el estado a 'Borrador'
+            elif estado == 'inactive':
+                content.status = 'inactive'     # Cambia el estado a 'Inactivo'
 
             content.save()
 
@@ -202,6 +214,7 @@ def content_create_edit(request, pk=None):
         'selected_plantilla': selected_plantilla,
         'selected_categoria': selected_categoria,
         'blocks': blocks,
+        'es_nuevo': es_nuevo  # Indicador de si es creación o edición
     })
 
 
@@ -303,9 +316,103 @@ def agregar_comentario(request, pk):
     return render(request, 'comentarios/agregar_comentario.html', {'form': form, 'contenido': contenido})
 
 
+def review_list(request):
+    # Obtener permisos necesarios
+    permisos_requeridos = [
+        'Contenido: Inactivar',
+        'Contenido: Publicar',
+        'Contenido: Eliminar',
+        'Contenido: Ver historial'
+    ]
+    
+    # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
+    roles_con_permisos = Rol.objects.filter(
+        permisos__nombre__in=permisos_requeridos
+    ).values_list('id', flat=True)
+
+    # Filtrar las categorías donde el usuario tiene estos roles
+    categorias_permitidas = RolEnCategoria.objects.filter(
+        usuario_id=request.user.id,
+        rol_id__in=roles_con_permisos
+    ).values_list('categoria_id', flat=True)
+    
+    # Filtrar los contenidos que pertenecen a esas categorías
+    contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+    
+    # Filtrar los estados de revision
+    contents = contents.exclude(status = 'published') & contents.exclude(status = 'draft')
+    
+    # Búsqueda por título
+    query = request.GET.get('q')
+    if query:
+        contents = contents.filter(title__icontains=query)
+
+    # Filtrar por fecha
+    fecha = request.GET.get('fecha')
+    if fecha == 'today':
+        contents = contents.filter(created_at__date=datetime.date.today())
+    elif fecha == 'week':
+        contents = contents.filter(created_at__gte=datetime.date.today() - datetime.timedelta(days=7))
+    elif fecha == 'month':
+        contents = contents.filter(created_at__month=datetime.date.today().month)
+
+    # Filtrar por estado
+    estado = request.GET.get('estado')
+    if estado:
+        contents = contents.filter(status=estado)
+
+    # Filtrar por categoría (solo las permitidas)
+    categoria = request.GET.get('categoria')
+    if categoria and categoria in categorias_permitidas:
+        contents = contents.filter(categoria__id=categoria)
+
+    # Obtener solo las categorías permitidas para el usuario
+    categorias = Categorias.objects.filter(id__in=categorias_permitidas)
+
+    # Paginación
+    paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página
+    page_number = request.GET.get('page')
+    contents = paginator.get_page(page_number)
+
+    # Pasar las categorías al contexto
+    return render(request, 'content/revision_list.html', {
+        'contents': contents,
+        'categorias': categorias,  # Solo categorías permitidas
+    })
+    
+    
+def review_detail(request, pk):
+    content = get_object_or_404(Content, pk=pk)
+    
+    # Obtener la URL anterior o una predeterminada
+    next_url = request.GET.get('next', '/content/review')
+
+    if request.method == 'POST':
+        estado = request.POST.get('status')  # Cambiado 'estado' por 'status'
+        
+        if estado == 'publicar':
+            content.status = 'published'  # Cambia el estado a "Publicado"
+        elif estado == 'rechazar':
+            content.status = 'rejected'  # Cambia el estado a 'Rechazado'
+        elif estado == 'borrador':
+            content.status = 'draft'  # Cambia el estado a 'Borrador'
+        content.save()  # Guarda los cambios
+
+        # Redirigir de nuevo a la página de detalle o a la URL anterior
+        return redirect(next_url)
+
+    return render(request, 'content/review_detail.html', {
+        'content': content,
+        'next_url': next_url  # Pasar el valor de next a la plantilla
+    })
 
 
 def cambiar_estado_contenido(request, pk, nuevo_estado):
+    """
+    Cambia el estado de un contenido entre 'published' e 'inactive'.
+    
+    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
+    """
     content = get_object_or_404(Content, pk=pk)
 
     # Verificar si el nuevo estado es "review" para registrar la fecha de inicio de la revisión
