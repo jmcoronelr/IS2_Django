@@ -52,18 +52,6 @@ def registrar_usuario(request):
     return render(request, 'usuarios/registro.html', context)
 
 class CustomLoginView(FormView):
-    """
-    Vista personalizada para el inicio de sesión de usuarios. 
-    Utiliza un formulario basado en `AuthenticationForm` para autenticar al usuario.
-    
-    Atributos:
-    - template_name: Nombre de la plantilla a utilizar para renderizar la vista de login.
-    - form_class: Clase del formulario que será utilizado (AuthenticationForm).
-    - success_url: URL a la que se redirige después de un inicio de sesión exitoso.
-
-    Métodos:
-    - form_valid: Si el formulario es válido, autentica y registra al usuario en la sesión.
-    """
     template_name = 'usuarios/login.html'
     form_class = AuthenticationForm
     success_url = reverse_lazy('sistema')  # Redirige a la página del sistema tras el login
@@ -71,16 +59,11 @@ class CustomLoginView(FormView):
     def form_valid(self, form):
         """
         Inicia sesión al usuario autenticado si el formulario es válido.
-
-        Parámetros:
-        - form (AuthenticationForm): El formulario de autenticación validado.
-
-        Retorna:
-        - HttpResponse: Redirige a la URL de éxito definida tras iniciar sesión.
         """
         user = form.get_user()
         login(self.request, user)
         return super().form_valid(form)
+
 
 class CustomLogoutView(LogoutView):
     """

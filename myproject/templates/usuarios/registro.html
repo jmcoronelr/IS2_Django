@@ -105,6 +105,20 @@
           padding: 15px;
         }
       }
+      /* Estilo para mensajes de error */
+      .error-message {
+          color: red;
+          font-size: 0.9rem;
+          margin-top: -10px;
+          margin-bottom: 10px;
+      }
+
+      .form-error {
+          color: red;
+          font-size: 1rem;
+          text-align: center;
+          margin-bottom: 15px;
+      }
     </style>
   </head>
   <body>
@@ -172,7 +186,35 @@
               class="form-control"
               required
             />
-          </div>
+            <!-- Mostrar errores específicos del campo de contraseña -->
+            {% if registro_form.password.errors %}
+                <div class="error-message">{{ registro_form.password.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="id_confirm_password">Confirmar Contraseña</label>
+            <input
+              type="password"
+              name="{{ registro_form.confirm_password.name }}"
+              id="{{ registro_form.confirm_password.id_for_label }}"
+              class="form-control"
+              required
+            />
+            <!-- Mostrar errores específicos del campo de confirmación de contraseña -->
+            {% if registro_form.confirm_password.errors %}
+                <div class="error-message">{{ registro_form.confirm_password.errors.0 }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- Mostrar errores generales en la parte superior del formulario -->
+        {% if registro_form.non_field_errors %}
+            <div class="form-error">
+                {{ registro_form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+        
+        
           <button type="submit" class="btn btn-primary w-100 mt-3">
             Registrar Usuario
           </button>

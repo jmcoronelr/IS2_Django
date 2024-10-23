@@ -89,6 +89,7 @@
 
 {% if user.is_authenticated %}
 {% load tiene_permiso %}
+
 <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
         <ul class="navbar-nav navbar-nav-left">
@@ -142,6 +143,17 @@
                             <button class="dropdown-item">LogOut</button>
                         </form>
                     </li>
+                  <!-- Opción Toggle Maintenance solo para administradores -->
+                    {% if user.is_staff %}
+                    <li>
+                        <a href="#" class="dropdown-item" onclick="document.getElementById('toggle-maintenance-form').submit(); return false;">
+                            Toggle Maintenance
+                        </a>
+                        <form id="toggle-maintenance-form" action="{% url 'toggle_maintenance' %}" method="get" style="display: none;">
+                            {% csrf_token %}
+                        </form>
+                    </li>
+                    {% endif %}
                 </ul>
             </li>
         </ul>

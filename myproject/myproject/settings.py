@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'reportes',
     'Plantillas',
     'historial',
+    'sitio',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -59,6 +60,7 @@ SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'usuarios.authentication.EmailOrUsernameModelBackend',  # El backend personalizado que permite email o username
 )
 
 # URL para redirigir después de iniciar sesión
@@ -98,7 +100,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'sitio.maintenance_middleware.MaintenanceMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
