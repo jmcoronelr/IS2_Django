@@ -14,17 +14,20 @@ class FlujoContentTestCase(TestCase):
             descripcionLarga="Tecnología", 
             estado=True
         )
-        self.content = Content.objects.create(
-            title="Nuevo Contenido", 
-            description="Descripción de prueba", 
-            categoria=self.categoria, 
-            status="draft"
-        )
         # Utilizar el modelo de usuario personalizado 'Usuario' y proporcionar el campo 'email'
         self.user = Usuario.objects.create_user(
             username='testuser', 
             password='12345', 
             email='testuser@example.com'  # Añadir el email
+        )
+
+        # Crear contenido con el autor
+        self.content = Content.objects.create(
+            title="Nuevo Contenido", 
+            description="Descripción de prueba", 
+            categoria=self.categoria, 
+            status="draft",
+            autor=self.user  # Asignar el autor al contenido
         )
 
     def test_crear_content(self):
@@ -42,10 +45,13 @@ class FlujoContentTestCase(TestCase):
         Verifica que el estado se actualice correctamente y que el proceso
         de revisión haya sido iniciado (fecha de inicio de revisión registrada).
         """
+        self.client.login(username='testuser', password='12345')  # Autenticar al usuario
+
         response = self.client.post(reverse('update_content_status'), json.dumps({
             'content_id': self.content.id,
             'new_status': 'review'
         }), content_type="application/json")
+        
         self.content.refresh_from_db()
         self.assertEqual(self.content.status, 'review')
         self.assertEqual(response.status_code, 200)
@@ -62,10 +68,13 @@ class FlujoContentTestCase(TestCase):
         self.content.revision_started_at = timezone.now()
         self.content.save()
         
+        self.client.login(username='testuser', password='12345')  # Autenticar al usuario
+
         response = self.client.post(reverse('update_content_status'), json.dumps({
             'content_id': self.content.id,
             'new_status': 'published'
         }), content_type="application/json")
+        
         self.content.refresh_from_db()
         self.assertEqual(self.content.status, 'published')
         self.assertEqual(response.status_code, 200)
@@ -82,10 +91,13 @@ class FlujoContentTestCase(TestCase):
         self.content.revision_started_at = timezone.now()
         self.content.save()
         
+        self.client.login(username='testuser', password='12345')  # Autenticar al usuario
+
         response = self.client.post(reverse('update_content_status'), json.dumps({
             'content_id': self.content.id,
             'new_status': 'rejected'
         }), content_type="application/json")
+        
         self.content.refresh_from_db()
         self.assertEqual(self.content.status, 'rejected')
         self.assertEqual(response.status_code, 200)
@@ -97,11 +109,13 @@ class FlujoContentTestCase(TestCase):
         Verifica que el estado se actualice correctamente y que no afecte
         las fechas de revisión (no deben estar presentes).
         """
+        self.client.login(username='testuser', password='12345')  # Autenticar al usuario
 
         response = self.client.post(reverse('update_content_status'), json.dumps({
             'content_id': self.content.id,
             'new_status': 'inactive'
         }), content_type="application/json")
+        
         self.content.refresh_from_db()
         self.assertEqual(self.content.status, 'inactive')
         self.assertEqual(response.status_code, 200)
@@ -114,10 +128,13 @@ class FlujoContentTestCase(TestCase):
         Verifica que no se realicen cambios en el estado del contenido y que la solicitud
         se maneje correctamente devolviendo un código de estado 200.
         """
+        self.client.login(username='testuser', password='12345')  # Autenticar al usuario
+
         response = self.client.post(reverse('update_content_status'), json.dumps({
             'content_id': self.content.id,
             'new_status': 'draft'  # Estado ya existente
         }), content_type="application/json")
+        
         self.content.refresh_from_db()
         self.assertEqual(self.content.status, 'draft')  # El estado no debe cambiar
         self.assertEqual(response.status_code, 200)
