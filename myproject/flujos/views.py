@@ -6,13 +6,27 @@ from content.models import Content
 import json
 from django.utils import timezone
 from django.core.mail import send_mail
+from roles.models import RolEnCategoria, Rol
 
 def flujos_home(request):
+    if request.user.is_superuser:
+        contents = Content.objects.all().order_by('created_at')
+    else:
+        permisos_estado = [
+            'Contenido: Mandar a borrador',
+            'Contenido: Mandar a revisión',
+            'Contenido: Publicar',
+            'Contenido: Rechazar',
+        ]
+        roles_con_permisos = Rol.objects.filter(permisos__nombre__in=permisos_estado).values_list('id', flat=True)
+        categorias_permitidas = RolEnCategoria.objects.filter(usuario_id=request.user.id, rol_id__in=roles_con_permisos).values_list('categoria_id', flat=True)
+        contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+    
     # Obtenemos los contenidos por estado
-    borradores = Content.objects.filter(status='draft')
-    en_revision = Content.objects.filter(status='review')
-    publicados = Content.objects.filter(status='published')
-    rechazados = Content.objects.filter(status='rejected')
+    borradores = contents.filter(status='draft')
+    en_revision = contents.filter(status='review')
+    publicados = contents.filter(status='published')
+    rechazados = contents.filter(status='rejected')
 
     return render(request, 'flujos/flujos_home.html', {
         'borradores': borradores,

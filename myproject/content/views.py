@@ -41,9 +41,9 @@ def content_list(request):
 
     # Filtrar por autor
     if tab == 'mine':
-        contents= contents.filter(author=request.user)
+        contents= contents.filter(autor=request.user)
     else:
-        contents = contents.exclude(author=request.user)
+        contents = contents.exclude(autor=request.user)
 
     # Búsqueda por título
     query = request.GET.get('q')
@@ -123,7 +123,6 @@ def content_create_edit(request, pk=None):
         form = ContentForm(request.POST, instance=content)
         if form.is_valid():
             content = form.save(commit=False)
-            content.author = request.user
 
             # Asigna el autor solo si es un contenido nuevo
             if not pk:
@@ -317,31 +316,23 @@ def agregar_comentario(request, pk):
 
 
 def review_list(request):
-    # Obtener permisos necesarios
-    permisos_requeridos = [
-        'Contenido: Inactivar',
-        'Contenido: Publicar',
-        'Contenido: Eliminar',
-        'Contenido: Ver historial'
-    ]
-    
-    # Filtrar roles del usuario que tienen al menos uno de los permisos necesarios
-    roles_con_permisos = Rol.objects.filter(
-        permisos__nombre__in=permisos_requeridos
-    ).values_list('id', flat=True)
+    if request.user.is_superuser:
+        contents = Content.objects.all().order_by('created_at')
+        categorias = Categorias.objects.all()
+    else:
+        permisos_requeridos = [
+            'Contenido: Inactivar',
+            'Contenido: Publicar',
+            'Contenido: Eliminar',
+            'Contenido: Ver historial'
+        ]
+        roles_con_permisos = Rol.objects.filter(permisos__nombre__in=permisos_requeridos).values_list('id', flat=True)
+        categorias_permitidas = RolEnCategoria.objects.filter(usuario_id=request.user.id, rol_id__in=roles_con_permisos).values_list('categoria_id', flat=True)
+        contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
+        categorias = Categorias.objects.filter(id__in=categorias_permitidas)
+        # Filtrar los estados de revision
+        contents = contents.exclude(status = 'published') & contents.exclude(status = 'draft')
 
-    # Filtrar las categorías donde el usuario tiene estos roles
-    categorias_permitidas = RolEnCategoria.objects.filter(
-        usuario_id=request.user.id,
-        rol_id__in=roles_con_permisos
-    ).values_list('categoria_id', flat=True)
-    
-    # Filtrar los contenidos que pertenecen a esas categorías
-    contents = Content.objects.filter(categoria_id__in=categorias_permitidas).order_by('created_at')
-    
-    # Filtrar los estados de revision
-    contents = contents.exclude(status = 'published') & contents.exclude(status = 'draft')
-    
     # Búsqueda por título
     query = request.GET.get('q')
     if query:
@@ -360,14 +351,6 @@ def review_list(request):
     estado = request.GET.get('estado')
     if estado:
         contents = contents.filter(status=estado)
-
-    # Filtrar por categoría (solo las permitidas)
-    categoria = request.GET.get('categoria')
-    if categoria and categoria in categorias_permitidas:
-        contents = contents.filter(categoria__id=categoria)
-
-    # Obtener solo las categorías permitidas para el usuario
-    categorias = Categorias.objects.filter(id__in=categorias_permitidas)
 
     # Paginación
     paginator = Paginator(contents, 8)  # Muestra 8 contenidos por página

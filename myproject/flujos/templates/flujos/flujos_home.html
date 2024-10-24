@@ -79,6 +79,7 @@ Flujos - Tablero Kanban
   }
 
   .kanban-column {
+    position: relative;
     width: 180px;
     background-color: #f5f5f5;
     padding: 10px;
@@ -195,34 +196,56 @@ Flujos - Tablero Kanban
   const columns = document.querySelectorAll('.kanban-column');
 
   columns.forEach((column) => {
-    new Sortable(column, {
-      group: 'kanban',
-      animation: 150,
-      filter: 'h2',  // Excluir títulos de las columnas (h2)
-      preventOnFilter: false,
-      onEnd: function (evt) {
-        const contentId = evt.item.getAttribute('data-id');
-        const newStatus = evt.to.id;
+    const columnId = column.getAttribute('id'); // Obtener el id de la columna
 
-        // Enviar solicitud al backend para actualizar el estado
-        fetch('{% url "update_content_status" %}', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',
-          },
-          body: JSON.stringify({ content_id: contentId, new_status: newStatus }),
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'ok') {
-            console.log('Estado actualizado correctamente');
-          } else {
-            console.log('Error al actualizar el estado');
-          }
-        });
-      },
-    });
+    let tienePermiso = false;
+
+    // Verificar permisos para cada columna usando la plantilla de Django
+    {% load tiene_permiso %}
+    {% if request.user|tiene_permiso:"Contenido: Mandar a borrador" %}
+    if (columnId === 'draft') tienePermiso = true;
+    {% endif %}
+    {% if request.user|tiene_permiso:"Contenido: Mandar a revisión" %}
+    if (columnId === 'review') tienePermiso = true;
+    {% endif %}
+    {% if request.user|tiene_permiso:"Contenido: Publicar" %}
+    if (columnId === 'published') tienePermiso = true;
+    {% endif %}
+    {% if request.user|tiene_permiso:"Contenido: Rechazar" %}
+    if (columnId === 'rejected') tienePermiso = true;
+    {% endif %}
+
+    // Solo inicializar Sortable si el usuario tiene permisos para esa columna
+    if (tienePermiso) {
+      new Sortable(column, {
+        group: 'kanban',
+        animation: 150,
+        filter: 'h2', // Excluir títulos de las columnas (h2)
+        preventOnFilter: true,
+        onEnd: function (evt) {
+          const contentId = evt.item.getAttribute('data-id');
+          const newStatus = evt.to.id;
+
+          // Enviar solicitud al backend para actualizar el estado
+          fetch('{% url "update_content_status" %}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ content_id: contentId, new_status: newStatus }),
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'ok') {
+              console.log('Estado actualizado correctamente');
+            } else {
+              console.log('Error al actualizar el estado');
+            }
+          });
+        },
+      });
+    }
   });
 </script>
 
