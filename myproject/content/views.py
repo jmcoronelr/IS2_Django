@@ -218,6 +218,13 @@ def content_detail(request, pk):
     user_interaction = None
     liked = False
     disliked = False
+
+    # Verificar si la solicitud anterior fue un comentario para evitar duplicar la visita
+    if request.method == 'GET' and not request.session.pop('avoid_double_count', False):
+        # Incrementar el número total de visitas
+        content.numero_visitas += 1
+        content.save()
+
     if request.user.is_authenticated:
         user_interaction = UserInteraction.objects.filter(user=request.user, content=content).first()
         if user_interaction:
@@ -231,6 +238,8 @@ def content_detail(request, pk):
             comentario.autor = request.user
             comentario.contenido = content
             comentario.save()
+            # Establecer un marcador temporal en la sesión para evitar el conteo doble de visitas
+            request.session['avoid_double_count'] = True
             return redirect('content_detail', pk=content.pk)
     else:
         form = ComentarioForm()

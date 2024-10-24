@@ -80,6 +80,19 @@ def reporte_titulos_publicados_json(request):
     
     return JsonResponse(data, safe=False)
 
+def reporte_visitas_json(request):
+    """
+    Genera un reporte de contenidos publicados con la cantidad de visualizaciones que va obteniendo.
+    """
+    publicaciones = Content.objects.filter(status='published').order_by('-numero_visitas')
+    data = [
+        {
+            'title': publicacion.title,
+            'visitas': publicacion.numero_visitas
+        }
+        for publicacion in publicaciones
+    ]
+    return JsonResponse(data, safe=False)
 
 def reporte_inactivos_json(request):
     """
