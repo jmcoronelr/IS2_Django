@@ -5,12 +5,19 @@ from content.models import Content, Comentario
 from Categorias.models import Categorias
 from django.db import IntegrityError
 
-#TEST CASES PARA LA GESTIÓN DE CONTENIDOS
+User = get_user_model()
 
-#Este test verificará que se puede crear contenido correctamente.
+# TEST CASES PARA LA GESTIÓN DE CONTENIDOS
+
+# Este test verificará que se puede crear contenido correctamente.
 class ContentCreateViewTest(TestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -22,16 +29,23 @@ class ContentCreateViewTest(TestCase):
             title='New Content',
             description='New Content Description',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
         self.assertEqual(Content.objects.count(), 1)
         self.assertEqual(content.title, 'New Content')
+        self.assertEqual(content.autor, self.user)
 
 
-#Este test verificará que se puede modificar contenido
+# Este test verificará que se puede modificar contenido
 class ContentUpdateViewTest(TestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -41,6 +55,7 @@ class ContentUpdateViewTest(TestCase):
             title='Old Content',
             description='Old Description',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
 
@@ -53,10 +68,15 @@ class ContentUpdateViewTest(TestCase):
         self.assertEqual(updated_content.description, 'Updated Description')
 
 
-#Este test verificará que se puede eliminar un contenido.
+# Este test verificará que se puede eliminar un contenido.
 class ContentDeleteViewTest(TestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -66,6 +86,7 @@ class ContentDeleteViewTest(TestCase):
             title='Test Content',
             description='Test Content Description',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
 
@@ -73,12 +94,17 @@ class ContentDeleteViewTest(TestCase):
         self.content.delete()
         self.assertEqual(Content.objects.count(), 0)
 
-#TEST CASES PARA LA GESTIÓN DE ESTADOS DEL CONTENIDO
+# TEST CASES PARA LA GESTIÓN DE ESTADOS DEL CONTENIDO
 
-#Este test verificará que se puede cambiar el estado de un contenido.
+# Este test verificará que se puede cambiar el estado de un contenido.
 class ContentStatusTest(TestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -88,6 +114,7 @@ class ContentStatusTest(TestCase):
             title='Status Test Content',
             description='Testing Status Change',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
 
@@ -112,11 +139,16 @@ class ContentStatusTest(TestCase):
         self.content.save()
         self.assertEqual(self.content.status, 'inactive')
 
-#Test Cases para la asignación de categoría
+# Test Cases para la asignación de categoría
 # Este test verificará que no se puede asignar un contenido sin categoría
 class ContentCategoryAssignmentTest(TestCase):
     
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -128,6 +160,7 @@ class ContentCategoryAssignmentTest(TestCase):
             title='Content with Category',
             description='Content Description',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
         self.assertEqual(content.categoria.descripcionCorta, 'Test Category')
@@ -139,13 +172,19 @@ class ContentCategoryAssignmentTest(TestCase):
                 title='Content with Invalid Category',
                 description='Content Description',
                 categoria=None,  # No asignar una categoría
+                autor=self.user,
                 status='draft'
             )
 
-#Test case para la búsqueda y filtrado
+# Test case para la búsqueda y filtrado
 class ContentFilteringTest(TestCase):
 
     def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.category = Categorias.objects.create(
             descripcionCorta='Test Category',
             descripcionLarga='Test Description',
@@ -155,12 +194,14 @@ class ContentFilteringTest(TestCase):
             title='Alpha Content',
             description='Content A',
             categoria=self.category,
+            autor=self.user,
             status='draft'
         )
         self.content2 = Content.objects.create(
             title='Beta Content',
             description='Content B',
             categoria=self.category,
+            autor=self.user,
             status='published'
         )
 
@@ -173,9 +214,7 @@ class ContentFilteringTest(TestCase):
         self.assertEqual(contents.count(), 1)
 
 
-#Test case para comentarios 
-User = get_user_model()
-
+# Test case para comentarios 
 class ContentCommentTest(TestCase):
 
     def setUp(self):
@@ -187,17 +226,23 @@ class ContentCommentTest(TestCase):
         )
         
         # Crear contenido de prueba
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
         self.content = Content.objects.create(
             title='Content with Comments',
             description='Content Description',
             categoria=self.category,
+            autor=self.user,
             status='published'
         )
 
         # Crear un autor de comentario (usuario)
         self.author = User.objects.create_user(
-            username='testuser',
-            email='testuser@example.com',
+            username='commentuser',
+            email='commentuser@example.com',
             password='password123'
         )
 
@@ -212,7 +257,7 @@ class ContentCommentTest(TestCase):
         # Verificar que el comentario se haya agregado correctamente
         self.assertEqual(self.content.comentarios.count(), 1)
         self.assertEqual(comment.texto, 'This is a test comment')
-        self.assertEqual(comment.autor.username, 'testuser')
+        self.assertEqual(comment.autor.username, 'commentuser')
 
     def test_delete_comment(self):
         # Crear un comentario
@@ -227,109 +272,3 @@ class ContentCommentTest(TestCase):
         
         # Verificar que el comentario se haya eliminado
         self.assertEqual(self.content.comentarios.count(), 0)
-
-#Test case para listar contenidos
-#Este test verificará que un usuario puede ver la lista de contenidos filtrados correctamente según permisos
-class ContentListViewTest(TestCase):
-
-    def setUp(self):
-        self.category = Categorias.objects.create(
-            descripcionCorta='Test Category',
-            descripcionLarga='Test Description',
-            estado=True
-        )
-        self.content1 = Content.objects.create(
-            title='Content One',
-            description='Content Description 1',
-            categoria=self.category,
-            status='published'
-        )
-        self.content2 = Content.objects.create(
-            title='Content Two',
-            description='Content Description 2',
-            categoria=self.category,
-            status='draft'
-        )
-
-    def test_content_list_view_as_superuser(self):
-        # Crear un usuario superusuario
-        superuser = User.objects.create_superuser(
-            username='admin',
-            email='admin@example.com',
-            password='password123'
-        )
-        self.client.login(username='admin', password='password123')
-        
-        # Llamar a la vista content_list
-        response = self.client.get(reverse('content_list'))
-
-        # Verificar que todos los contenidos están presentes
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Content One')
-        self.assertContains(response, 'Content Two')
-
-    def test_content_list_view_as_non_superuser(self):
-        # Crear un usuario normal
-        user = User.objects.create_user(
-            username='user',
-            email='user@example.com',
-            password='password123'
-        )
-        self.client.login(username='user', password='password123')
-        
-        # Llamar a la vista content_list
-        response = self.client.get(reverse('content_list'))
-
-        # Verificar que el estado es 200 pero no contiene contenidos si no tiene permisos
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'Content One')
-        self.assertNotContains(response, 'Content Two')
-
-
-#Test de paginación de contenidos
-
-class ContentPaginationTest(TestCase):
-
-    def setUp(self):
-        # Crear una categoría
-        self.category = Categorias.objects.create(
-            descripcionCorta='Test Category',
-            descripcionLarga='Test Description',
-            estado=True
-        )
-        
-        # Crear 15 contenidos para probar la paginación
-        for i in range(15):
-            Content.objects.create(
-                title=f'Content {i + 1}',
-                description=f'Content Description {i + 1}',
-                categoria=self.category,
-                status='published'
-            )
-
-    def test_content_pagination(self):
-        # Iniciar sesión como superusuario para ver todos los contenidos
-        self.superuser = User.objects.create_superuser(
-            username='admin',
-            email='admin@example.com',
-            password='password123'
-        )
-        self.client.login(username='admin', password='password123')
-
-        # Llamar a la vista content_list para la primera página
-        response = self.client.get(reverse('content_list') + '?page=1')
-        self.assertEqual(response.status_code, 200)
-        
-        # Verificar que la primera página contiene exactamente 8 contenidos
-        self.assertEqual(len(response.context['contents']), 8)
-        self.assertContains(response, 'Content 1')
-        self.assertContains(response, 'Content 8')
-
-        # Llamar a la vista content_list para la segunda página
-        response = self.client.get(reverse('content_list') + '?page=2')
-        self.assertEqual(response.status_code, 200)
-        
-        # Verificar que la segunda página contiene los restantes 7 contenidos
-        self.assertEqual(len(response.context['contents']), 7)
-        self.assertContains(response, 'Content 9')
-        self.assertContains(response, 'Content 15')

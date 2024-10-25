@@ -65,3 +65,48 @@ def reporte_revision_json(request):
         })
 
     return JsonResponse(data, safe=False)
+
+def reporte_titulos_publicados_json(request):
+    # Obtener solo los contenidos con estado 'publicado'
+    contenidos = Content.objects.filter(status='published')
+    data = []
+
+    # Construir la respuesta en formato JSON con los títulos y fechas de publicación
+    for contenido in contenidos:
+        data.append({
+            'title': contenido.title,
+            'published_started_at': contenido.published_started_at.strftime('%Y-%m-%d') if contenido.published_started_at else None
+        })
+    
+    return JsonResponse(data, safe=False)
+
+def reporte_visitas_json(request):
+    """
+    Genera un reporte de contenidos publicados con la cantidad de visualizaciones que va obteniendo.
+    """
+    publicaciones = Content.objects.filter(status='published').order_by('-numero_visitas')
+    data = [
+        {
+            'title': publicacion.title,
+            'visitas': publicacion.numero_visitas
+        }
+        for publicacion in publicaciones
+    ]
+    return JsonResponse(data, safe=False)
+
+def reporte_inactivos_json(request):
+    """
+    Genera un reporte de artículos inactivos con su título y fecha de inactivación.
+    """
+    contenidos = Content.objects.filter(status='inactive').annotate(
+        fecha_inactivacion=F('inactivated_at')
+    ).order_by('-fecha_inactivacion')
+
+    data = []
+    for contenido in contenidos:
+        data.append({
+            'title': contenido.title,
+            'fecha_inactivacion': contenido.inactivated_at.strftime('%Y-%m-%d') if contenido.inactivated_at else None,
+        })
+
+    return JsonResponse(data, safe=False)

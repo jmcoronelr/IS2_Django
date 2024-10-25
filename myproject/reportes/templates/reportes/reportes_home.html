@@ -183,6 +183,8 @@ Reportes
         <option value="approved_posts">Publicaciones aprobadas</option>
         <option value="most_commented">Publicaciones con más comentarios</option>
         <option value="most_likes">Publicaciones con más likes</option>
+        <option value="visited_post">Vistas de publicaciones</option>
+        <option value="inactive_posts">Publicaciones inactivas</option>
       </optgroup>
     </select>
 
@@ -314,6 +316,108 @@ Reportes
 
             row.appendChild(titleCell);
             row.appendChild(likesCell);
+            reportBody.appendChild(row);
+          });
+
+          // Mostrar la sección de resultados
+          reportResult.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.log('Error al obtener el reporte:', error);
+        });
+    } else if (reportType === 'approved_posts') {
+    // Lógica para el reporte de "Publicaciones Aprobadas"
+    fetch("{% url 'reporte_publicados_json' %}")
+      .then(response => response.json())
+      .then(data => {
+        // Configurar los encabezados de la tabla
+        tableHeaders.innerHTML = `
+          <th>Título de la Publicación</th>
+          <th>Fecha de Publicación</th>
+        `;
+
+        // Limpiar el cuerpo de la tabla
+        reportBody.innerHTML = "";
+
+        // Rellenar la tabla con los datos reales del backend
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          const titleCell = document.createElement('td');
+          const dateCell = document.createElement('td');
+
+          titleCell.textContent = item.title;
+          dateCell.textContent = item.published_started_at || 'Sin fecha';
+
+          row.appendChild(titleCell);
+          row.appendChild(dateCell);
+          reportBody.appendChild(row);
+        });
+
+        // Mostrar la sección de resultados
+        reportResult.classList.remove('hidden');
+      })
+      .catch(error => {
+        console.log('Error al obtener el reporte:', error);
+      });
+    } else if (reportType === 'visited_post') {  
+    // Solicitar el reporte de publicaciones más visitadas al servidor
+      fetch("{% url 'reporte_visitas_json' %}")
+        .then(response => response.json())
+        .then(data => {
+          // Configurar los encabezados de la tabla
+          tableHeaders.innerHTML = `
+            <th>Título de la Publicación</th>
+            <th>Número de Visitas</th>
+          `;
+
+          // Limpiar el cuerpo de la tabla
+          reportBody.innerHTML = "";
+
+          // Rellenar la tabla con los datos reales del backend
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            const titleCell = document.createElement('td');
+            const visitasCell = document.createElement('td');
+
+            titleCell.textContent = item.title;
+            visitasCell.textContent = item.visitas;
+
+            row.appendChild(titleCell);
+            row.appendChild(visitasCell);
+            reportBody.appendChild(row);
+          });
+
+          // Mostrar la sección de resultados
+          reportResult.classList.remove('hidden');
+        })
+        .catch(error => {
+          console.log('Error al obtener el reporte:', error);
+        });
+    } else if (reportType === 'inactive_posts') {
+      // Lógica para el reporte de "Publicaciones inactivas"
+      fetch("{% url 'reporte_inactivos_json' %}")
+        .then(response => response.json())
+        .then(data => {
+          // Configurar los encabezados de la tabla
+          tableHeaders.innerHTML = `
+            <th>Título de la Publicación</th>
+            <th>Fecha de Inactivación</th>
+          `;
+
+          // Limpiar el cuerpo de la tabla
+          reportBody.innerHTML = "";
+
+          // Rellenar la tabla con los datos reales del backend
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            const titleCell = document.createElement('td');
+            const dateCell = document.createElement('td');
+
+            titleCell.textContent = item.title;
+            dateCell.textContent = item.fecha_inactivacion || 'Sin fecha';
+
+            row.appendChild(titleCell);
+            row.appendChild(dateCell);
             reportBody.appendChild(row);
           });
 

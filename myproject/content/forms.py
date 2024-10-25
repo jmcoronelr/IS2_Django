@@ -13,3 +13,8 @@ class ComentarioForm(forms.ModelForm):
         widgets = {
             'texto': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escribe tu comentario aquí...'})
         }
+        
+class StatusForm(forms.ModelForm):
+    class Meta:
+        model = Content
+        fields = ['status']

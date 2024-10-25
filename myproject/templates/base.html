@@ -103,6 +103,13 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'categoria_list' %}active{% endif %}" href="{% url 'categoria_list' %}">Categorias</a>
             </li>
             {% endif %}
+            {% if request.user|tiene_permiso:"Contenido: Publicar" %} 
+        {% if request.user|tiene_permiso:"Contenido: Inactivar" %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'review_list' %}active{% endif %}" href="{% url 'review_list' %}">Revisión</a>
+            </li>
+            {% endif %}
+            {% endif %}
         </ul>
 
         <!-- Logo en lugar de "CMS" -->

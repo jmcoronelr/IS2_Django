@@ -9,7 +9,7 @@ from usuarios.models import Usuario
 class HistorialContentViewTests(TestCase):
     def setUp(self):
         # Crear un usuario de prueba
-        self.user = Usuario.objects.create_user(username='testuser',email='testuser@mail.com', password='12345')
+        self.user = Usuario.objects.create_user(username='testuser', email='testuser@mail.com', password='12345')
         
         # Crear una categoría de prueba
         self.categoria = Categorias.objects.create(
@@ -18,14 +18,13 @@ class HistorialContentViewTests(TestCase):
             estado=True
         )
         
-        # Crear una plantilla de prueba
-        
-        # Crear un contenido de prueba
+        # Crear un contenido de prueba con el usuario como autor
         self.content = Content.objects.create(
             title="Test Content",
             description="This is a test content",
             categoria=self.categoria,
             status='draft',
+            autor=self.user  # Agregar el autor aquí
         )
         
         # Crear varias versiones del historial para el contenido

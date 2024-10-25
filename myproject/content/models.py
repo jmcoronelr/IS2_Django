@@ -24,8 +24,12 @@ class Content(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     revision_started_at = models.DateTimeField(null=True, blank=True)
     revision_ended_at = models.DateTimeField(null=True, blank=True)
+    published_started_at = models.DateField(null=True, blank=True)
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
+    numero_visitas = models.PositiveIntegerField(default=0)
+    inactivated_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
         return self.title
 

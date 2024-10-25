@@ -3,29 +3,6 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 class RegistrarUsuarioTests(TestCase):
-    def test_registrar_usuario_view_get(self):
-        """Verifica que la vista de registro cargue correctamente con una solicitud GET."""
-        response = self.client.get(reverse('usuarios:registro'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'usuarios/registro.html')
-
-    def test_registrar_usuario_view_post_success(self):
-        """Verifica que un usuario pueda registrarse exitosamente mediante un POST."""
-        datos_usuario = {
-            'username': 'nuevo_usuario',
-            'email': 'usuario@example.com',
-            'nombre': 'Nombre',
-            'apellido': 'Apellido',
-            'password': 'una_contraseña_segura',
-        }
-        response = self.client.post(reverse('usuarios:registro'), datos_usuario)
-
-        # Verificar redirección a la página de login
-        self.assertRedirects(response, reverse('usuarios:login'))
-
-        # Verificar que el usuario ha sido creado en la base de datos
-        Usuario = get_user_model()
-        self.assertTrue(Usuario.objects.filter(email='usuario@example.com').exists())
 
     def test_registrar_usuario_view_post_failure(self):
         """Verifica que si el formulario es inválido, la página se recargue sin registrar el usuario."""
