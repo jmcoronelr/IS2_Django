@@ -8,17 +8,18 @@ class MaintenanceMiddleware:
 
     def __call__(self, request):
         # Obtener la configuración de mantenimiento desde la base de datos
-        site_settings = SiteSettings.objects.first()
-        
-        # Asegúrate de que las rutas críticas están excluidas
+        site_settings, created = SiteSettings.objects.get_or_create(id=1)
+
+        # Asegúrate de que las rutas críticas y la página de mantenimiento están excluidas
         excluded_paths = [
-            reverse('admin:index'),                     # Página de administración de Django
-            reverse('home'),                    # Página de inicio
+            reverse('admin:index'),  # Página de administración de Django
+            reverse('home'),         # Página de inicio
+            reverse('maintenance'),  # Página de mantenimiento
         ]
 
         # Verificar si el modo de mantenimiento está activado
-        if site_settings and site_settings.maintenance_mode:
-            # Excluir todas las rutas que empiecen con '/usuario/'
+        if site_settings.maintenance_mode:
+            # Excluir todas las rutas que empiecen con '/usuario/' o estén en excluded_paths
             if request.path.startswith('/usuarios/') or request.path in excluded_paths:
                 print("Ruta excluida del mantenimiento.")
                 return self.get_response(request)
