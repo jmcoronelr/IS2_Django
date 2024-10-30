@@ -384,10 +384,12 @@ def review_detail(request, pk):
         
         if estado == 'publicar':
             content.status = 'published'  # Cambia el estado a "Publicado"
+            content.published_started_at = timezone.now()  # Guardar la fecha y hora actual de publicación
         elif estado == 'rechazar':
             content.status = 'rejected'  # Cambia el estado a 'Rechazado'
         elif estado == 'borrador':
             content.status = 'draft'  # Cambia el estado a 'Borrador'
+        
         content.save()  # Guarda los cambios
 
         # Redirigir de nuevo a la página de detalle o a la URL anterior
@@ -397,6 +399,7 @@ def review_detail(request, pk):
         'content': content,
         'next_url': next_url  # Pasar el valor de next a la plantilla
     })
+
 
 
 def cambiar_estado_contenido(request, pk, nuevo_estado):
