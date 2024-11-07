@@ -404,9 +404,10 @@ def review_detail(request, pk):
 
 def cambiar_estado_contenido(request, pk, nuevo_estado):
     """
-    Cambia el estado de un contenido entre 'published' e 'inactive'.
+    Cambia el estado de un contenido a 'review', 'published', 'rejected' o 'inactive'.
     
-    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
+
+    Luego notifica por correo al autor del contenido
     """
     content = get_object_or_404(Content, pk=pk)
 
