@@ -6,9 +6,58 @@
                     </head>
                     <body>
                         <nav><a href='index.html'>Back to Index</a></nav>
-                        <h1>reportes.views</h1><h2>Funciones</h2><ul><h3>formatear_tiempo_revision</h3><p><strong>Parámetros:</strong> (tiempo)</p><p><strong>Retorno:</strong> None</p><p>
+                        <h1>reportes.views</h1><h2>Funciones</h2><ul><h3>formatear_tiempo_revision</h3><p><strong>Parámetros:</strong> (tiempo)</p><p>
     Formatea el tiempo de revisión para mostrarlo de manera legible.
-    </p><h3>obtener_fechas</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_inactivos_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_likes_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_most_shared_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_revision_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_titulos_publicados_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reporte_visitas_json</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>reportes_home</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p></ul><h2>Clases</h2><h2>Content</h2><p>Content(id, title, description, categoria, autor, status, plantilla, created_at, updated_at, revision_started_at, revision_ended_at, published_started_at, likes, dislikes, numero_visitas, shared_count, inactivated_at)</p><h3>Atributos:</h3><ul><li>STATUS_CHOICES</li><li>title</li><li>description</li><li>categoria_id</li><li>categoria</li><li>autor_id</li><li>autor</li><li>status</li><li>get_status_display</li><li>plantilla_id</li><li>plantilla</li><li>created_at</li><li>get_next_by_created_at</li><li>get_previous_by_created_at</li><li>updated_at</li><li>get_next_by_updated_at</li><li>get_previous_by_updated_at</li><li>revision_started_at</li><li>revision_ended_at</li><li>published_started_at</li><li>likes</li><li>dislikes</li><li>numero_visitas</li><li>shared_count</li><li>inactivated_at</li><li>id</li><li>objects</li><li>blocks</li><li>comentarios</li><li>interactions</li><li>historial_set</li></ul><h3>Métodos:</h3><ul></ul><h2>ExpressionWrapper</h2><p>
+
+    Args:
+        tiempo (timedelta): Duración del tiempo de revisión.
+
+    Returns:
+        str: Tiempo formateado en días, horas, minutos y segundos.
+    </p><h3>obtener_fechas</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Obtiene y valida las fechas 'start_date' y 'end_date' de los parámetros de la solicitud.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene las fechas en sus parámetros.
+
+    Returns:
+        tuple: Tupla con las fechas inicial y final como objetos datetime. Si las fechas son inválidas, devuelve (None, None).
+    </p><h3>reporte_inactivos_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de los contenidos inactivos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y fecha de inactivación.
+    </p><h3>reporte_likes_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de los contenidos ordenados por cantidad de likes.
+
+    Returns:
+        JsonResponse: Lista de contenidos con sus títulos y cantidad de likes.
+    </p><h3>reporte_most_shared_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de los contenidos más compartidos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y cantidad de veces compartido.
+    </p><h3>reporte_revision_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de los tiempos de revisión de contenidos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título, tiempo de revisión formateado y estado.
+    </p><h3>reporte_titulos_publicados_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de los contenidos publicados.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y fecha de publicación.
+    </p><h3>reporte_visitas_json</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Genera un reporte en formato JSON de las visitas de contenidos publicados.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y cantidad de visitas.
+    </p><h3>reportes_home</h3><p><strong>Parámetros:</strong> (request)</p><p>
+    Renderiza la página principal de reportes.
+
+    Returns:
+        HttpResponse: Respuesta con la plantilla renderizada 'reportes/reportes_home.html'.
+    </p></ul><h2>Clases</h2><h2>Content</h2><p>Content(id, title, description, categoria, autor, status, plantilla, created_at, updated_at, revision_started_at, revision_ended_at, published_started_at, likes, dislikes, numero_visitas, shared_count, inactivated_at)</p><h3>Atributos:</h3><ul><li>STATUS_CHOICES</li><li>title</li><li>description</li><li>categoria_id</li><li>categoria</li><li>autor_id</li><li>autor</li><li>status</li><li>get_status_display</li><li>plantilla_id</li><li>plantilla</li><li>created_at</li><li>get_next_by_created_at</li><li>get_previous_by_created_at</li><li>updated_at</li><li>get_next_by_updated_at</li><li>get_previous_by_updated_at</li><li>revision_started_at</li><li>revision_ended_at</li><li>published_started_at</li><li>likes</li><li>dislikes</li><li>numero_visitas</li><li>shared_count</li><li>inactivated_at</li><li>id</li><li>objects</li><li>blocks</li><li>comentarios</li><li>interactions</li><li>historial_set</li></ul><h3>Métodos:</h3><ul></ul><h2>ExpressionWrapper</h2><p>
     An expression that can wrap another expression so that it can provide
     extra context to the inner expression, such as the output_field.
     </p><h3>Atributos:</h3><ul><li>allowed_default</li></ul><h3>Métodos:</h3><ul><li>set_source_expressions(self, exprs): No hay docstring disponible</li><li>get_source_expressions(self): No hay docstring disponible</li><li>get_group_by_cols(self): No hay docstring disponible</li><li>as_sql(self, compiler, connection): No hay docstring disponible</li><li>deconstruct(obj): 

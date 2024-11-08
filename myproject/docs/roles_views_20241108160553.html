@@ -6,27 +6,27 @@
                     </head>
                     <body>
                         <nav><a href='index.html'>Back to Index</a></nav>
-                        <h1>roles.views</h1><h2>Funciones</h2><ul><h3>asignar_permisos</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p><strong>Retorno:</strong> None</p><p>
+                        <h1>roles.views</h1><h2>Funciones</h2><ul><h3>asignar_permisos</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p>
     Asigna permisos a un rol específico.
-    </p><h3>asignar_rol</h3><p><strong>Parámetros:</strong> (request, usuario_id)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>asignar_rol</h3><p><strong>Parámetros:</strong> (request, usuario_id)</p><p>
     Asigna o actualiza un rol para un usuario en una categoría específica.
     Si el método es POST, se procesa el formulario y se asigna un rol.
     Si el método es GET, se muestra el formulario para la asignación.
-    </p><h3>crear_rol</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>crear_rol</h3><p><strong>Parámetros:</strong> (request)</p><p>
     Crea un nuevo rol en el sistema.
 
-    </p><h3>eliminar_rol</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p><strong>Retorno:</strong> None</p><p> Eliminar un rol con confirmación previa </p><h3>eliminar_rol_en_categoria</h3><p><strong>Parámetros:</strong> (request, rol_en_categoria_id)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>eliminar_rol</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p> Eliminar un rol con confirmación previa </p><h3>eliminar_rol_en_categoria</h3><p><strong>Parámetros:</strong> (request, rol_en_categoria_id)</p><p>
     Eliminar un rol específico asignado a un usuario en una categoría.
-    </p><h3>lista_roles</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>lista_roles</h3><p><strong>Parámetros:</strong> (request)</p><p>
     Lista todos los roles disponibles en el sistema.
 
-    </p><h3>lista_usuarios</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>lista_usuarios</h3><p><strong>Parámetros:</strong> (request)</p><p>
     Lista todos los usuarios del sistema.
 
-    </p><h3>ver_rol</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>ver_rol</h3><p><strong>Parámetros:</strong> (request, rol_id)</p><p>
     Muestra los detalles de un rol, incluidos los permisos asignados.
 
-    </p><h3>ver_usuario</h3><p><strong>Parámetros:</strong> (request, usuario_id)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>ver_usuario</h3><p><strong>Parámetros:</strong> (request, usuario_id)</p><p>
     Muestra los roles asignados a un usuario en diferentes categorías.
 
     </p></ul><h2>Clases</h2><h2>AsignarPermisoForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>AsignarRolForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>Categorias</h2><p>Categorias(id, descripcionCorta, descripcionLarga, estado)</p><h3>Atributos:</h3><ul><li>descripcionCorta</li><li>descripcionLarga</li><li>estado</li><li>id</li><li>objects</li><li>content_set</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul></ul><h2>CrearRolForm</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul></ul><h2>Permiso</h2><p>Permiso(id, nombre, descripcion)</p><h3>Atributos:</h3><ul><li>nombre</li><li>descripcion</li><li>id</li><li>objects</li><li>rol_set</li></ul><h3>Métodos:</h3><ul></ul><h2>Rol</h2><p>Rol(id, nombre, descripcion)</p><h3>Atributos:</h3><ul><li>nombre</li><li>descripcion</li><li>permisos</li><li>id</li><li>objects</li><li>rolencategoria_set</li></ul><h3>Métodos:</h3><ul><li>delete(self, *args, **kwargs): No hay docstring disponible</li></ul><h2>RolEnCategoria</h2><p>RolEnCategoria(id, usuario, categoria, rol)</p><h3>Atributos:</h3><ul><li>usuario_id</li><li>usuario</li><li>categoria_id</li><li>categoria</li><li>rol_id</li><li>rol</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>Usuario</h2><p>

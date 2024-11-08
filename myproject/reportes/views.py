@@ -9,6 +9,15 @@ from django.utils import timezone
 
 # Función reutilizable para obtener y validar fechas
 def obtener_fechas(request):
+    """
+    Obtiene y valida las fechas 'start_date' y 'end_date' de los parámetros de la solicitud.
+
+    Args:
+        request (HttpRequest): Objeto de solicitud HTTP que contiene las fechas en sus parámetros.
+
+    Returns:
+        tuple: Tupla con las fechas inicial y final como objetos datetime. Si las fechas son inválidas, devuelve (None, None).
+    """
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
@@ -18,7 +27,6 @@ def obtener_fechas(request):
         if not start_date or not end_date:
             return None, None  # Fechas inválidas
         
-        # Convertir las fechas a "aware" (conscientes de la zona horaria)
         start_date = timezone.make_aware(datetime.combine(start_date, datetime.min.time()), timezone.get_current_timezone())
         end_date = timezone.make_aware(datetime.combine(end_date, datetime.max.time()), timezone.get_current_timezone())
     else:
@@ -27,31 +35,33 @@ def obtener_fechas(request):
     return start_date, end_date
 
 
-
 def reportes_home(request):
+    """
+    Renderiza la página principal de reportes.
+
+    Returns:
+        HttpResponse: Respuesta con la plantilla renderizada 'reportes/reportes_home.html'.
+    """
     return render(request, 'reportes/reportes_home.html')
 
 
 def reporte_likes_json(request):
-    # Obtener las fechas del request
+    """
+    Genera un reporte en formato JSON de los contenidos ordenados por cantidad de likes.
+
+    Returns:
+        JsonResponse: Lista de contenidos con sus títulos y cantidad de likes.
+    """
     start_date, end_date = obtener_fechas(request)
     
     if start_date and end_date:
-        # Filtrar contenidos dentro del rango de fechas
         contenidos = Content.objects.filter(created_at__range=[start_date, end_date])
     else:
-        # Si no se proporcionan fechas, traer todos los contenidos
         contenidos = Content.objects.all()
 
-    # Ordenar por likes
     contenidos = contenidos.order_by('-likes')
     
-    data = []
-    for contenido in contenidos:
-        data.append({
-            'title': contenido.title,
-            'likes': contenido.likes,
-        })
+    data = [{'title': contenido.title, 'likes': contenido.likes} for contenido in contenidos]
     
     return JsonResponse(data, safe=False)
 
@@ -59,9 +69,15 @@ def reporte_likes_json(request):
 def formatear_tiempo_revision(tiempo):
     """
     Formatea el tiempo de revisión para mostrarlo de manera legible.
+
+    Args:
+        tiempo (timedelta): Duración del tiempo de revisión.
+
+    Returns:
+        str: Tiempo formateado en días, horas, minutos y segundos.
     """
     if tiempo is None:
-        return "N/A"  # Manejo de posibles valores nulos
+        return "N/A"
     
     total_segundos = int(tiempo.total_seconds())
     dias = total_segundos // 86400
@@ -76,13 +92,19 @@ def formatear_tiempo_revision(tiempo):
         partes.append(f"{horas}h")
     if minutos > 0:
         partes.append(f"{minutos}m")
-    if segundos > 0 or not partes:  # Mostrar segundos si no hay otra parte
+    if segundos > 0 or not partes:
         partes.append(f"{segundos}s")
     
     return ' '.join(partes)
 
 
 def reporte_revision_json(request):
+    """
+    Genera un reporte en formato JSON de los tiempos de revisión de contenidos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título, tiempo de revisión formateado y estado.
+    """
     start_date, end_date = obtener_fechas(request)
     
     if start_date and end_date:
@@ -97,7 +119,6 @@ def reporte_revision_json(request):
             revision_ended_at__isnull=False
         )
     
-    # Calcular el tiempo de revisión
     contenidos = contenidos.annotate(
         tiempo_revision=ExpressionWrapper(
             F('revision_ended_at') - F('revision_started_at'),
@@ -105,42 +126,38 @@ def reporte_revision_json(request):
         )
     ).order_by('-tiempo_revision')
 
-    # Formatear los resultados para el JSON
-    data = []
-    for contenido in contenidos:
-        tiempo_formateado = formatear_tiempo_revision(contenido.tiempo_revision)
-        data.append({
-            'title': contenido.title,
-            'tiempo_revision': tiempo_formateado,
-            'status': contenido.status,
-        })
+    data = [{'title': contenido.title, 'tiempo_revision': formatear_tiempo_revision(contenido.tiempo_revision), 'status': contenido.status} for contenido in contenidos]
 
     return JsonResponse(data, safe=False)
 
 
-
-
 def reporte_titulos_publicados_json(request):
+    """
+    Genera un reporte en formato JSON de los contenidos publicados.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y fecha de publicación.
+    """
     start_date, end_date = obtener_fechas(request)
 
     if start_date and end_date:
-        # Incluir el rango completo del día hasta las 23:59:59 del día final
         end_date = end_date + timedelta(days=1) - timedelta(seconds=1)
         contenidos = Content.objects.filter(status='published', published_started_at__range=[start_date, end_date])
     else:
         contenidos = Content.objects.filter(status='published')
     
-    data = []
-    for contenido in contenidos:
-        data.append({
-            'title': contenido.title,
-            'published_started_at': contenido.published_started_at.strftime('%Y-%m-%d') if contenido.published_started_at else None
-        })
+    data = [{'title': contenido.title, 'published_started_at': contenido.published_started_at.strftime('%Y-%m-%d') if contenido.published_started_at else None} for contenido in contenidos]
     
     return JsonResponse(data, safe=False)
 
 
 def reporte_visitas_json(request):
+    """
+    Genera un reporte en formato JSON de las visitas de contenidos publicados.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y cantidad de visitas.
+    """
     start_date, end_date = obtener_fechas(request)
 
     if start_date and end_date:
@@ -148,23 +165,22 @@ def reporte_visitas_json(request):
     else:
         publicaciones = Content.objects.filter(status='published').order_by('-numero_visitas')
 
-    # Paginación: 20 resultados por página
     paginator = Paginator(publicaciones, 20)
     page_number = request.GET.get('page', 1)
     page_obj = paginator.get_page(page_number)
     
-    data = [
-        {
-            'title': publicacion.title,
-            'visitas': publicacion.numero_visitas
-        }
-        for publicacion in page_obj
-    ]
+    data = [{'title': publicacion.title, 'visitas': publicacion.numero_visitas} for publicacion in page_obj]
 
     return JsonResponse(data, safe=False)
 
 
 def reporte_most_shared_json(request):
+    """
+    Genera un reporte en formato JSON de los contenidos más compartidos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y cantidad de veces compartido.
+    """
     start_date, end_date = obtener_fechas(request)
 
     if start_date and end_date:
@@ -172,18 +188,18 @@ def reporte_most_shared_json(request):
     else:
         contenidos = Content.objects.all().order_by('-shared_count')
 
-    data = [
-        {
-            'title': contenido.title,
-            'shared_count': contenido.shared_count,
-        }
-        for contenido in contenidos
-    ]
+    data = [{'title': contenido.title, 'shared_count': contenido.shared_count} for contenido in contenidos]
 
     return JsonResponse(data, safe=False)
 
 
 def reporte_inactivos_json(request):
+    """
+    Genera un reporte en formato JSON de los contenidos inactivos.
+
+    Returns:
+        JsonResponse: Lista de contenidos con título y fecha de inactivación.
+    """
     start_date, end_date = obtener_fechas(request)
 
     if start_date and end_date:
@@ -198,11 +214,6 @@ def reporte_inactivos_json(request):
         fecha_inactivacion=F('inactivated_at')
     ).order_by('-fecha_inactivacion')
 
-    data = []
-    for contenido in contenidos:
-        data.append({
-            'title': contenido.title,
-            'fecha_inactivacion': contenido.inactivated_at.strftime('%Y-%m-%d') if contenido.inactivated_at else None,
-        })
+    data = [{'title': contenido.title, 'fecha_inactivacion': contenido.inactivated_at.strftime('%Y-%m-%d') if contenido.inactivated_at else None} for contenido in contenidos]
 
     return JsonResponse(data, safe=False)

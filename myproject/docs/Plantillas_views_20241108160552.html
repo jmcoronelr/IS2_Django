@@ -6,7 +6,7 @@
                     </head>
                     <body>
                         <nav><a href='index.html'>Back to Index</a></nav>
-                        <h1>Plantillas.views</h1><h2>Funciones</h2><ul><h3>get_plantilla_blocks</h3><p><strong>Parámetros:</strong> (request, plantilla_id)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_create</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_delete</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>
+                        <h1>Plantillas.views</h1><h2>Funciones</h2><ul><h3>get_plantilla_blocks</h3><p><strong>Parámetros:</strong> (request, plantilla_id)</p><p>No hay docstring disponible</p><h3>plantilla_create</h3><p><strong>Parámetros:</strong> (request)</p><p>No hay docstring disponible</p><h3>plantilla_delete</h3><p><strong>Parámetros:</strong> (request, pk)</p><p>
     Vista para eliminar una plantilla existente.
 
     Maneja la solicitud GET para mostrar una página de confirmación de eliminación y 
@@ -19,7 +19,7 @@
     Returns:
         HttpResponse: Redirige a la lista de plantillas tras la eliminación exitosa o 
         renderiza la página de confirmación de eliminación si la solicitud es GET.
-    </p><h3>plantilla_edit</h3><p><strong>Parámetros:</strong> (request, pk)</p><p><strong>Retorno:</strong> None</p><p>No hay docstring disponible</p><h3>plantilla_list</h3><p><strong>Parámetros:</strong> (request)</p><p><strong>Retorno:</strong> None</p><p>
+    </p><h3>plantilla_edit</h3><p><strong>Parámetros:</strong> (request, pk)</p><p>No hay docstring disponible</p><h3>plantilla_list</h3><p><strong>Parámetros:</strong> (request)</p><p>
     Vista para listar todas las plantillas
     </p></ul><h2>Clases</h2><h2>Bloque</h2><p>Bloque(id, plantilla, tipo, contenido, multimedia, posicion_top, posicion_left, width, height)</p><h3>Atributos:</h3><ul><li>plantilla_id</li><li>plantilla</li><li>tipo</li><li>contenido</li><li>multimedia</li><li>posicion_top</li><li>posicion_left</li><li>width</li><li>height</li><li>id</li><li>objects</li></ul><h3>Métodos:</h3><ul></ul><h2>JsonResponse</h2><p>
     An HTTP response class that consumes data to be serialized to JSON.
