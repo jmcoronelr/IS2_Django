@@ -270,6 +270,9 @@ def content_detail(request, pk):
     else:
         form = ComentarioForm()
 
+    # Obtiene la URL completa del contenido
+    content_url = request.build_absolute_uri()
+
     return render(request, 'content/content_detail.html', {
         'content': content,
         'next_url': next_url,
@@ -277,6 +280,7 @@ def content_detail(request, pk):
         'user_interaction': user_interaction,
         'liked': liked,
         'disliked': disliked,
+        'content_url': content_url,
     })
 
 
@@ -384,10 +388,12 @@ def review_detail(request, pk):
         
         if estado == 'publicar':
             content.status = 'published'  # Cambia el estado a "Publicado"
+            content.published_started_at = timezone.now()  # Guardar la fecha y hora actual de publicación
         elif estado == 'rechazar':
             content.status = 'rejected'  # Cambia el estado a 'Rechazado'
         elif estado == 'borrador':
             content.status = 'draft'  # Cambia el estado a 'Borrador'
+        
         content.save()  # Guarda los cambios
 
         # Redirigir de nuevo a la página de detalle o a la URL anterior
@@ -399,11 +405,13 @@ def review_detail(request, pk):
     })
 
 
+
 def cambiar_estado_contenido(request, pk, nuevo_estado):
     """
-    Cambia el estado de un contenido entre 'published' e 'inactive'.
+    Cambia el estado de un contenido a 'review', 'published', 'rejected' o 'inactive'.
     
-    Muestra un mensaje de éxito indicando el nuevo estado del contenido.
+
+    Luego notifica por correo al autor del contenido
     """
     content = get_object_or_404(Content, pk=pk)
 
@@ -440,7 +448,13 @@ def cambiar_estado_contenido(request, pk, nuevo_estado):
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
 
-
+@require_POST
+@login_required
+def share_content(request, content_id):
+    content = get_object_or_404(Content, pk=content_id)
+    content.shared_count += 1
+    content.save()
+    return JsonResponse({'shared_count': content.shared_count})
 
 @require_POST
 @login_required

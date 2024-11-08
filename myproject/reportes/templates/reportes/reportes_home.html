@@ -181,9 +181,9 @@ Reportes
       <optgroup label="Reportes de Publicaciones">
         <option value="revision_time">Tiempo de Revisión</option>
         <option value="approved_posts">Publicaciones aprobadas</option>
-        <option value="most_commented">Publicaciones con más comentarios</option>
         <option value="most_likes">Publicaciones con más likes</option>
         <option value="visited_post">Vistas de publicaciones</option>
+        <option value="most_shared_publicaciones">Publicaciones más compartidas</option>
         <option value="inactive_posts">Publicaciones inactivas</option>
       </optgroup>
     </select>
@@ -252,184 +252,140 @@ Reportes
     const reportResult = document.getElementById('report-result');
     const reportBody = document.getElementById('report-body');
     const tableHeaders = document.getElementById('table-headers');
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
 
+    // Construir la URL con los parámetros de fecha si están presentes
+    let urlParams = '';
+    if (startDate && endDate) {
+        urlParams = `?start_date=${startDate}&end_date=${endDate}`;
+    }
+
+    let fetchUrl = '';
+
+    // Validar el tipo de reporte
     if (reportType === 'revision_time') {
-      // Solicitar el reporte de tiempo de revisión al servidor
-      fetch("{% url 'reporte_revision_json' %}")
-        .then(response => response.json())
-        .then(data => {
-          // Configurar los encabezados de la tabla
+        fetchUrl = `{% url 'reporte_revision_json' %}${urlParams}`;
+    } else if (reportType === 'most_likes') {
+        fetchUrl = `{% url 'reporte_likes_json' %}${urlParams}`;
+    } else if (reportType === 'approved_posts') {
+        fetchUrl = `{% url 'reporte_publicados_json' %}${urlParams}`;
+    } else if (reportType === 'visited_post') {
+        // Agregar manejo de paginación si es necesario
+        const page = 1;  // Cambiar si se implementa paginación
+        fetchUrl = `{% url 'reporte_visitas_json' %}${urlParams}&page=${page}`;
+    } else if (reportType === 'most_shared_publicaciones') {
+      fetchUrl = `{% url 'reporte_most_shared_json' %}${urlParams}`;
+    } else if (reportType === 'inactive_posts') {
+        fetchUrl = `{% url 'reporte_inactivos_json' %}${urlParams}`;
+    } else {
+        alert("Selecciona un tipo de reporte válido para generar.");
+        return;
+    }
+
+    // Realizar el fetch
+    fetch(fetchUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos");
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Limpiar la tabla
+        tableHeaders.innerHTML = '';
+        reportBody.innerHTML = '';
+
+        // Configurar los encabezados según el reporte seleccionado
+        if (reportType === 'revision_time') {
           tableHeaders.innerHTML = `
             <th>Título de la Publicación</th>
             <th>Tiempo de Revisión</th>
             <th>Estado Final</th>
           `;
-
-          // Limpiar el cuerpo de la tabla
-          reportBody.innerHTML = "";
-
-          // Rellenar la tabla con los datos reales del backend
           data.forEach(item => {
             const row = document.createElement('tr');
-            const titleCell = document.createElement('td');
-            const timeCell = document.createElement('td');
-            const statusCell = document.createElement('td');
-
-            titleCell.textContent = item.title;
-            timeCell.textContent = item.tiempo_revision;
-            statusCell.textContent = item.status;
-
-            row.appendChild(titleCell);
-            row.appendChild(timeCell);
-            row.appendChild(statusCell);
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.tiempo_revision}</td>
+              <td>${item.status}</td>
+            `;
             reportBody.appendChild(row);
           });
-
-          // Mostrar la sección de resultados
-          reportResult.classList.remove('hidden');
-        })
-        .catch(error => {
-          console.log('Error al obtener el reporte:', error);
-        });
-    } else if (reportType === 'most_likes') {
-      // Lógica para el reporte de "Publicaciones con más likes"
-      fetch("{% url 'reporte_likes_json' %}")
-        .then(response => response.json())
-        .then(data => {
-          // Configurar los encabezados de la tabla
+        } else if (reportType === 'most_likes') {
           tableHeaders.innerHTML = `
             <th>Título de la Publicación</th>
             <th>Likes</th>
           `;
-
-          // Limpiar el cuerpo de la tabla
-          reportBody.innerHTML = "";
-
-          // Rellenar la tabla con los datos reales del backend
           data.forEach(item => {
             const row = document.createElement('tr');
-            const titleCell = document.createElement('td');
-            const likesCell = document.createElement('td');
-
-            titleCell.textContent = item.title;
-            likesCell.textContent = item.likes;
-
-            row.appendChild(titleCell);
-            row.appendChild(likesCell);
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.likes}</td>
+            `;
             reportBody.appendChild(row);
           });
-
-          // Mostrar la sección de resultados
-          reportResult.classList.remove('hidden');
-        })
-        .catch(error => {
-          console.log('Error al obtener el reporte:', error);
-        });
-    } else if (reportType === 'approved_posts') {
-    // Lógica para el reporte de "Publicaciones Aprobadas"
-    fetch("{% url 'reporte_publicados_json' %}")
-      .then(response => response.json())
-      .then(data => {
-        // Configurar los encabezados de la tabla
-        tableHeaders.innerHTML = `
-          <th>Título de la Publicación</th>
-          <th>Fecha de Publicación</th>
-        `;
-
-        // Limpiar el cuerpo de la tabla
-        reportBody.innerHTML = "";
-
-        // Rellenar la tabla con los datos reales del backend
-        data.forEach(item => {
-          const row = document.createElement('tr');
-          const titleCell = document.createElement('td');
-          const dateCell = document.createElement('td');
-
-          titleCell.textContent = item.title;
-          dateCell.textContent = item.published_started_at || 'Sin fecha';
-
-          row.appendChild(titleCell);
-          row.appendChild(dateCell);
-          reportBody.appendChild(row);
-        });
+        } else if (reportType === 'approved_posts') {
+          tableHeaders.innerHTML = `
+            <th>Título de la Publicación</th>
+            <th>Fecha de Publicación</th>
+          `;
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.published_started_at || 'Sin fecha'}</td>
+            `;
+            reportBody.appendChild(row);
+          });
+        } else if (reportType === 'visited_post') {
+          tableHeaders.innerHTML = `
+            <th>Título de la Publicación</th>
+            <th>Número de Visitas</th>
+          `;
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.visitas}</td>
+            `;
+            reportBody.appendChild(row);
+          });
+        } else if(reportType === 'most_shared_publicaciones') {
+          tableHeaders.innerHTML = `
+            <th>Título del Artículo</th>
+            <th>Veces Compartido</th>
+          `;
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.shared_count}</td>
+            `;
+            reportBody.appendChild(row);
+          });
+      } else if (reportType === 'inactive_posts') {
+          tableHeaders.innerHTML = `
+            <th>Título de la Publicación</th>
+            <th>Fecha de Inactivación</th>
+          `;
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.fecha_inactivacion || 'Sin fecha'}</td>
+            `;
+            reportBody.appendChild(row);
+          });
+        }
 
         // Mostrar la sección de resultados
         reportResult.classList.remove('hidden');
       })
       .catch(error => {
-        console.log('Error al obtener el reporte:', error);
+        console.error('Error al obtener el reporte:', error);
+        alert('Hubo un error al generar el reporte. Intenta nuevamente.');
       });
-    } else if (reportType === 'visited_post') {  
-    // Solicitar el reporte de publicaciones más visitadas al servidor
-      fetch("{% url 'reporte_visitas_json' %}")
-        .then(response => response.json())
-        .then(data => {
-          // Configurar los encabezados de la tabla
-          tableHeaders.innerHTML = `
-            <th>Título de la Publicación</th>
-            <th>Número de Visitas</th>
-          `;
-
-          // Limpiar el cuerpo de la tabla
-          reportBody.innerHTML = "";
-
-          // Rellenar la tabla con los datos reales del backend
-          data.forEach(item => {
-            const row = document.createElement('tr');
-            const titleCell = document.createElement('td');
-            const visitasCell = document.createElement('td');
-
-            titleCell.textContent = item.title;
-            visitasCell.textContent = item.visitas;
-
-            row.appendChild(titleCell);
-            row.appendChild(visitasCell);
-            reportBody.appendChild(row);
-          });
-
-          // Mostrar la sección de resultados
-          reportResult.classList.remove('hidden');
-        })
-        .catch(error => {
-          console.log('Error al obtener el reporte:', error);
-        });
-    } else if (reportType === 'inactive_posts') {
-      // Lógica para el reporte de "Publicaciones inactivas"
-      fetch("{% url 'reporte_inactivos_json' %}")
-        .then(response => response.json())
-        .then(data => {
-          // Configurar los encabezados de la tabla
-          tableHeaders.innerHTML = `
-            <th>Título de la Publicación</th>
-            <th>Fecha de Inactivación</th>
-          `;
-
-          // Limpiar el cuerpo de la tabla
-          reportBody.innerHTML = "";
-
-          // Rellenar la tabla con los datos reales del backend
-          data.forEach(item => {
-            const row = document.createElement('tr');
-            const titleCell = document.createElement('td');
-            const dateCell = document.createElement('td');
-
-            titleCell.textContent = item.title;
-            dateCell.textContent = item.fecha_inactivacion || 'Sin fecha';
-
-            row.appendChild(titleCell);
-            row.appendChild(dateCell);
-            reportBody.appendChild(row);
-          });
-
-          // Mostrar la sección de resultados
-          reportResult.classList.remove('hidden');
-        })
-        .catch(error => {
-          console.log('Error al obtener el reporte:', error);
-        });
-    } else {
-      alert("Selecciona un tipo de reporte válido para generar.");
-    }
   });
 </script>
 

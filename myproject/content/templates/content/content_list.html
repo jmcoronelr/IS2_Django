@@ -307,9 +307,6 @@
                                     {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
                                     <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                                     {% endif %}
-                                    {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
-                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Publicar</a>
-                                    {% endif %}
                                     {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
                                     <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
                                     {% endif %}
@@ -443,6 +440,45 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script>
+
+// Script para conservar el estado de la pestaña activa al recargar
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeTab = urlParams.get('tab');
+
+    // Si no hay ningún tab seleccionado, marcar 'mine' como predeterminado
+    if (!activeTab) {
+        document.getElementById('my-content-tab').classList.add('active');
+        document.getElementById('my-content').classList.add('show', 'active');
+    } else if (activeTab === 'mine') {
+        document.getElementById('my-content-tab').classList.add('active');
+        document.getElementById('my-content').classList.add('show', 'active');
+    } else if (activeTab === 'all') {
+        document.getElementById('all-content-tab').classList.add('active');
+        document.getElementById('all-content').classList.add('show', 'active');
+    }
+
+    // Agregar evento de click para cambiar de pestaña y actualizar el parámetro de URL
+    document.querySelectorAll('.nav-link').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabName = this.getAttribute('href').replace('#', '');
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tabName);
+            window.history.pushState({}, '', url);
+        });
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
             var deleteModal = document.getElementById('deleteModal');
 
             if (deleteModal) {

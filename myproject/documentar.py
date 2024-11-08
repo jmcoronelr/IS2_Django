@@ -144,6 +144,8 @@ def generate_docs(apps_list, docs_dir):
 
 from inspect import signature, Signature
 
+from typing import get_type_hints
+
 def document_function(func):
     """Genera la documentación de una función incluyendo su docstring, parámetros y tipo de retorno."""
     doc = f"<h3>{func.__name__}</h3>"
@@ -152,11 +154,13 @@ def document_function(func):
     try:
         func_signature = signature(func)
         params = ', '.join(str(p) for p in func_signature.parameters.values())
-        return_annotation = func_signature.return_annotation if func_signature.return_annotation != Signature.empty else 'None'
         
+        # Intentar obtener el tipo de retorno de la función
+        type_hints = get_type_hints(func)
+        return_annotation = type_hints.get('return', 'None') if type_hints else 'None'
+
         # Agregar parámetros y retorno a la documentación
         doc += f"<p><strong>Parámetros:</strong> ({params})</p>"
-        doc += f"<p><strong>Retorno:</strong> {return_annotation}</p>"
     except (ValueError, TypeError):
         # Si no se puede obtener la firma, agregar una nota
         doc += "<p>No se pudo obtener la firma de la función.</p>"
@@ -167,6 +171,7 @@ def document_function(func):
     return doc
 
 
+
 if __name__ == "__main__":
     setup_django()
 
@@ -174,7 +179,7 @@ if __name__ == "__main__":
     docs_dir = os.path.join(os.getcwd(), "docs")
 
     # Lista de aplicaciones Django
-    apps_list = ['Categorias', 'Plantillas', 'usuarios','content','roles']
+    apps_list = ['Categorias', 'Plantillas', 'usuarios','content','roles','reportes']
 
     generate_docs(apps_list, docs_dir)
     print(f"Documentación generada con éxito en {docs_dir}.")

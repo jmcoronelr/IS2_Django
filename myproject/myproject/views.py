@@ -6,25 +6,21 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 
 def home(request):
-    # Filtra solo los contenidos que estén en estado 'published'
     contenidos_publicados = Content.objects.filter(status='published').order_by('created_at')
 
-    # Si el usuario está autenticado, redirigir a la página del sistema
     if request.user.is_authenticated:
         return redirect('sistema')
 
-    # Agregar lógica para extraer las imágenes multimedia de los bloques
     contenidos_con_imagenes = []
     for contenido in contenidos_publicados:
         bloques_multimedia = contenido.blocks.filter(block_type='multimedia', multimedia__isnull=False)
-        # Seleccionar la primera imagen si hay alguna
-        imagen = bloques_multimedia.first().multimedia.url if bloques_multimedia.exists() else None
+        # Verificar que el bloque multimedia tenga un archivo antes de intentar obtener la URL
+        imagen = bloques_multimedia.first().multimedia.url if bloques_multimedia.exists() and bloques_multimedia.first().multimedia else None
         contenidos_con_imagenes.append({
             'contenido': contenido,
             'imagen': imagen,
         })
 
-    # Pasar los contenidos publicados con imágenes al template 'home.html'
     return render(request, 'home.html', {'contenidos': contenidos_con_imagenes})
 
 from django.shortcuts import render, redirect

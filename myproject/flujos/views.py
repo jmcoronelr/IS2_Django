@@ -48,18 +48,28 @@ def update_content_status(request):
 
         # Verificar si el nuevo estado es "review" para registrar la fecha de inicio de la revisión
         if new_status == 'review':
-            # Si el contenido vuelve a revisión, solo establecer la fecha de inicio si es None
-            if content.revision_started_at is None:
-                content.revision_started_at = timezone.now()
-            # Limpiar la fecha de fin de la revisión cuando entra en revisión
-            content.revision_ended_at = None
-        elif content.status == 'review' and new_status in ['published', 'rejected']:
-            # Si el contenido estaba en "review" y cambia a "published" o "rejected", registrar el fin de la revisión
+            # Si el contenido vuelve a revisión, actualizar la fecha de inicio de la revisión
+            content.revision_started_at = timezone.now()  # Se sobreescribe cada vez que entra a revisión
+            content.revision_ended_at = None  # Limpiar la fecha de fin de la revisión
+            content.published_started_at = None  # Limpiar la fecha de publicación
+        elif new_status == 'published':
+            # Si el contenido se publica, registrar la fecha de fin de revisión y la fecha de publicación
             content.revision_ended_at = timezone.now()
+            content.published_started_at = timezone.now()
+        elif new_status == 'rejected':
+            # Si el contenido se rechaza, registrar el fin de la revisión
+            content.revision_ended_at = timezone.now()
+            content.published_started_at = None  # Limpiar la fecha de publicación
+        elif new_status == 'draft':
+            # Si el contenido vuelve a borrador, limpiar las fechas de revisión y publicación
+            content.revision_started_at = None
+            content.revision_ended_at = None
+            content.published_started_at = None
 
         # Cambiar el estado del contenido
         content.status = new_status
         content.save()
+
         # Enviar correo al autor notificando el cambio de estado
         send_mail(
             subject=f'Actualización de estado para "{content.title}"',

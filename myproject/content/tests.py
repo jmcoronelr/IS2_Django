@@ -272,3 +272,54 @@ class ContentCommentTest(TestCase):
         
         # Verificar que el comentario se haya eliminado
         self.assertEqual(self.content.comentarios.count(), 0)
+
+from unittest.mock import MagicMock
+from django.test import RequestFactory
+from django.core import mail
+from django.contrib.auth import get_user_model
+from content.views import cambiar_estado_contenido
+
+User = get_user_model()
+
+class ContentStatusEmailNotificationTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password123'
+        )
+        self.category = Categorias.objects.create(
+            descripcionCorta='Test Category',
+            descripcionLarga='Test Description',
+            estado=True
+        )
+        self.content = Content.objects.create(
+            title='Content for Email Test',
+            description='Testing email notification on status change',
+            categoria=self.category,
+            autor=self.user,
+            status='draft'
+        )
+        self.factory = RequestFactory()
+
+    def test_email_sent_on_status_change(self):
+        # Crear una solicitud simulada
+        request = self.factory.get(reverse('content_list'))
+        request.user = self.user
+
+        # Mock del sistema de mensajes
+        request._messages = MagicMock()
+
+        # Cambiar el estado del contenido a 'review'
+        cambiar_estado_contenido(request, pk=self.content.pk, nuevo_estado='review')
+
+        # Verificar que se envió un correo electrónico
+        self.assertEqual(len(mail.outbox), 1)
+        
+        # Verificar el contenido del correo
+        email = mail.outbox[0]
+        self.assertEqual(email.subject, f'Actualización de estado para "{self.content.title}"')
+        self.assertIn(f'Hola {self.user.username}', email.body)
+        self.assertIn(f'Tu contenido "{self.content.title}" ha cambiado de estado a "review".', email.body)
+        self.assertEqual(email.to, [self.user.email])
