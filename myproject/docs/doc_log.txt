@@ -8,3 +8,15 @@
 2024-10-15 18:00:59.420993 - Documented: content.views
 2024-10-15 18:00:59.422989 - Documented: roles.models
 2024-10-15 18:00:59.430967 - Documented: roles.views
+2024-11-08 14:13:12.907403 - Documented: Categorias.models
+2024-11-08 14:13:12.909396 - Documented: Categorias.views
+2024-11-08 14:13:12.910394 - Documented: Plantillas.models
+2024-11-08 14:13:12.917120 - Documented: Plantillas.views
+2024-11-08 14:13:12.918131 - Documented: usuarios.models
+2024-11-08 14:13:12.923132 - Documented: usuarios.views
+2024-11-08 14:13:12.925100 - Documented: content.models
+2024-11-08 14:13:12.934107 - Documented: content.views
+2024-11-08 14:13:12.935073 - Documented: roles.models
+2024-11-08 14:13:12.938065 - Documented: roles.views
+2024-11-08 14:13:12.939063 - Documented: reportes.models
+2024-11-08 14:13:12.946043 - Documented: reportes.views

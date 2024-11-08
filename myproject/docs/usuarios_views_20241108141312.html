@@ -37,25 +37,8 @@
         If the given user may log in, this method should return None.
         </li><li>get_user(self): No hay docstring disponible</li><li>get_invalid_login_error(self): No hay docstring disponible</li></ul><h2>ChangePasswordView</h2><p>
     Falta añadir comentarios[]][][][][]
-    </p><h3>Atributos:</h3><ul><li>template_name</li><li>success_message</li><li>success_url</li></ul><h3>Métodos:</h3><ul></ul><h2>Content</h2><p>Content(id, title, description, categoria, status, plantilla, created_at, updated_at, likes, dislikes)</p><h3>Atributos:</h3><ul><li>STATUS_CHOICES</li><li>title</li><li>description</li><li>categoria_id</li><li>categoria</li><li>status</li><li>get_status_display</li><li>plantilla_id</li><li>plantilla</li><li>created_at</li><li>get_next_by_created_at</li><li>get_previous_by_created_at</li><li>updated_at</li><li>get_next_by_updated_at</li><li>get_previous_by_updated_at</li><li>likes</li><li>dislikes</li><li>id</li><li>objects</li><li>blocks</li><li>comentarios</li><li>interactions</li><li>historial_set</li></ul><h3>Métodos:</h3><ul></ul><h2>CustomLoginView</h2><p>
-    Vista personalizada para el inicio de sesión de usuarios. 
-    Utiliza un formulario basado en `AuthenticationForm` para autenticar al usuario.
-    
-    Atributos:
-    - template_name: Nombre de la plantilla a utilizar para renderizar la vista de login.
-    - form_class: Clase del formulario que será utilizado (AuthenticationForm).
-    - success_url: URL a la que se redirige después de un inicio de sesión exitoso.
-
-    Métodos:
-    - form_valid: Si el formulario es válido, autentica y registra al usuario en la sesión.
-    </p><h3>Atributos:</h3><ul><li>template_name</li><li>success_url</li></ul><h3>Métodos:</h3><ul><li>form_valid(self, form): 
+    </p><h3>Atributos:</h3><ul><li>template_name</li><li>success_message</li><li>success_url</li></ul><h3>Métodos:</h3><ul></ul><h2>Content</h2><p>Content(id, title, description, categoria, autor, status, plantilla, created_at, updated_at, revision_started_at, revision_ended_at, published_started_at, likes, dislikes, numero_visitas, shared_count, inactivated_at)</p><h3>Atributos:</h3><ul><li>STATUS_CHOICES</li><li>title</li><li>description</li><li>categoria_id</li><li>categoria</li><li>autor_id</li><li>autor</li><li>status</li><li>get_status_display</li><li>plantilla_id</li><li>plantilla</li><li>created_at</li><li>get_next_by_created_at</li><li>get_previous_by_created_at</li><li>updated_at</li><li>get_next_by_updated_at</li><li>get_previous_by_updated_at</li><li>revision_started_at</li><li>revision_ended_at</li><li>published_started_at</li><li>likes</li><li>dislikes</li><li>numero_visitas</li><li>shared_count</li><li>inactivated_at</li><li>id</li><li>objects</li><li>blocks</li><li>comentarios</li><li>interactions</li><li>historial_set</li></ul><h3>Métodos:</h3><ul></ul><h2>CustomLoginView</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>template_name</li><li>success_url</li></ul><h3>Métodos:</h3><ul><li>form_valid(self, form): 
         Inicia sesión al usuario autenticado si el formulario es válido.
-
-        Parámetros:
-        - form (AuthenticationForm): El formulario de autenticación validado.
-
-        Retorna:
-        - HttpResponse: Redirige a la URL de éxito definida tras iniciar sesión.
         </li></ul><h2>CustomLogoutView</h2><p>
     Vista personalizada para cerrar la sesión del usuario.
     
@@ -66,30 +49,11 @@
     </p><h3>Atributos:</h3><ul><li>http_method_names</li><li>template_name</li><li>extra_context</li></ul><h3>Métodos:</h3><ul><li>dispatch(self, request, *args, **kwargs): No hay docstring disponible</li><li>post(self, request, *args, **kwargs): Logout may be done via POST.</li><li>get_default_redirect_url(self): Return the default redirect URL.</li><li>get_context_data(self, **kwargs): No hay docstring disponible</li></ul><h2>PasswordChangeView</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>success_url</li><li>template_name</li><li>title</li></ul><h3>Métodos:</h3><ul><li>dispatch(self, *args, **kwargs): No hay docstring disponible</li><li>get_form_kwargs(self): No hay docstring disponible</li><li>form_valid(self, form): No hay docstring disponible</li></ul><h2>PasswordResetView</h2><p>No hay docstring disponible</p><h3>Atributos:</h3><ul><li>email_template_name</li><li>extra_email_context</li><li>from_email</li><li>html_email_template_name</li><li>subject_template_name</li><li>success_url</li><li>template_name</li><li>title</li><li>token_generator</li></ul><h3>Métodos:</h3><ul><li>dispatch(self, *args, **kwargs): No hay docstring disponible</li><li>form_valid(self, form): No hay docstring disponible</li></ul><h2>RecuperarUsuario</h2><p>
     Falta añadir comentarios[]][][][][]
     </p><h3>Atributos:</h3><ul><li>template_name</li><li>email_template_name</li><li>subject_template_name</li><li>success_message</li><li>success_url</li></ul><h3>Métodos:</h3><ul></ul><h2>RegistroUsuarioForm</h2><p>
-    Formulario de registro de usuarios basado en un ModelForm.
-    Este formulario permite la creación de un nuevo usuario mediante
-    los campos especificados en el modelo `Usuario`.
-
-    Atributos:
-    - password: Campo de contraseña que utiliza un widget de tipo `PasswordInput` 
-      para ocultar la entrada de texto.
-
-    Meta:
-    - model: Especifica que el formulario está asociado con el modelo `Usuario`.
-    - fields: Define los campos que serán mostrados en el formulario: 
-      `username`, `email`, `nombre`, `apellido`, y `password`.
-
-    Métodos:
-    - clean_password: Valida que la contraseña no esté vacía. 
-      Si no se proporciona una contraseña, se lanza una `ValidationError`.
-    </p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul><li>clean_password(self): 
-        Verifica si el campo de contraseña ha sido completado correctamente.
-
-        Retorna:
-        - password (str): La contraseña validada.
-
-        Lanza:
-        - forms.ValidationError: Si no se proporciona ninguna contraseña.
+    Formulario de registro de usuarios con confirmación de contraseña.
+    </p><h3>Atributos:</h3><ul><li>declared_fields</li><li>media</li><li>base_fields</li></ul><h3>Métodos:</h3><ul><li>clean(self): 
+        Verifica que las contraseñas coincidan.
+        </li><li>clean_password(self): 
+        Verifica que se haya proporcionado una contraseña.
         </li></ul><h2>SuccessMessageMixin</h2><p>
     Add a success message on successful form submission.
     </p><h3>Atributos:</h3><ul><li>success_message</li></ul><h3>Métodos:</h3><ul><li>form_valid(self, form): No hay docstring disponible</li><li>get_success_message(self, cleaned_data): No hay docstring disponible</li></ul><h2>UpdateProfileForm</h2><p>

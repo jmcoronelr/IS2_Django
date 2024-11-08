@@ -174,7 +174,7 @@ if __name__ == "__main__":
     docs_dir = os.path.join(os.getcwd(), "docs")
 
     # Lista de aplicaciones Django
-    apps_list = ['Categorias', 'Plantillas', 'usuarios','content','roles']
+    apps_list = ['Categorias', 'Plantillas', 'usuarios','content','roles','reportes']
 
     generate_docs(apps_list, docs_dir)
     print(f"Documentación generada con éxito en {docs_dir}.")
