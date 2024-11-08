@@ -176,6 +176,13 @@
            alt="No me gusta" style="width: 30px; height: 30px; transform: rotate(180deg); filter: invert(100%);">
     </button>
     <span id="dislike-count">{{ content.dislikes }}</span>
+
+    {% load tiene_permiso %}
+    
+    {% if request.user|tiene_permiso:"Contenido: Compartir" %}
+        <!-- Botón de compartir -->
+        <button id="share-btn" class="btn btn-primary">Compartir</button>
+    {% endif %}
 </div>
 
   <!-- Sección de comentarios -->
@@ -237,6 +244,28 @@ document.addEventListener("DOMContentLoaded", function () {
             dislikeBtn.classList.toggle("active-dislike");
             likeBtn.classList.remove("active-like");
         });
+    });
+
+    const shareBtn = document.getElementById("share-btn");
+
+    // Agregar evento de clic al botón
+    shareBtn.addEventListener("click", function () {
+        // Crear un elemento de input temporal para copiar la URL
+        const tempInput = document.createElement("input");
+        tempInput.value = window.location.href;  // URL actual de la página
+        document.body.appendChild(tempInput);  // Añadir el input al DOM
+        tempInput.select();  // Seleccionar el texto en el input
+
+        // Intentar copiar el texto al portapapeles
+        const successful = document.execCommand("copy");  // Copiar al portapapeles
+        document.body.removeChild(tempInput);  // Eliminar el input temporal
+
+        // Mostrar mensaje según si la copia fue exitosa o no
+        if (successful) {
+            alert("URL copiada al portapapeles: " + tempInput.value);
+        } else {
+            alert("No se pudo copiar la URL. Intenta nuevamente.");
+        }
     });
 });
 </script>

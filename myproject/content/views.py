@@ -270,6 +270,9 @@ def content_detail(request, pk):
     else:
         form = ComentarioForm()
 
+    # Obtiene la URL completa del contenido
+    content_url = request.build_absolute_uri()
+
     return render(request, 'content/content_detail.html', {
         'content': content,
         'next_url': next_url,
@@ -277,6 +280,7 @@ def content_detail(request, pk):
         'user_interaction': user_interaction,
         'liked': liked,
         'disliked': disliked,
+        'content_url': content_url,
     })
 
 

@@ -28,6 +28,7 @@ class Content(models.Model):
     likes = models.PositiveIntegerField(default=0)
     dislikes = models.PositiveIntegerField(default=0)
     numero_visitas = models.PositiveIntegerField(default=0)
+    shared_count = models.IntegerField(default=0)
     inactivated_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
