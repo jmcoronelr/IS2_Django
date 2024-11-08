@@ -15,5 +15,5 @@ urlpatterns = [
     path('switch-state/<int:pk>/', views.cambiar_estado_contenido, name='switch_state'),
     path('like/<int:pk>/', views.like_content, name='like_content'),
     path('dislike/<int:pk>/', views.dislike_content, name='dislike_content'), 
-    path('share/<int:pk>/', views.share_content, name='share_content'),   
+    path('share/<int:content_id>/', views.share_content, name='share_content'),   
 ]

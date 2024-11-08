@@ -183,6 +183,7 @@ Reportes
         <option value="approved_posts">Publicaciones aprobadas</option>
         <option value="most_likes">Publicaciones con más likes</option>
         <option value="visited_post">Vistas de publicaciones</option>
+        <option value="most_shared_publicaciones">Publicaciones más compartidas</option>
         <option value="inactive_posts">Publicaciones inactivas</option>
       </optgroup>
     </select>
@@ -273,6 +274,8 @@ Reportes
         // Agregar manejo de paginación si es necesario
         const page = 1;  // Cambiar si se implementa paginación
         fetchUrl = `{% url 'reporte_visitas_json' %}${urlParams}&page=${page}`;
+    } else if (reportType === 'most_shared_publicaciones') {
+      fetchUrl = `{% url 'reporte_most_shared_json' %}${urlParams}`;
     } else if (reportType === 'inactive_posts') {
         fetchUrl = `{% url 'reporte_inactivos_json' %}${urlParams}`;
     } else {
@@ -348,7 +351,20 @@ Reportes
             `;
             reportBody.appendChild(row);
           });
-        } else if (reportType === 'inactive_posts') {
+        } else if(reportType === 'most_shared_publicaciones') {
+          tableHeaders.innerHTML = `
+            <th>Título del Artículo</th>
+            <th>Veces Compartido</th>
+          `;
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.title}</td>
+              <td>${item.shared_count}</td>
+            `;
+            reportBody.appendChild(row);
+          });
+      } else if (reportType === 'inactive_posts') {
           tableHeaders.innerHTML = `
             <th>Título de la Publicación</th>
             <th>Fecha de Inactivación</th>

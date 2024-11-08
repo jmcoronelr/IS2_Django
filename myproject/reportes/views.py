@@ -164,6 +164,25 @@ def reporte_visitas_json(request):
     return JsonResponse(data, safe=False)
 
 
+def reporte_most_shared_json(request):
+    start_date, end_date = obtener_fechas(request)
+
+    if start_date and end_date:
+        contenidos = Content.objects.filter(created_at__range=[start_date, end_date]).order_by('-shared_count')
+    else:
+        contenidos = Content.objects.all().order_by('-shared_count')
+
+    data = [
+        {
+            'title': contenido.title,
+            'shared_count': contenido.shared_count,
+        }
+        for contenido in contenidos
+    ]
+
+    return JsonResponse(data, safe=False)
+
+
 def reporte_inactivos_json(request):
     start_date, end_date = obtener_fechas(request)
 

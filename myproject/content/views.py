@@ -448,7 +448,13 @@ def cambiar_estado_contenido(request, pk, nuevo_estado):
     messages.success(request, f'El estado del contenido ha sido cambiado a {content.status}.')
     return redirect('content_list')
 
-
+@require_POST
+@login_required
+def share_content(request, content_id):
+    content = get_object_or_404(Content, pk=content_id)
+    content.shared_count += 1
+    content.save()
+    return JsonResponse({'shared_count': content.shared_count})
 
 @require_POST
 @login_required

@@ -8,4 +8,5 @@ urlpatterns = [
     path('publicados-json/', views.reporte_titulos_publicados_json, name='reporte_publicados_json'),
     path('reporte_visitas_json/', views.reporte_visitas_json, name='reporte_visitas_json'),
     path('reporte-inactivos-json/', views.reporte_inactivos_json, name='reporte_inactivos_json'),
+    path('most-shared-json/', views.reporte_most_shared_json, name='reporte_most_shared_json'),
 ]

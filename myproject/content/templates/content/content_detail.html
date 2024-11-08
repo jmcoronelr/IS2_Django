@@ -182,6 +182,7 @@
     {% if request.user|tiene_permiso:"Contenido: Compartir" %}
         <!-- Botón de compartir -->
         <button id="share-btn" class="btn btn-primary">Compartir</button>
+        <span id="shared-count">{{ content.shared_count }}</span>
     {% endif %}
 </div>
 
@@ -250,6 +251,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Agregar evento de clic al botón
     shareBtn.addEventListener("click", function () {
+        fetch("{% url 'share_content' content.pk %}", {
+          method: "POST",
+          headers: {
+              "X-CSRFToken": "{{ csrf_token }}",
+          },
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Actualiza el contador de compartidos en la interfaz, si tienes un elemento para mostrarlo
+          document.getElementById("shared-count").textContent = data.shared_count;
+      })
+      .catch(error => {
+          console.error("Error al compartir:", error);
+          alert("No se pudo compartir el contenido. Intenta nuevamente.");
+      });
         // Crear un elemento de input temporal para copiar la URL
         const tempInput = document.createElement("input");
         tempInput.value = window.location.href;  // URL actual de la página
