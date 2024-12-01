@@ -20,7 +20,7 @@ permisos = [
     {'nombre': 'Contenido: Compartir', 'descripcion': 'Permite compartir contenidos del sitio.'},
     {'nombre': 'Contenido: Comentar', 'descripcion': 'Permite realizar comentarios en los contenidos.'},
     {'nombre': 'Contenido: Crear', 'descripcion': 'Permite crear nuevos contenidos.'},
-    {'nombre': 'Contenido: Editar propio', 'descripcion': 'Permite al usuario editar sus propios contenidos.'},
+    {'nombre': 'Contenido: Editar', 'descripcion': 'Permite al usuario editar los contenidos.'},
     {'nombre': 'Contenido: Inactivar', 'descripcion': 'Permite marcar un contenido como inactivo, lo que lo oculta de la vista pública sin eliminarlo del sistema.'},
     {'nombre': 'Contenido: Publicar', 'descripcion': 'Permite publicar contenidos en el sitio web.'},
     {'nombre': 'Contenido: Eliminar', 'descripcion': 'Permite eliminar contenidos del sitio web.'},

@@ -21,10 +21,7 @@ roles_data = [
      'permisos': [
          {'nombre': 'Contenido: Compartir'},
          {'nombre': 'Contenido: Comentar'},
-         {'nombre': 'Contenido: Crear'},
-         {'nombre': 'Contenido: Editar propio'},
-         {'nombre': 'Contenido: Eliminar'},
-         {'nombre': 'Contenido: Ver historial'}
+         {'nombre': 'Contenido: Crear'}
         ]
     },
     {'nombre': 'Editor', 
@@ -33,7 +30,7 @@ roles_data = [
          {'nombre': 'Contenido: Compartir'},
          {'nombre': 'Contenido: Comentar'},
          {'nombre': 'Contenido: Crear'},
-         {'nombre': 'Contenido: Editar propio'},
+         {'nombre': 'Contenido: Editar'},
          {'nombre': 'Contenido: Eliminar'},
          {'nombre': 'Contenido: Ver historial'},
          {'nombre': 'Contenido: Mandar a revisión'}
@@ -45,7 +42,7 @@ roles_data = [
          {'nombre': 'Contenido: Compartir'},
          {'nombre': 'Contenido: Comentar'},
          {'nombre': 'Contenido: Crear'},
-         {'nombre': 'Contenido: Editar propio'},
+         {'nombre': 'Contenido: Editar'},
          {'nombre': 'Contenido: Eliminar'},
          {'nombre': 'Contenido: Ver historial'},
          {'nombre': 'Contenido: Mandar a revisión'},
