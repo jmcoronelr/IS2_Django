@@ -297,16 +297,12 @@
                         <div class="col-md-4 col-lg-3">
                             <div class="content-card">
                                 <div class="content-title">
-                                    {% if request.user|tiene_permiso:"Contenido: Ver historial"%}
                                     <a href="{% url 'historial_content' content.pk %}">
                                         <img src="https://static-00.iconduck.com/assets.00/history-icon-2048x1863-258qellh.png" 
                                             alt="Historia" class="history-icon" width="20" height="20">
-                                    </a>
-                                    {% endif %}                      
+                                    </a>                   
                                     {{ content.title }}
-                                    {% if request.user|tiene_permiso:"Contenido: Eliminar"%}
                                     <img src="https://static-00.iconduck.com/assets.00/delete-icon-1864x2048-bp2i0gor.png" alt="Eliminar" class="delete-icon" width="20" height="20" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-content-id="{{ content.pk }}">
-                                    {% endif %}   
                                 </div>
                                 <div class="content-info">
                                     <p>Categoría: {{ content.categoria.descripcionLarga }}</p>
@@ -314,12 +310,7 @@
                                 </div>
                                 <div class="content-actions">
                                     <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                                    {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
                                     <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
-                                    {% endif %}
-                                    {% if request.user|tiene_permiso:"Contenido: Inactivar" and content.status != 'inactive' %}
-                                    <a href="{% url 'switch_state' content.pk %}" class="btn btn-primary btn-sm">Inactivar</a>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -380,7 +371,7 @@
                                 </div>
                                 <div class="content-actions">
                                     <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                                    {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
+                                    {% if request.user|tiene_permiso:"Contenido: Editar"%}
                                     <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                                     {% endif %}
                                     {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}

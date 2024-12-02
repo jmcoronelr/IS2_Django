@@ -14,6 +14,9 @@ from content.models import UserInteraction
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.core.mail import send_mail
+
+import json
 
 def content_list(request):
     """
@@ -28,7 +31,7 @@ def content_list(request):
         categorias = Categorias.objects.all()
     else:
         permisos_requeridos = [
-            'Contenido: Editar propio', 'Contenido: Inactivar', 'Contenido: Publicar',
+            'Contenido: Editar', 'Contenido: Inactivar', 'Contenido: Publicar',
             'Contenido: Eliminar', 'Contenido: Ver historial', 'Contenido: Crear'
         ]
         roles_con_permisos = Rol.objects.filter(permisos__nombre__in=permisos_requeridos).values_list('id', flat=True)
@@ -77,18 +80,6 @@ def content_list(request):
         'categorias': categorias,
         'tab': tab,  # Pasar la pestaña activa al contexto
     })
-
-
-from django.core.mail import send_mail
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.core.mail import send_mail
-from django.utils import timezone
-from .forms import ContentForm
-from Plantillas.models import Plantilla
-from Categorias.models import Categorias
-from roles.models import RolEnCategoria, Rol
-import json
 
 def content_create_edit(request, pk=None):
     """
