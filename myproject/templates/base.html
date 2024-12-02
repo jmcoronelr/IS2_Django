@@ -77,6 +77,24 @@
             font-weight: 500;
         }
 
+        .dropdown-menu {
+            position: absolute; /* Asegura que el menú se posicione correctamente */
+            top: 100%; /* Desplaza el menú hacia abajo del botón de activación */
+            left: auto;
+            right: 0; /* Alinea el menú a la derecha */
+            z-index: 1050; /* Asegura que el menú esté por encima del contenido */
+            display: none; /* Oculto inicialmente */
+            opacity: 0; /* Transparente inicialmente */
+            visibility: hidden; /* No visible inicialmente */
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .dropdown-menu.show {
+            display: block; /* Garantiza que el menú sea visible cuando está desplegado */
+            opacity: 1; /* Hacerlo visible */
+            visibility: visible;
+        }
+
         .settings-icon {
             width: 24px;
             height: 24px;
