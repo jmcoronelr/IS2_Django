@@ -361,7 +361,7 @@
                                 </div>
                                 <div class="content-actions">
                                     <a href="{% url 'content_detail' content.pk %}" class="btn btn-primary btn-sm">Ver</a>
-                                    {% if request.user|tiene_permiso:"Contenido: Editar propio"%}
+                                    {% if request.user|tiene_permiso:"Contenido: Editar"%}
                                     <a href="{% url 'content_edit' content.pk %}?page={{ request.GET.page }}" class="btn btn-secondary btn-sm">Editar</a>
                                     {% endif %}
                                     {% if request.user|tiene_permiso:"Contenido: Publicar" and content.status != 'published' %}
