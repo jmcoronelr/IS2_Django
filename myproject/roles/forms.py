@@ -2,10 +2,13 @@ from django import forms
 from .models import Rol,Permiso
 from Categorias.models import Categorias
 
-
 class AsignarRolForm(forms.Form):
-    categoria = forms.ModelChoiceField(queryset=Categorias.objects.all(), label="Categoría")
+    categoria = forms.ModelChoiceField(
+        queryset=Categorias.objects.exclude(descripcionLarga="None"),  # Excluir la categoría con descripcionLarga = "None"
+        label="Categoría"
+    )
     rol = forms.ModelChoiceField(queryset=Rol.objects.all(), label="Rol")
+
 
 
 class CrearRolForm(forms.ModelForm):

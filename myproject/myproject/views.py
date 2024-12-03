@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from content.models import Content  # Importa tu modelo de contenido
-from Categorias.models import Categorias
-from django.template.loader import render_to_string
-from django.http import JsonResponse
+from roles.models import Categorias, RolEnCategoria,Rol
+from usuarios.models import Usuario
 
 def home(request):
     contenidos_publicados = Content.objects.filter(status='published').order_by('created_at')
@@ -37,6 +35,28 @@ def sistema(request):
 
     # Obtener el valor del orden desde la URL (ascendente por defecto)
     order = request.GET.get('order', 'asc')
+
+    # Verificar y asignar roles a usuarios con nombre '-'
+    usuarios_sin_nombre = Usuario.objects.filter(nombre='')
+    try:
+        rol_suscriptor = Rol.objects.get(nombre='Suscriptor')
+        categoria_none = Categorias.objects.get(descripcionLarga='None')
+
+        # Asignar el rol 'Suscriptor' en la categoría 'None' a cada usuario sin nombre
+        for usuario in usuarios_sin_nombre:
+            RolEnCategoria.objects.get_or_create(
+                usuario=usuario,
+                categoria=categoria_none,
+                defaults={'rol': rol_suscriptor}
+            )
+            print(f"Rol 'Suscriptor' asignado a {usuario.email} en la categoría 'None'.")
+    
+    except Rol.DoesNotExist:
+        print("Error: No se encontró el rol 'Suscriptor'.")
+    except Categorias.DoesNotExist:
+        print("Error: No se encontró la categoría 'None'.")
+    except Exception as e:
+        print(f"Error inesperado al asignar rol: {e}")
 
     # Filtramos los contenidos publicados
     contenidos_publicados = Content.objects.filter(status='published')

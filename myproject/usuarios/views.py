@@ -9,28 +9,18 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView
 from content.models import Content
-
+from roles.models import Rol, RolEnCategoria, Categorias
 from .forms import RegistroUsuarioForm, UpdateUserForm, UpdateProfileForm
 
 def google_login_redirect(request):
     return oauth2_login(request)
 
+
 def registrar_usuario(request):
     """
     Vista para registrar un nuevo usuario en el sistema.
-    
-    Si la solicitud es de tipo POST, se valida el formulario `RegistroUsuarioForm`.
-    Si el formulario es válido, el usuario se guarda en la base de datos después de
-    configurar su contraseña, y luego se redirige al usuario a la vista de login.
-    
-    Si la solicitud es GET, se renderiza el formulario vacío.
-
-    Parámetros:
-    - request (HttpRequest): Objeto que contiene los datos de la solicitud HTTP.
-
-    Retorna:
-    - HttpResponse: Renderiza la plantilla 'usuarios/registro.html' con el formulario
-      de registro, o redirige a la vista de login si el registro es exitoso.
+    Al registrar un usuario, se le asigna automáticamente el rol 'Suscriptor' 
+    en la categoría 'None'.
     """
     if request.method == 'POST':
         registro_form = RegistroUsuarioForm(request.POST)
@@ -40,6 +30,25 @@ def registrar_usuario(request):
             usuario = registro_form.save(commit=False)
             usuario.set_password(registro_form.cleaned_data['password'])
             usuario.save()
+            
+            # Asignar el rol 'Suscriptor' en la categoría 'None'
+            try:
+                # Obtener el rol y la categoría
+                rol_suscriptor = Rol.objects.get(nombre='Suscriptor')
+                categoria_none = Categorias.objects.get(descripcionLarga='None')
+                
+                # Crear la relación RolEnCategoria
+                RolEnCategoria.objects.create(
+                    usuario=usuario,
+                    categoria=categoria_none,
+                    rol=rol_suscriptor
+                )
+            except Rol.DoesNotExist:
+                print("Error: No se encontró el rol 'Suscriptor'.")
+            except Categorias.DoesNotExist:
+                print("Error: No se encontró la categoría 'None'.")
+            except Exception as e:
+                print(f"Error inesperado al asignar rol: {e}")
             
             return redirect('usuarios:login')  # Redirige a la vista de login
 
