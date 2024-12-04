@@ -186,7 +186,8 @@ def content_create_edit(request, pk=None):
                     if content_block.content_text != block.get('content'):
                         detalles_cambios.append("Se modificó el contenido de un bloque.")
                     multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
-                    if multimedia_file and content_block.multimedia != multimedia_file:
+                    if multimedia_file:
+                        content_block.multimedia = multimedia_file
                         detalles_cambios.append("Se actualizó el archivo multimedia de un bloque.")
                     content_block.block_type = block.get('type')
                     content_block.content_text = block.get('content')
@@ -194,8 +195,6 @@ def content_create_edit(request, pk=None):
                     content_block.left = block.get('left', '0px')
                     content_block.width = block.get('width', '200px')
                     content_block.height = block.get('height', '100px')
-                    if multimedia_file:
-                        content_block.multimedia = multimedia_file
                     content_block.save()
                 else:
                     # Nuevo bloque
@@ -206,11 +205,9 @@ def content_create_edit(request, pk=None):
                         top=block.get('top', '0px'),
                         left=block.get('left', '0px'),
                         width=block.get('width', '200px'),
-                        height=block.get('height', '100px')
+                        height=block.get('height', '100px'),
+                        multimedia=request.FILES.get(f"multimedia-{block.get('id')}", None) if block.get('type') == 'multimedia' else None,
                     )
-                    multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
-                    if multimedia_file:
-                        content_block.multimedia = multimedia_file
                     content_block.save()
                     detalles_cambios.append("Se añadió un nuevo bloque.")
                 block_ids.append(content_block.id)
@@ -260,6 +257,7 @@ def content_create_edit(request, pk=None):
         'blocks': blocks,
         'es_nuevo': es_nuevo
     })
+
 
 
 

@@ -35,6 +35,8 @@ class Content(models.Model):
         return self.title
 
 
+from cloudinary.models import CloudinaryField
+
 class ContentBlock(models.Model):
     BLOCK_TYPE_CHOICES = [
         ('texto', 'Texto'),
@@ -44,7 +46,7 @@ class ContentBlock(models.Model):
     content = models.ForeignKey(Content, on_delete=models.CASCADE, related_name='blocks')
     block_type = models.CharField(max_length=20, choices=BLOCK_TYPE_CHOICES)
     content_text = models.TextField(blank=True, null=True)  # Solo para bloques de texto
-    multimedia = models.FileField(upload_to='uploads/', null=True, blank=True)  # Para bloques de multimedia
+    multimedia = CloudinaryField('image', blank=True, null=True)  # Cambiado a CloudinaryField
     top = models.CharField(max_length=10, default='0px')
     left = models.CharField(max_length=10, default='0px')
     width = models.CharField(max_length=10, default='200px')
