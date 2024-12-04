@@ -255,9 +255,11 @@
                     <label for="categoria">Categoría</label>
                     <select name="categoria" id="categoria">
                         {% for categoria in categorias %}
-                            <option value="{{ categoria.id }}" {% if selected_categoria and selected_categoria.id == categoria.id %}selected{% endif %}>
-                                {{ categoria.descripcionLarga }}
-                            </option>
+                            {% if categorias|length >= 2 %}
+                                <option value="{{ categoria.id }}" {% if selected_categoria and selected_categoria.id == categoria.id %}selected{% endif %}>
+                                    {{ categoria.descripcionLarga }}
+                                </option>
+                            {% endif%}
                         {% endfor %}
                     </select>
                 </div>
@@ -347,6 +349,7 @@
 
     <script>
         let deleteMode = false;
+        let initialBlockData = []; // Estado inicial de los bloques al cargar la página
 
         function initializeExistingBlocks() {
             const blocks = document.querySelectorAll('.draggable');
@@ -355,6 +358,8 @@
                 makeDraggable(block);
                 makeResizable(block, resizeHandle);
             });
+            initialBlockData = getBlockData();
+
         }
 
         function addTextBlock() {
@@ -569,7 +574,17 @@
             input.type = 'hidden';
             input.name = 'block_data';
             input.value = JSON.stringify(blockData);
+
+            // Enviar estado inicial para comparar cambios
+            const initialInput = document.createElement('input');
+            initialInput.type = 'hidden';
+            initialInput.name = 'initial_block_data';
+            initialInput.value = JSON.stringify(initialBlockData);
+
+
             this.appendChild(input);
+            this.appendChild(initialInput);
+
         };
 
         // Inicializar los bloques existentes al cargar la página

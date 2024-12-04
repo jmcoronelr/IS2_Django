@@ -1,20 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
-from .models import Content
 from .forms import ContentForm, ComentarioForm
 import datetime
 from Plantillas.models import Plantilla  # Importa el modelo Plantilla
 from django.http import JsonResponse
 import json
 from .models import Content, ContentBlock
+from historial.models import Historial
 from Categorias.models import Categorias
 from roles.models import RolEnCategoria, Rol
-from historial.models import Historial
 from django.contrib import messages
 from content.models import UserInteraction
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.core.mail import send_mail
+
+import json
+
 def content_list(request):
     """
     Muestra una lista de contenidos, con la opción de filtrarlos por permisos, estado, categoría, fecha y título.
@@ -28,7 +31,7 @@ def content_list(request):
         categorias = Categorias.objects.all()
     else:
         permisos_requeridos = [
-            'Contenido: Editar propio', 'Contenido: Inactivar', 'Contenido: Publicar',
+            'Contenido: Editar', 'Contenido: Inactivar', 'Contenido: Publicar',
             'Contenido: Eliminar', 'Contenido: Ver historial', 'Contenido: Crear'
         ]
         roles_con_permisos = Rol.objects.filter(permisos__nombre__in=permisos_requeridos).values_list('id', flat=True)
@@ -78,33 +81,35 @@ def content_list(request):
         'tab': tab,  # Pasar la pestaña activa al contexto
     })
 
-
-from django.core.mail import send_mail
-
 def content_create_edit(request, pk=None):
     """
     Crea o edita un contenido.
 
     Si se proporciona una clave primaria (pk), se edita el contenido existente; de lo contrario, se crea uno nuevo.
-    Solo los superusuarios pueden ver todas las categorías; los demás usuarios ven categorías según sus roles.
-    Maneja la carga de bloques de contenido dinámicos y actualiza el historial de cambios del contenido.
-
-    Cuando se aprieta el boton editar entra a revision y ahi se guarda para el tema de los reportes
+    Actualiza el historial con detalles específicos de los cambios realizados.
     """
     if pk:
         content = get_object_or_404(Content, pk=pk)
         accion = 'editado'
-        old_status = content.status  # Guarda el estado anterior
-        es_nuevo = False  # Ya existe, por lo tanto, es una edición
+        old_title = content.title
+        old_description = content.description
+        old_status = content.status
+        old_categoria = content.categoria
+        old_plantilla = content.plantilla  # Guardar plantilla anterior
+        es_nuevo = False
         content.status = 'review'
-        # Verificar si revision_started_at está vacío y el contenido pasa a revisión
+
         if content.revision_started_at is None:
-            content.revision_started_at = timezone.now()        
+            content.revision_started_at = timezone.now()
     else:
         content = None
         accion = 'creado'
-        old_status = None  # No hay estado anterior si es nuevo
-        es_nuevo = True  # No existe, por lo tanto, es creación
+        old_title = None
+        old_description = None
+        old_status = None
+        old_categoria = None
+        old_plantilla = None
+        es_nuevo = True
 
     plantillas = Plantilla.objects.all()
 
@@ -124,14 +129,15 @@ def content_create_edit(request, pk=None):
         if form.is_valid():
             content = form.save(commit=False)
 
-            # Asigna el autor solo si es un contenido nuevo
             if not pk:
                 content.autor = request.user
 
             plantilla_id = request.POST.get('plantilla')
             if plantilla_id:
-                content.plantilla = Plantilla.objects.get(id=plantilla_id)
+                nueva_plantilla = Plantilla.objects.get(id=plantilla_id)
+                content.plantilla = nueva_plantilla
             else:
+                nueva_plantilla = None
                 content.plantilla = None
 
             categoria_id = request.POST.get('categoria')
@@ -140,21 +146,19 @@ def content_create_edit(request, pk=None):
             else:
                 content.categoria = None
 
-            new_status = content.status  # Guarda el nuevo estado
-            # Cambiar el estado del contenido basado en el botón presionado
+            new_status = content.status
             estado = request.POST.get('status')
             if estado == 'review':
-                content.estado = 'review'     # Cambia el estado a 'Revision'
+                content.estado = 'review'
             elif estado == 'published':
-                content.estado = 'published'    # Cambia el estado a "Publicado"
+                content.estado = 'published'
             elif estado == 'draft':
-                content.estado = 'draft'        # Cambia el estado a 'Borrador'
+                content.estado = 'draft'
             elif estado == 'inactive':
-                content.status = 'inactive'     # Cambia el estado a 'Inactivo'
+                content.status = 'inactive'
 
             content.save()
 
-            # Enviar correo solo si el estado ha cambiado
             if old_status and old_status != new_status:
                 send_mail(
                     subject=f'Actualización de estado para "{content.title}"',
@@ -166,36 +170,74 @@ def content_create_edit(request, pk=None):
 
             block_data = json.loads(request.POST.get('block_data', '[]'))
             block_ids = []
+            detalles_cambios = []
+
+            # Obtener los bloques existentes antes de guardar
+            existing_blocks = ContentBlock.objects.filter(content=content)
+            existing_blocks_dict = {str(block.id): block for block in existing_blocks}
 
             for block in block_data:
                 bloque_id = block.get('id')
-                if bloque_id:
-                    content_block = ContentBlock.objects.get(id=bloque_id)
+                if bloque_id and bloque_id in existing_blocks_dict:
+                    # Bloque existente: comprobar cambios
+                    content_block = existing_blocks_dict[bloque_id]
+                    if content_block.block_type != block.get('type'):
+                        detalles_cambios.append("Se cambió el tipo de un bloque.")
+                    if content_block.content_text != block.get('content'):
+                        detalles_cambios.append("Se modificó el contenido de un bloque.")
+                    multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
+                    if multimedia_file:
+                        content_block.multimedia = multimedia_file
+                        detalles_cambios.append("Se actualizó el archivo multimedia de un bloque.")
+                    content_block.block_type = block.get('type')
+                    content_block.content_text = block.get('content')
+                    content_block.top = block.get('top', '0px')
+                    content_block.left = block.get('left', '0px')
+                    content_block.width = block.get('width', '200px')
+                    content_block.height = block.get('height', '100px')
+                    content_block.save()
                 else:
-                    content_block = ContentBlock(content=content)
-
-                content_block.block_type = block.get('type')
-                content_block.content_text = block.get('content') if block.get('type') == 'texto' else None
-
-                multimedia_file = request.FILES.get(f"multimedia-{block.get('id')}", None)
-                if multimedia_file:
-                    content_block.multimedia = multimedia_file
-
-                content_block.top = block.get('top', '0px')
-                content_block.left = block.get('left', '0px')
-                content_block.width = block.get('width', '200px')
-                content_block.height = block.get('height', '100px')
-                content_block.save()
-
+                    # Nuevo bloque
+                    content_block = ContentBlock(
+                        content=content,
+                        block_type=block.get('type'),
+                        content_text=block.get('content') if block.get('type') == 'texto' else None,
+                        top=block.get('top', '0px'),
+                        left=block.get('left', '0px'),
+                        width=block.get('width', '200px'),
+                        height=block.get('height', '100px'),
+                        multimedia=request.FILES.get(f"multimedia-{block.get('id')}", None) if block.get('type') == 'multimedia' else None,
+                    )
+                    content_block.save()
+                    detalles_cambios.append("Se añadió un nuevo bloque.")
                 block_ids.append(content_block.id)
 
-            ContentBlock.objects.filter(content=content).exclude(id__in=block_ids).delete()
+            # Detectar bloques eliminados
+            deleted_blocks = existing_blocks.exclude(id__in=block_ids)
+            if deleted_blocks.exists():
+                detalles_cambios.append("Se eliminaron bloques de contenido.")
+
+            deleted_blocks.delete()
+
+            # Registrar cambios en el historial
+            if old_title and old_title != content.title:
+                detalles_cambios.append("Se cambió el título del contenido.")
+            if old_description and old_description != content.description:
+                detalles_cambios.append("Se actualizó la descripción del contenido.")
+            if old_categoria and old_categoria != content.categoria:
+                detalles_cambios.append("Se cambió la categoría del contenido.")
+            if old_plantilla != nueva_plantilla:
+                if nueva_plantilla:
+                    detalles_cambios.append(f"Se seleccionó la plantilla '{nueva_plantilla.descripcion}'.")
+                else:
+                    detalles_cambios.append("Se eliminó la plantilla seleccionada.")
 
             Historial.objects.create(
                 content=content,
                 user=request.user,
                 cambio=f"El contenido '{content.title}' fue {accion}.",
-                version=Historial.objects.filter(content=content).count() + 1
+                version=Historial.objects.filter(content=content).count() + 1,
+                accion_detalle="\n".join(detalles_cambios)
             )
 
             return redirect('content_list')
@@ -213,8 +255,12 @@ def content_create_edit(request, pk=None):
         'selected_plantilla': selected_plantilla,
         'selected_categoria': selected_categoria,
         'blocks': blocks,
-        'es_nuevo': es_nuevo  # Indicador de si es creación o edición
+        'es_nuevo': es_nuevo
     })
+
+
+
+
 
 
 

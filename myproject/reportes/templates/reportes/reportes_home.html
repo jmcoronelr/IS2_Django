@@ -171,13 +171,6 @@ Reportes
     <label for="report-type">Tipo de Reporte:</label>
     <select id="report-type" class="form-control">
       <option value="" disabled selected>Seleccione tipo de reporte</option>
-      <optgroup label="Reportes de Categorías">
-        <option value="most_visited">Categorías más visitadas</option>
-        <option value="most_shared">Categorías más compartidas</option>
-      </optgroup>
-      <optgroup label="Reportes de Usuarios">
-        <option value="top_contributors">Usuarios con más contribuciones</option>
-      </optgroup>
       <optgroup label="Reportes de Publicaciones">
         <option value="revision_time">Tiempo de Revisión</option>
         <option value="approved_posts">Publicaciones aprobadas</option>
@@ -188,23 +181,13 @@ Reportes
       </optgroup>
     </select>
 
-    <!-- Intervalo de Tiempo -->
-    <label for="time-interval">Intervalo de Tiempo:</label>
-    <select id="time-interval" class="form-control">
-      <option value="" disabled selected>Seleccione intervalo de tiempo</option>
-      <option value="year">Año</option>
-      <option value="month">Mes</option>
-      <option value="week">Semanas</option>
-      <option value="custom">Personalizado</option>
-    </select>
 
     <!-- Campos para rango de fechas personalizado -->
-    <label for="start-date" class="hidden date-label">Desde:</label>
-    <input type="date" id="start-date" class="form-control hidden">
+    <label for="start-date" class="date-label">Desde:</label>
+    <input type="date" id="start-date" class="form-control">
 
-    <label for="end-date" class="hidden date-label">Hasta:</label>
-    <input type="date" id="end-date" class="form-control hidden">
-
+    <label for="end-date" class="date-label">Hasta:</label>
+    <input type="date" id="end-date" class="form-control">
     <!-- Botón de Generar -->
     <button id="generate-report" class="btn btn-primary">Generar Reporte</button>
   </div>
@@ -227,24 +210,19 @@ Reportes
 
 <script>
   // Mostrar campos de fecha solo cuando se selecciona "Personalizado"
-  document.getElementById('time-interval').addEventListener('change', function() {
-    const startDate = document.getElementById('start-date');
-    const endDate = document.getElementById('end-date');
-    const startDateLabel = document.querySelector('label[for="start-date"]');
-    const endDateLabel = document.querySelector('label[for="end-date"]');
+  document.addEventListener('DOMContentLoaded', function() {
+  const startDate = document.getElementById('start-date');
+  const endDate = document.getElementById('end-date');
+  const startDateLabel = document.querySelector('label[for="start-date"]');
+  const endDateLabel = document.querySelector('label[for="end-date"]');
 
-    if (this.value === 'custom') {
-      startDate.classList.remove('hidden');
-      endDate.classList.remove('hidden');
-      startDateLabel.classList.remove('hidden');
-      endDateLabel.classList.remove('hidden');
-    } else {
-      startDate.classList.add('hidden');
-      endDate.classList.add('hidden');
-      startDateLabel.classList.add('hidden');
-      endDateLabel.classList.add('hidden');
-    }
-  });
+  // Mostrar los campos de fecha al cargar la página
+  startDate.classList.remove('hidden');
+  endDate.classList.remove('hidden');
+  startDateLabel.classList.remove('hidden');
+  endDateLabel.classList.remove('hidden');
+});
+
 
   // Event Listener para el botón de generar reporte
   document.getElementById('generate-report').addEventListener('click', function() {
