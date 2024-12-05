@@ -206,7 +206,7 @@ def content_create_edit(request, pk=None):
                         left=block.get('left', '0px'),
                         width=block.get('width', '200px'),
                         height=block.get('height', '100px'),
-                        multimedia=request.FILES.get(f"multimedia-{block.get('id')}", None) if block.get('type') == 'multimedia' else None,
+                        multimedia=request.FILES.get(f"multimedia", None) if block.get('type') == 'multimedia' else None,
                     )
                     content_block.save()
                     detalles_cambios.append("Se añadió un nuevo bloque.")
